@@ -1,0 +1,16 @@
+# Node & Client
+client/node_modules/
+client/dist/
+
+# Maven & Java
+server/target/
+server/data/
+*.class
+
+# IDE & OS
+.idea/
+*.iml
+.vscode/
+Thumbs.db
+[Dd]esktop.ini
+*.log
