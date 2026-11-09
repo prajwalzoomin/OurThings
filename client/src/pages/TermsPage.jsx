@@ -21,15 +21,15 @@ export default function TermsPage() {
       <div
         style={{
           padding: '0.75rem 1rem',
-          backgroundColor: '#eff6ff',
-          border: '1px solid #bfdbfe',
+          backgroundColor: 'var(--color-surface-hover)',
+          border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-md)',
           marginBottom: '1.5rem',
           fontSize: '0.85rem',
-          color: '#1e40af',
+          color: 'var(--color-text-secondary)',
         }}
       >
-        <strong>Operational Framework:</strong> This platform enforces non-commercial, peer-to-peer resource sharing scoped strictly to verified community groups (hostels, apartment complexes, neighbourhoods).
+        <strong style={{ color: 'var(--color-text-primary)' }}>Operational Framework:</strong> This platform enforces non-commercial, peer-to-peer resource sharing scoped strictly to verified community groups (hostels, apartment complexes, neighbourhoods).
       </div>
 
       <div style={{ lineHeight: 1.7, color: 'var(--color-text-secondary)', fontSize: '0.925rem' }}>

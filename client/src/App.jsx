@@ -52,7 +52,7 @@ function AppContent() {
       {/* Quick Demo Workflow Guidance Subbar */}
       <div
         style={{
-          backgroundColor: '#f8fafc',
+          backgroundColor: 'var(--color-surface-subtle)',
           borderBottom: '1px solid var(--color-border)',
           padding: '0.35rem 1.25rem',
           fontSize: '0.785rem',
@@ -61,7 +61,7 @@ function AppContent() {
       >
         <div
           style={{
-            maxWidth: '1200px',
+            maxWidth: '1380px',
             margin: '0 auto',
             display: 'flex',
             justifyContent: 'space-between',

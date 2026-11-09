@@ -21,12 +21,12 @@ export default function PrivacyPage() {
       <div
         style={{
           padding: '0.75rem 1rem',
-          backgroundColor: '#f0fdf4',
-          border: '1px solid #bbf7d0',
+          backgroundColor: 'var(--color-surface-hover)',
+          border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-md)',
           marginBottom: '1.5rem',
           fontSize: '0.85rem',
-          color: '#166534',
+          color: 'var(--color-text-secondary)',
         }}
       >
         <strong>Sensitive Item Protection:</strong> Healthcare equipment requests (crutches, wheelchairs, blood pressure monitors) receive special privacy handling to protect member dignity and confidentiality.

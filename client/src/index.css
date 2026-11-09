@@ -51,11 +51,12 @@
   --badge-slate-text: #334155;
   --badge-slate-border: #cbd5e1;
 
-  /* Rounded corners */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* Clean, restrained desktop border radii */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
   --radius-full: 9999px;
 
   /* Elevated Soft Shadows */
@@ -67,58 +68,58 @@
 }
 
 /* ==========================================================================
-   Dark Theme Design System (Default Mode)
+   Complete Dark Theme (Matte, subtle, minimalist, zero neon vibe-coding)
    ========================================================================== */
 [data-theme='dark'],
 :root[data-theme='dark'] {
-  --color-canvas: #090d16;
-  --color-surface: #111827;
-  --color-surface-hover: #1f2937;
-  --color-surface-subtle: #162032;
+  --color-canvas: #0a0a0c;
+  --color-surface: #121316;
+  --color-surface-hover: #191a1f;
+  --color-surface-subtle: #0e0f12;
 
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  --color-text-inverted: #0f172a;
+  --color-text-primary: #ededef;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: #6b7280;
+  --color-text-inverted: #0a0a0c;
 
   --color-brand: #10b981;
-  --color-brand-hover: #34d399;
-  --color-brand-active: #059669;
-  --color-brand-light: rgba(16, 185, 129, 0.15);
-  --color-brand-border: rgba(16, 185, 129, 0.35);
+  --color-brand-hover: #059669;
+  --color-brand-active: #047857;
+  --color-brand-light: rgba(16, 185, 129, 0.12);
+  --color-brand-border: rgba(16, 185, 129, 0.25);
 
-  --color-slate-dark: #f8fafc;
-  --color-slate-hover: #e2e8f0;
+  --color-slate-dark: #ededef;
+  --color-slate-hover: #e5e7eb;
 
-  --color-border: #1e293b;
-  --color-border-subtle: #1e293b;
+  --color-border: #22242a;
+  --color-border-subtle: #1a1b21;
   --color-border-focus: #10b981;
 
-  --badge-green-bg: rgba(16, 185, 129, 0.16);
+  --badge-green-bg: rgba(16, 185, 129, 0.12);
   --badge-green-text: #34d399;
-  --badge-green-border: rgba(52, 211, 153, 0.3);
+  --badge-green-border: rgba(52, 211, 153, 0.25);
 
-  --badge-blue-bg: rgba(59, 130, 246, 0.16);
+  --badge-blue-bg: rgba(59, 130, 246, 0.12);
   --badge-blue-text: #60a5fa;
-  --badge-blue-border: rgba(96, 165, 250, 0.3);
+  --badge-blue-border: rgba(96, 165, 250, 0.25);
 
-  --badge-amber-bg: rgba(245, 158, 11, 0.16);
+  --badge-amber-bg: rgba(245, 158, 11, 0.12);
   --badge-amber-text: #fbbf24;
-  --badge-amber-border: rgba(251, 191, 36, 0.3);
+  --badge-amber-border: rgba(251, 191, 36, 0.25);
 
-  --badge-rose-bg: rgba(244, 63, 94, 0.16);
+  --badge-rose-bg: rgba(244, 63, 94, 0.12);
   --badge-rose-text: #fb7185;
-  --badge-rose-border: rgba(251, 113, 133, 0.3);
+  --badge-rose-border: rgba(251, 113, 133, 0.25);
 
-  --badge-slate-bg: rgba(100, 116, 139, 0.16);
-  --badge-slate-text: #cbd5e1;
-  --badge-slate-border: rgba(148, 163, 184, 0.25);
+  --badge-slate-bg: rgba(100, 116, 139, 0.12);
+  --badge-slate-text: #9ca3af;
+  --badge-slate-border: rgba(156, 163, 175, 0.2);
 
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
-  --shadow-hover: 0 14px 32px -4px rgba(0, 0, 0, 0.55);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 10px -1px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.55);
+  --shadow-hover: 0 14px 28px -4px rgba(0, 0, 0, 0.65);
 }
 
 *,
@@ -278,8 +279,8 @@ p {
 }
 
 [data-theme='dark'] .site-header {
-  background: rgba(17, 24, 39, 0.92);
-  border-bottom: 1px solid rgba(30, 41, 59, 0.9);
+  background: rgba(18, 19, 22, 0.94);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header-inner {
@@ -299,17 +300,17 @@ p {
 }
 
 .brand-logo-icon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  width: 34px;
+  height: 34px;
+  background: var(--color-brand);
   color: #ffffff;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1.15rem;
-  box-shadow: 0 4px 10px -2px rgba(5, 150, 105, 0.35);
+  font-size: 1.05rem;
+  box-shadow: var(--shadow-xs);
 }
 
 .brand-text-block {
@@ -318,7 +319,7 @@ p {
 }
 
 .brand-title {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--color-text-primary);
@@ -327,51 +328,69 @@ p {
 }
 
 .brand-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   color: var(--color-text-muted);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-/* Nav Pills */
+/* Main Navigation Bar (Clean desktop taskbar inspired, non-capsule) */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  background-color: var(--color-canvas);
-  padding: 0.25rem;
-  border-radius: var(--radius-full);
+  gap: 0.2rem;
+  background-color: var(--color-surface);
+  padding: 0.2rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
 }
 
 .nav-pill {
   font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.825rem;
+  font-weight: 500;
   color: var(--color-text-secondary);
   background: transparent;
   border: none;
-  padding: 0.45rem 0.95rem;
-  border-radius: var(--radius-full);
+  padding: 0.42rem 0.85rem 0.52rem 0.85rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
   text-decoration: none;
   white-space: nowrap;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-pill:hover {
   color: var(--color-text-primary);
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: var(--color-surface-hover);
 }
 
 .nav-pill.active {
-  color: #ffffff;
-  background-color: var(--color-slate-dark);
-  box-shadow: var(--shadow-sm);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-hover);
+  font-weight: 600;
+}
+
+/* Windows Taskbar Active Window Indicator Dot */
+.nav-pill.active::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--color-brand);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
 }
 
 [data-theme='dark'] .nav-links {
-  background-color: var(--color-surface-subtle);
+  background-color: var(--color-surface);
   border-color: var(--color-border);
 }
 
@@ -381,30 +400,30 @@ p {
 }
 
 [data-theme='dark'] .nav-pill.active {
-  background-color: var(--color-brand);
-  color: #ffffff;
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-primary);
 }
 
 .nav-cta-btn {
   background-color: var(--color-brand);
   color: #ffffff !important;
   font-weight: 600;
-  border-radius: var(--radius-full);
-  padding: 0.5rem 1.1rem;
-  box-shadow: 0 2px 8px -1px rgba(5, 150, 105, 0.35);
-  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  padding: 0.42rem 0.95rem;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+  font-size: 0.825rem;
 }
 
 .nav-cta-btn:hover {
   background-color: var(--color-brand-hover) !important;
-  transform: translateY(-1px);
 }
 
 /* Minimalist Animated Theme Toggle */
 .theme-toggle-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-full);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -412,7 +431,7 @@ p {
   background-color: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   box-shadow: var(--shadow-xs);
   padding: 0;
   outline: none;
@@ -421,67 +440,65 @@ p {
 .theme-toggle-btn:hover {
   background-color: var(--color-surface-hover);
   color: var(--color-brand);
-  border-color: var(--color-brand-border);
-  transform: scale(1.06);
+  border-color: var(--color-border-focus);
 }
 
 .theme-toggle-btn:active {
-  transform: scale(0.94);
+  transform: scale(0.95);
 }
 
 .theme-toggle-icon {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s ease;
 }
 
 .theme-toggle-btn:hover .theme-toggle-icon {
-  transform: rotate(30deg) scale(1.1);
+  transform: rotate(25deg);
 }
 
 [data-theme='dark'] .theme-toggle-btn {
-  background-color: #1e293b;
-  border-color: #334155;
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
   color: #fbbf24;
 }
 
 [data-theme='dark'] .theme-toggle-btn:hover {
-  background-color: #334155;
+  background-color: var(--color-surface-hover);
   color: #fde047;
   border-color: #f59e0b;
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
 }
 
-/* Hero Section */
+/* Hero Section (Solid Matte Dark - No Neon Vibe Gradients) */
 .hero-container {
-  background: radial-gradient(circle at 10% 20%, rgba(236, 253, 245, 0.8) 0%, rgba(248, 250, 252, 0.5) 90%);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  padding: 3.5rem 2rem 2.5rem 2rem;
-  margin-bottom: 2.5rem;
+  padding: 2.75rem 2rem 2.25rem 2rem;
+  margin-bottom: 2rem;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: background 0.3s ease, border-color 0.3s ease;
+  box-shadow: var(--shadow-xs);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 [data-theme='dark'] .hero-container {
-  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0.8) 90%), #111827;
+  background: var(--color-surface);
   border-color: var(--color-border);
 }
 
 .hero-tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-brand-border);
+  gap: 0.45rem;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
   color: var(--color-brand);
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.35rem 0.85rem;
-  border-radius: var(--radius-full);
+  font-size: 0.725rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
   margin-bottom: 1.25rem;
-  box-shadow: var(--shadow-xs);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
@@ -806,25 +823,27 @@ p {
 }
 
 .btn-secondary {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
-  border-color: var(--color-border);
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-xs);
 }
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--color-surface-hover);
-  border-color: #cbd5e1;
+  border-color: var(--color-border-focus);
+  color: var(--color-text-primary);
 }
 
 .btn-danger {
-  background-color: #ffffff;
-  color: #e11d48;
-  border-color: #fecdd3;
+  background-color: var(--color-surface);
+  color: #ef4444;
+  border: 1px solid var(--color-border);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #fff1f2;
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
 }
 
 .btn-sm {
@@ -891,9 +910,9 @@ p {
 }
 
 .status-active {
-  background-color: #f0fdf4;
-  color: #15803d;
-  border-color: #bbf7d0;
+  background-color: var(--badge-green-bg);
+  color: var(--badge-green-text);
+  border-color: var(--badge-green-border);
 }
 
 .status-active::before {
@@ -914,12 +933,15 @@ p {
 .status-inactive,
 .status-withdrawn,
 .status-declined {
-  background-color: #f1f5f9;
-  color: #64748b;
-  border-color: #e2e8f0;
+  background-color: var(--badge-slate-bg);
+  color: var(--badge-slate-text);
+  border-color: var(--badge-slate-border);
 }
 
-.status-paused::before {
+.status-paused::before,
+.status-inactive::before,
+.status-withdrawn::before,
+.status-declined::before {
   background-color: #94a3b8;
 }
 
@@ -1089,12 +1111,13 @@ p {
 
 /* Impact Dashboard Highlights */
 .impact-banner {
-  background: linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%);
-  color: #ffffff;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
   border-radius: var(--radius-xl);
-  padding: 2.25rem 2rem;
+  padding: 2rem 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+  box-shadow: var(--shadow-xs);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1107,7 +1130,7 @@ p {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  color: #a7f3d0;
+  color: var(--color-brand);
 }
 
 /* Footer */
@@ -1144,310 +1167,15 @@ p {
   color: var(--color-text-primary);
 }
 
-/* ==========================================================================
-   Amazon / Flipkart / Zomato Inspired Modern E-Commerce Item Cards
-   ========================================================================== */
 
-.ecom-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: 1.5rem;
-}
 
-@media (max-width: 640px) {
-  .ecom-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
-.ecom-product-card {
-  background-color: #ffffff;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.06), 0 1px 3px 0 rgba(15, 23, 42, 0.04);
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  position: relative;
-}
 
-.ecom-product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
-  border-color: #cbd5e1;
-}
 
-/* Media Box with aspect ratio */
-.ecom-media-box {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background-color: #f1f5f9;
-}
 
-.ecom-product-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease, opacity 0.25s ease;
-  display: block;
-}
 
-.ecom-product-img.loading {
-  opacity: 0;
-}
 
-.ecom-product-img.loaded {
-  opacity: 1;
-}
 
-.ecom-product-card:hover .ecom-product-img {
-  transform: scale(1.06);
-}
-
-.ecom-fallback-img {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--color-text-muted);
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 1.5rem;
-  text-align: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-}
-
-/* Floating Badges on Image (Zomato / Flipkart style) */
-.ecom-badge-top-left {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--radius-full);
-  font-size: 0.725rem;
-  font-weight: 700;
-  color: #065f46;
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.ecom-badge-top-right {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.ecom-badge-bottom-left {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  z-index: 2;
-  background: rgba(15, 23, 42, 0.78);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: #ffffff;
-  padding: 0.25rem 0.55rem;
-  border-radius: 6px;
-  font-size: 0.725rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  max-width: 65%;
-}
-
-.ecom-location-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ecom-badge-bottom-right {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  z-index: 2;
-  background: #059669;
-  color: #ffffff;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.725rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.ecom-star-icon {
-  color: #fde047;
-  font-size: 0.8rem;
-}
-
-/* Card Body Section */
-.ecom-card-body {
-  padding: 1.1rem 1.15rem 1.15rem 1.15rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.ecom-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1.35;
-  margin: 0 0 0.35rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 2.7rem;
-  transition: color 0.15s ease;
-}
-
-.ecom-product-card:hover .ecom-title {
-  color: var(--color-brand);
-}
-
-.ecom-lender-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.785rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.55rem;
-}
-
-.ecom-lender-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ecom-owner-tag {
-  background-color: var(--color-brand-light);
-  color: var(--color-brand);
-  font-weight: 700;
-  font-size: 0.7rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: var(--radius-full);
-}
-
-.ecom-description {
-  font-size: 0.825rem;
-  color: #64748b;
-  line-height: 1.45;
-  margin: 0 0 0.75rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.ecom-delivery-timeline {
-  background: #f8fafc;
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.65rem;
-  font-size: 0.775rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.95rem;
-}
-
-.ecom-timeline-info {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.ecom-booking-notice {
-  margin-top: 0.3rem;
-  color: #b45309;
-  font-size: 0.725rem;
-  font-weight: 600;
-}
-
-/* Card Pricing & CTA Footer (Amazon/Flipkart Style) */
-.ecom-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  border-top: 1px solid var(--color-border);
-  padding-top: 0.75rem;
-  margin-top: auto;
-}
-
-.ecom-price-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.ecom-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
-}
-
-.ecom-free-badge {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--color-brand);
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.ecom-price-sub {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.ecom-avoided-cost {
-  font-size: 0.725rem;
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.ecom-avoided-label {
-  color: var(--color-text-muted);
-}
-
-.ecom-avoided-val {
-  font-weight: 700;
-  color: #334155;
-  text-decoration: line-through;
-}
-
-.ecom-avoided-tag {
-  color: #059669;
-  font-weight: 600;
-  font-size: 0.7rem;
-}
-
-.ecom-cta-btn {
-  padding: 0.45rem 0.9rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-}
 
 /* ==========================================================================
    Compact Resource Cards (Tidy, sleek, strictly truncated with "...")
@@ -1768,9 +1496,9 @@ p {
 }
 
 [data-theme='dark'] .zen-glance-panel {
-  background-color: #111827;
-  border-color: #1e293b;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 @keyframes zenPanelSlide {
@@ -1794,8 +1522,8 @@ p {
 }
 
 [data-theme='dark'] .zen-glance-header {
-  background-color: #162032;
-  border-bottom-color: #1e293b;
+  background-color: var(--color-surface-hover);
+  border-bottom-color: var(--color-border);
 }
 
 .zen-glance-title-group {
@@ -1854,14 +1582,14 @@ p {
 }
 
 [data-theme='dark'] .zen-glance-btn-expand {
-  background-color: #1f2937;
-  border-color: #374151;
-  color: #f8fafc;
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
 }
 
 [data-theme='dark'] .zen-glance-btn-expand:hover {
-  background-color: #374151;
-  color: #34d399;
+  background-color: var(--color-surface-hover);
+  color: var(--color-brand);
 }
 
 .zen-glance-btn-close {
@@ -1907,7 +1635,7 @@ p {
 }
 
 [data-theme='dark'] .zen-glance-media {
-  background-color: #0b0f19;
+  background-color: var(--color-surface-subtle);
 }
 
 .zen-glance-img {
@@ -1940,9 +1668,9 @@ p {
 }
 
 [data-theme='dark'] .zen-glance-category {
-  background: rgba(17, 24, 39, 0.94);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(18, 19, 22, 0.94);
+  color: var(--color-brand);
+  border: 1px solid var(--color-border);
 }
 
 .zen-glance-media-bottom {
@@ -2035,9 +1763,9 @@ p {
 }
 
 [data-theme='dark'] .zen-glance-dates-bar {
-  background-color: #162032;
-  border-color: #1e293b;
-  color: #cbd5e1;
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .zen-glance-conflict-tag {

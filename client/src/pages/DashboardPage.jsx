@@ -82,26 +82,26 @@ export default function DashboardPage() {
       {/* Avoided Community Expenditure Hero Banner */}
       <div className="impact-banner">
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', backgroundColor: 'rgba(255,255,255,0.15)', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.65rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', color: 'var(--color-brand)', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.65rem' }}>
             <span>🌱</span>
             <span>Estimated Avoided Expenditure</span>
           </div>
           <div className="impact-amount">
-            {hasAvoidedExp ? `Rs ${Number(data.avoidedExpenditureEstimateInr).toLocaleString('en-IN')}` : 'Rs 0'}
+            {hasAvoidedExp ? `₹${Number(data.avoidedExpenditureEstimateInr).toLocaleString('en-IN')}` : '₹0'}
           </div>
-          <p style={{ color: '#d1fae5', fontSize: '0.875rem', maxWidth: '650px', margin: '0.5rem 0 0 0', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem', maxWidth: '650px', margin: '0.5rem 0 0 0', lineHeight: 1.5 }}>
             <strong>Calculation Method:</strong> {data.avoidedExpenditureExplanation}
           </p>
         </div>
 
-        <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-lg)', minWidth: '180px', textAlign: 'center' }}>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#a7f3d0', fontWeight: 600 }}>
+        <div style={{ backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-md)', minWidth: '180px', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600 }}>
             Resource Utilization
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.25rem', color: '#ffffff' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--color-text-primary)' }}>
             {data.utilizationRatePercent}%
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#d1fae5', marginTop: '0.15rem' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.15rem' }}>
             {data.totalDaysBorrowed} days actively loaned
           </div>
         </div>
@@ -276,11 +276,8 @@ export default function DashboardPage() {
                     </td>
                     <td>
                       <span
-                        className="status-pill"
+                        className="status-pill status-paused"
                         style={{
-                          backgroundColor: '#f1f5f9',
-                          color: '#334155',
-                          borderColor: '#cbd5e1',
                           fontSize: '0.725rem',
                         }}
                       >
