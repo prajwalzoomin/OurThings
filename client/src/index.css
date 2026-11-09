@@ -66,11 +66,14 @@
   --shadow-hover: 0 14px 32px -4px rgba(15, 23, 42, 0.1), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   background-color: var(--color-canvas);
@@ -99,7 +102,12 @@ a:hover {
   color: var(--color-brand-hover);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--color-text-primary);
   font-weight: 700;
   line-height: 1.25;
@@ -108,10 +116,21 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-h1 { font-size: 1.85rem; }
-h2 { font-size: 1.4rem; }
-h3 { font-size: 1.15rem; }
-h4 { font-size: 1rem; }
+h1 {
+  font-size: 1.85rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+}
+
+h4 {
+  font-size: 1rem;
+}
 
 p {
   margin-top: 0;
@@ -713,49 +732,73 @@ p {
   color: var(--badge-green-text);
   border-color: var(--badge-green-border);
 }
-.status-available::before { background-color: #10b981; }
+
+.status-available::before {
+  background-color: #10b981;
+}
 
 .status-pending {
   background-color: var(--badge-amber-bg);
   color: var(--badge-amber-text);
   border-color: var(--badge-amber-border);
 }
-.status-pending::before { background-color: #f59e0b; }
+
+.status-pending::before {
+  background-color: #f59e0b;
+}
 
 .status-approved {
   background-color: var(--badge-blue-bg);
   color: var(--badge-blue-text);
   border-color: var(--badge-blue-border);
 }
-.status-approved::before { background-color: #3b82f6; }
+
+.status-approved::before {
+  background-color: #3b82f6;
+}
 
 .status-active {
   background-color: #f0fdf4;
   color: #15803d;
   border-color: #bbf7d0;
 }
-.status-active::before { background-color: #22c55e; }
+
+.status-active::before {
+  background-color: #22c55e;
+}
 
 .status-returned {
   background-color: var(--badge-slate-bg);
   color: var(--badge-slate-text);
   border-color: var(--badge-slate-border);
 }
-.status-returned::before { background-color: #64748b; }
 
-.status-paused, .status-inactive, .status-withdrawn, .status-declined {
+.status-returned::before {
+  background-color: #64748b;
+}
+
+.status-paused,
+.status-inactive,
+.status-withdrawn,
+.status-declined {
   background-color: #f1f5f9;
   color: #64748b;
   border-color: #e2e8f0;
 }
-.status-paused::before { background-color: #94a3b8; }
+
+.status-paused::before {
+  background-color: #94a3b8;
+}
 
 .status-issue {
   background-color: var(--badge-rose-bg);
   color: var(--badge-rose-text);
   border-color: var(--badge-rose-border);
 }
-.status-issue::before { background-color: #e11d48; }
+
+.status-issue::before {
+  background-color: #e11d48;
+}
 
 /* Modern Forms */
 .form-group {
@@ -776,7 +819,9 @@ p {
   margin-top: 0.3rem;
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input,
+.form-select,
+.form-textarea {
   width: 100%;
   font-family: var(--font-sans);
   font-size: 0.925rem;
@@ -788,7 +833,9 @@ p {
   transition: all 0.15s ease;
 }
 
-.form-input:focus, .form-select:focus, .form-textarea:focus {
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
   border-color: var(--color-brand);
   outline: none;
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
@@ -961,4 +1008,309 @@ p {
 
 .footer-nav a:hover {
   color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   Amazon / Flipkart / Zomato Inspired Modern E-Commerce Item Cards
+   ========================================================================== */
+
+.ecom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .ecom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ecom-product-card {
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.06), 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.ecom-product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+  border-color: #cbd5e1;
+}
+
+/* Media Box with aspect ratio */
+.ecom-media-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+
+.ecom-product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease, opacity 0.25s ease;
+  display: block;
+}
+
+.ecom-product-img.loading {
+  opacity: 0;
+}
+
+.ecom-product-img.loaded {
+  opacity: 1;
+}
+
+.ecom-product-card:hover .ecom-product-img {
+  transform: scale(1.06);
+}
+
+.ecom-fallback-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 1.5rem;
+  text-align: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* Floating Badges on Image (Zomato / Flipkart style) */
+.ecom-badge-top-left {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #065f46;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ecom-badge-top-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ecom-badge-bottom-left {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.725rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 65%;
+}
+
+.ecom-location-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ecom-badge-bottom-right {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+  background: #059669;
+  color: #ffffff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.725rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.ecom-star-icon {
+  color: #fde047;
+  font-size: 0.8rem;
+}
+
+/* Card Body Section */
+.ecom-card-body {
+  padding: 1.1rem 1.15rem 1.15rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.ecom-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+  margin: 0 0 0.35rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7rem;
+  transition: color 0.15s ease;
+}
+
+.ecom-product-card:hover .ecom-title {
+  color: var(--color-brand);
+}
+
+.ecom-lender-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.785rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.55rem;
+}
+
+.ecom-lender-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ecom-owner-tag {
+  background-color: var(--color-brand-light);
+  color: var(--color-brand);
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-full);
+}
+
+.ecom-description {
+  font-size: 0.825rem;
+  color: #64748b;
+  line-height: 1.45;
+  margin: 0 0 0.75rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ecom-delivery-timeline {
+  background: #f8fafc;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.775rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.95rem;
+}
+
+.ecom-timeline-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ecom-booking-notice {
+  margin-top: 0.3rem;
+  color: #b45309;
+  font-size: 0.725rem;
+  font-weight: 600;
+}
+
+/* Card Pricing & CTA Footer (Amazon/Flipkart Style) */
+.ecom-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+  margin-top: auto;
+}
+
+.ecom-price-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.ecom-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.ecom-free-badge {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-brand);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.ecom-price-sub {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.ecom-avoided-cost {
+  font-size: 0.725rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.ecom-avoided-label {
+  color: var(--color-text-muted);
+}
+
+.ecom-avoided-val {
+  font-weight: 700;
+  color: #334155;
+  text-decoration: line-through;
+}
+
+.ecom-avoided-tag {
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+.ecom-cta-btn {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
 }

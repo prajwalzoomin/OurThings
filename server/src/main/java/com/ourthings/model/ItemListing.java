@@ -43,6 +43,9 @@ public class ItemListing {
     @Column(name = "estimated_replacement_value_inr", precision = 10, scale = 2)
     private BigDecimal estimatedReplacementValueInr;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     @Column(nullable = false, length = 50)
     private String status = "AVAILABLE"; // AVAILABLE, PAUSED, LENT, INACTIVE
 
@@ -104,6 +107,9 @@ public class ItemListing {
 
     public BigDecimal getEstimatedReplacementValueInr() { return estimatedReplacementValueInr; }
     public void setEstimatedReplacementValueInr(BigDecimal estimatedReplacementValueInr) { this.estimatedReplacementValueInr = estimatedReplacementValueInr; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

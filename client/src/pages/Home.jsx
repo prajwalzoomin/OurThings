@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import StatusBadge from '../components/StatusBadge';
+import ItemCard from '../components/ItemCard';
 
 const CATEGORIES = [
   {
@@ -229,77 +230,9 @@ export default function Home() {
             </button>
           </div>
         ) : (
-          <div className="resource-grid">
+          <div className="ecom-grid">
             {featuredItems.map((item) => (
-              <div key={item.id} className="resource-card">
-                <div>
-                  <div className="resource-card-top">
-                    <span className="resource-category-pill">{item.category}</span>
-                    <StatusBadge status={item.status} />
-                  </div>
-
-                  <h3 className="resource-title">
-                    <a
-                      href={`#item-${item.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigateTo('detail', { itemId: item.id });
-                      }}
-                    >
-                      {item.title}
-                    </a>
-                  </h3>
-
-                  <p className="resource-desc">{item.description}</p>
-                </div>
-
-                <div>
-                  <div className="resource-meta-list">
-                    <div className="resource-meta-row">
-                      <svg className="meta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                      <span>{item.pickupLocation}</span>
-                    </div>
-
-                    <div className="resource-meta-row">
-                      <svg className="meta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                      <span>Available until: <strong>{item.availableTo}</strong></span>
-                    </div>
-
-                    <div className="resource-meta-row">
-                      <svg className="meta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                      </svg>
-                      <span>Owner: <strong>{item.ownerName}</strong> ({item.itemCondition})</span>
-                    </div>
-                  </div>
-
-                  <div className="resource-card-footer">
-                    <div>
-                      {item.estimatedReplacementValueInr && (
-                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                          Value: Rs {Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => navigateTo('detail', { itemId: item.id })}
-                    >
-                      View Details &rarr;
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <ItemCard key={item.id} item={item} />
             ))}
           </div>
         )}
@@ -339,3 +272,4 @@ export default function Home() {
     </div>
   );
 }
+

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import StatusBadge from '../components/StatusBadge';
+import { getItemImageUrl } from '../utils/itemImages';
 
 export default function ItemDetail() {
   const { selectedItemId, currentUser, currentCommunity, navigateTo, notify } = useApp();
@@ -185,6 +186,66 @@ export default function ItemDetail() {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Product Visual Showcase Banner (Amazon / Flipkart Style) */}
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '320px',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            backgroundColor: '#f1f5f9',
+            marginBottom: '1.75rem',
+            border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <img
+            src={getItemImageUrl(item)}
+            alt={item.title}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '14px',
+              left: '14px',
+              backgroundColor: 'rgba(15, 23, 42, 0.8)',
+              backdropFilter: 'blur(8px)',
+              color: '#ffffff',
+              padding: '0.4rem 0.8rem',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Pickup Spot: {item.pickupLocation}</span>
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '14px',
+              right: '14px',
+              backgroundColor: '#059669',
+              color: '#ffffff',
+              padding: '0.35rem 0.75rem',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            }}
+          >
+            ★ {item.itemCondition} Condition
+          </div>
         </div>
 
         {/* Specifications Cards Grid */}

@@ -80,6 +80,10 @@ public class ItemService {
                 req.getEstimatedReplacementValueInr()
         );
 
+        if (req.getImageUrl() != null && !req.getImageUrl().trim().isEmpty()) {
+            item.setImageUrl(req.getImageUrl().trim());
+        }
+
         item = itemListingRepository.save(item);
 
         activityLogRepository.save(new ActivityLog(
@@ -121,6 +125,10 @@ public class ItemService {
         item.setAvailableTo(req.getAvailableTo());
         item.setEstimatedReplacementValueInr(req.getEstimatedReplacementValueInr());
         item.setUpdatedAt(LocalDateTime.now());
+
+        if (req.getImageUrl() != null && !req.getImageUrl().trim().isEmpty()) {
+            item.setImageUrl(req.getImageUrl().trim());
+        }
 
         item = itemListingRepository.save(item);
         return toResponseDto(item);
@@ -211,6 +219,7 @@ public class ItemService {
         dto.setAvailableFrom(item.getAvailableFrom());
         dto.setAvailableTo(item.getAvailableTo());
         dto.setEstimatedReplacementValueInr(item.getEstimatedReplacementValueInr());
+        dto.setImageUrl(item.getImageUrl());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());
 

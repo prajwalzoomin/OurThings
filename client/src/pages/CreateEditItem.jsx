@@ -22,6 +22,7 @@ export default function CreateEditItem() {
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [itemCondition, setItemCondition] = useState('Good');
   const [pickupLocation, setPickupLocation] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
   const [estimatedReplacementValueInr, setEstimatedReplacementValueInr] = useState('');
@@ -37,6 +38,7 @@ export default function CreateEditItem() {
       }
       setItemCondition(prefillItem.itemCondition || 'Good');
       setPickupLocation(prefillItem.pickupLocation || (currentUser && currentUser.roomOrFlat ? currentUser.roomOrFlat : ''));
+      setImageUrl(prefillItem.imageUrl || '');
       setAvailableFrom(prefillItem.availableFrom || prefillItem.neededFrom || new Date().toISOString().slice(0, 10));
       setAvailableTo(prefillItem.availableTo || prefillItem.neededTo || '');
       if (prefillItem.estimatedReplacementValueInr) {
@@ -81,6 +83,7 @@ export default function CreateEditItem() {
       availableFrom,
       availableTo,
       estimatedReplacementValueInr: estimatedReplacementValueInr ? Number(estimatedReplacementValueInr) : null,
+      imageUrl: imageUrl.trim() || null,
     };
 
     try {
@@ -199,6 +202,21 @@ export default function CreateEditItem() {
             />
             <div className="form-hint">
               Convenient location within your hostel or apartment complex for mutual inspection and handover.
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="item-image-url" className="form-label">Product Image URL (Optional)</label>
+            <input
+              id="item-image-url"
+              type="url"
+              className="form-input"
+              placeholder="https://... (Optional: leave blank for smart automatic photo matching)"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+            <div className="form-hint">
+              Leave blank to automatically match a high-definition product photo based on your item title and category.
             </div>
           </div>
 

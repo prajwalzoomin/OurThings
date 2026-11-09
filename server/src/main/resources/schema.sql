@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS item_listings (
     available_from DATE NOT NULL,
     available_to DATE NOT NULL,
     estimated_replacement_value_inr DECIMAL(10,2),
+    image_url VARCHAR(500),
     status VARCHAR(50) DEFAULT 'AVAILABLE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

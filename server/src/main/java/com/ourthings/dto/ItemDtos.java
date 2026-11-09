@@ -16,6 +16,7 @@ public class ItemDtos {
         private LocalDate availableFrom;
         private LocalDate availableTo;
         private BigDecimal estimatedReplacementValueInr;
+        private String imageUrl;
 
         public String getTitle() { return title; }
         public void setTitle(String title) { this.title = title; }
@@ -40,6 +41,9 @@ public class ItemDtos {
 
         public BigDecimal getEstimatedReplacementValueInr() { return estimatedReplacementValueInr; }
         public void setEstimatedReplacementValueInr(BigDecimal estimatedReplacementValueInr) { this.estimatedReplacementValueInr = estimatedReplacementValueInr; }
+
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     }
 
     public static class ReservedPeriodDto {
@@ -73,6 +77,7 @@ public class ItemDtos {
         private LocalDate availableFrom;
         private LocalDate availableTo;
         private BigDecimal estimatedReplacementValueInr;
+        private String imageUrl;
         private String status;
         private LocalDateTime createdAt;
         private List<ReservedPeriodDto> reservedPeriods;
@@ -120,6 +125,9 @@ public class ItemDtos {
 
         public BigDecimal getEstimatedReplacementValueInr() { return estimatedReplacementValueInr; }
         public void setEstimatedReplacementValueInr(BigDecimal estimatedReplacementValueInr) { this.estimatedReplacementValueInr = estimatedReplacementValueInr; }
+
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
         public String getStatus() { return status; }
         public void setStatus(String status) { this.status = status; }
