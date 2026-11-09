@@ -18,3 +18,4 @@ if (fs.existsSync(rollupNativePath)) {
     console.log('Patched Rollup for Windows Application Control fallback.');
   }
 }
+

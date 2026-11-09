@@ -147,3 +147,4 @@ The database is pre-seeded with realistic community scenarios:
 | **Cauvery Boys Hostel** | Bosch Impact Drill Kit, Underarm Crutches, Epson HD Projector, Wildcraft Rucksack, JBL PA Speaker | Returned drill with condition log, active projector loan, approved crutches reservation, and aggregated demand for folding wheelchairs. |
 | **Green Glen Heights Apartment** | Adult Wheelchair, Omron Blood Pressure Monitor, 6-Step Folding Ladder, Large Suitcase | Fulfilled wheelchair borrowing with sanitized return notes, demand for infant scale and battery jump starter. |
 | **Kaikondrahalli Neighbourhood** | Community lead account for neighbourhood ward collective | Community scoping and independent inventory. |
+

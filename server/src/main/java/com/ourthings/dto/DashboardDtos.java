@@ -84,3 +84,4 @@ public class DashboardDtos {
         public void setRecentActivity(List<ActivitySummaryDto> recentActivity) { this.recentActivity = recentActivity; }
     }
 }
+

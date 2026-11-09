@@ -10,3 +10,4 @@ public class OurThingsApplication {
         SpringApplication.run(OurThingsApplication.class, args);
     }
 }
+

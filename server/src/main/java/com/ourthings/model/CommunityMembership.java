@@ -42,3 +42,4 @@ public class CommunityMembership {
     public LocalDateTime getJoinedAt() { return joinedAt; }
     public void setJoinedAt(LocalDateTime joinedAt) { this.joinedAt = joinedAt; }
 }
+

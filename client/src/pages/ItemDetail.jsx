@@ -37,9 +37,9 @@ export default function ItemDetail() {
 
   if (loading) {
     return (
-      <div className="panel">
+      <div className="card-container">
         <div className="state-message">
-          <p>Loading item details...</p>
+          <p>Loading item specifications...</p>
         </div>
       </div>
     );
@@ -47,10 +47,10 @@ export default function ItemDetail() {
 
   if (error || !item) {
     return (
-      <div className="panel">
+      <div className="card-container">
         <div className="alert alert-danger">{error || 'Resource not found.'}</div>
         <button type="button" className="btn btn-secondary" onClick={() => navigateTo('browse')}>
-          Back to Listings
+          &larr; Back to Listings
         </button>
       </div>
     );
@@ -77,7 +77,7 @@ export default function ItemDetail() {
       return;
     }
     if (endDate < startDate) {
-      setRequestError('End date cannot be prior to start date.');
+      setRequestError('End date cannot precede start date.');
       return;
     }
 
@@ -90,7 +90,7 @@ export default function ItemDetail() {
         borrowPurpose,
       });
 
-      setRequestSuccess('Borrow request submitted successfully. The owner has been notified to review your reservation.');
+      setRequestSuccess('Borrow request submitted successfully! The owner will review your reservation.');
       notify('success', 'Borrow request recorded.');
       setTimeout(() => {
         navigateTo('requests');
@@ -127,30 +127,36 @@ export default function ItemDetail() {
 
   return (
     <div>
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
         <button
           type="button"
           className="btn btn-secondary btn-sm"
           onClick={() => navigateTo('browse')}
         >
-          &larr; Back to Resource Listings
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Directory
         </button>
       </div>
 
-      <div className="panel">
-        <div className="panel-header">
+      <div className="card-container">
+        {/* Header with Title and Badges */}
+        <div className="card-header">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-              <h1 className="panel-title">{item.title}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+              <span className="resource-category-pill">{item.category}</span>
               <StatusBadge status={item.status} />
               {isOwner && (
-                <span className="status-badge" style={{ backgroundColor: '#f0f4f8', color: '#1e3a5f', borderColor: '#bfdbfe' }}>
-                  Your Listing
+                <span className="status-pill status-approved">
+                  You are the Owner
                 </span>
               )}
             </div>
-            <p className="panel-description" style={{ marginTop: '0.3rem' }}>
-              Category: <strong>{item.category}</strong> | Community Scope: <strong>{currentCommunity ? currentCommunity.name : ''}</strong>
+            <h1 style={{ fontSize: '1.65rem', margin: 0 }}>{item.title}</h1>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+              Community: <strong>{currentCommunity ? currentCommunity.name : ''}</strong>
             </p>
           </div>
 
@@ -175,51 +181,73 @@ export default function ItemDetail() {
                 className="btn btn-danger btn-sm"
                 onClick={handleRemove}
               >
-                Remove Listing
+                Remove
               </button>
             </div>
           )}
         </div>
 
-        {/* Detailed Item Attributes */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem', backgroundColor: '#faf9f6', padding: '1rem', border: '1px solid var(--color-border)', borderRadius: '3px' }}>
-          <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Observed Condition</span>
-            <div style={{ fontWeight: 600 }}>{item.itemCondition}</div>
-          </div>
-          <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Pickup & Handover Location</span>
-            <div style={{ fontWeight: 600 }}>{item.pickupLocation}</div>
-          </div>
-          <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Owner Listed Availability</span>
-            <div style={{ fontWeight: 600 }}>{item.availableFrom} to {item.availableTo}</div>
-          </div>
-          <div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Reported Replacement Value</span>
-            <div style={{ fontWeight: 600 }}>
-              {item.estimatedReplacementValueInr ? `Rs ${Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}` : 'Not provided'}
+        {/* Specifications Cards Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Condition</span>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
+              {item.itemCondition}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Used solely for community avoided expenditure estimate</div>
+          </div>
+
+          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Pickup Location</span>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
+              {item.pickupLocation}
+            </div>
+          </div>
+
+          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Listed Availability</span>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
+              {item.availableFrom} to {item.availableTo}
+            </div>
+          </div>
+
+          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Estimated Value</span>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-brand)', marginTop: '0.2rem' }}>
+              {item.estimatedReplacementValueInr ? `Rs ${Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}` : 'Not specified'}
+            </div>
           </div>
         </div>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1rem', marginBottom: '0.35rem' }}>Description & Included Accessories</h2>
-          <p style={{ color: 'var(--color-text-secondary)', whiteSpace: 'pre-line' }}>{item.description}</p>
+        {/* Description */}
+        <div style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Description & Included Accessories</h2>
+          <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+            {item.description || 'No additional description provided.'}
+          </p>
         </div>
 
-        {/* Owner Information (Strictly scoped to active community) */}
-        <div style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', border: '1px solid var(--color-border)', borderRadius: '3px', backgroundColor: '#ffffff' }}>
-          <h2 style={{ fontSize: '0.95rem', marginBottom: '0.3rem' }}>Owner Contact Coordination</h2>
-          <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-            <strong>Owner:</strong> {item.ownerName} &bull; <strong>Room/Flat:</strong> {item.ownerRoomOrFlat || 'Not listed'} &bull; <strong>Contact Phone:</strong> {item.ownerPhone || 'Coordinates via in-app request'}
+        {/* Owner Card */}
+        <div style={{ padding: '1.25rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--color-text-muted)' }}>
+              Listed By Community Member
+            </div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
+              {item.ownerName}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+              Residence: {item.ownerRoomOrFlat || 'Room not listed'} &bull; Phone: {item.ownerPhone || 'Coordinates in-app'}
+            </div>
+          </div>
+
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', backgroundColor: '#ffffff', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)' }}>
+            Verified Resident in Community
           </div>
         </div>
 
-        {/* Existing Confirmed Reservations Schedule */}
-        <div style={{ marginBottom: '1.75rem' }}>
-          <h2 style={{ fontSize: '1rem', marginBottom: '0.35rem' }}>Reserved Booking Periods</h2>
+        {/* Scheduled Confirmed Bookings */}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Reserved Calendar Windows</h2>
           {item.reservedPeriods && item.reservedPeriods.length > 0 ? (
             <div className="table-wrapper">
               <table className="data-table">
@@ -227,20 +255,20 @@ export default function ItemDetail() {
                   <tr>
                     <th>Start Date</th>
                     <th>End Date</th>
-                    <th>Booking Status</th>
+                    <th>Reservation Status</th>
                     <th>Availability Window</th>
                   </tr>
                 </thead>
                 <tbody>
                   {item.reservedPeriods.map((p, idx) => (
                     <tr key={idx}>
-                      <td style={{ fontFamily: 'var(--font-mono)' }}>{p.startDate}</td>
-                      <td style={{ fontFamily: 'var(--font-mono)' }}>{p.endDate}</td>
+                      <td style={{ fontWeight: 600 }}>{p.startDate}</td>
+                      <td style={{ fontWeight: 600 }}>{p.endDate}</td>
                       <td>
                         <StatusBadge status={p.status} />
                       </td>
-                      <td style={{ color: '#92400e', fontWeight: 500 }}>
-                        Locked period (Overlap prevention enforced on server)
+                      <td style={{ color: '#b45309', fontWeight: 500 }}>
+                        Locked (Server prevents overlapping bookings)
                       </td>
                     </tr>
                   ))}
@@ -248,29 +276,29 @@ export default function ItemDetail() {
               </table>
             </div>
           ) : (
-            <div style={{ padding: '0.75rem', backgroundColor: '#faf9f6', border: '1px solid var(--color-border)', borderRadius: '3px', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-              No confirmed bookings currently exist within the availability window.
+            <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+              No confirmed bookings currently overlap with this item. All dates in the availability window are open for reservations.
             </div>
           )}
         </div>
 
         {/* Borrower Request Form */}
         {!isOwner && (
-          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>Request to Borrow This Resource</h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Select your intended reservation window. Overlapping confirmed bookings are prevented deterministically on the server.
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.35rem' }}>Reserve This Resource</h2>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+              Submit your desired borrowing period. The server validates dates and atomically checks for scheduling conflicts.
             </p>
 
             {item.status !== 'AVAILABLE' && (
               <div className="alert alert-warning">
-                This item is currently marked as <strong>{item.status}</strong> and cannot accept new requests at this moment.
+                This resource is currently marked as <strong>{item.status}</strong> and is not accepting new requests right now.
               </div>
             )}
 
             {hasClientConflict && (
               <div className="alert alert-danger">
-                Warning: The selected dates overlap with an already confirmed reservation above. The server will reject overlapping bookings.
+                Notice: The dates you selected overlap with an already confirmed reservation above. The server will reject this booking.
               </div>
             )}
 
@@ -278,10 +306,10 @@ export default function ItemDetail() {
             {requestSuccess && <div className="alert alert-success">{requestSuccess}</div>}
 
             {item.status === 'AVAILABLE' && (
-              <form onSubmit={handleBorrowSubmit} style={{ maxWidth: '600px' }}>
+              <form onSubmit={handleBorrowSubmit} style={{ maxWidth: '640px' }}>
                 <div className="form-grid-2">
                   <div className="form-group">
-                    <label htmlFor="req-start" className="form-label">Borrow Start Date</label>
+                    <label htmlFor="req-start" className="form-label">Borrow Start Date *</label>
                     <input
                       id="req-start"
                       type="date"
@@ -295,7 +323,7 @@ export default function ItemDetail() {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="req-end" className="form-label">Return End Date</label>
+                    <label htmlFor="req-end" className="form-label">Return End Date *</label>
                     <input
                       id="req-end"
                       type="date"
@@ -310,22 +338,22 @@ export default function ItemDetail() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="req-purpose" className="form-label">Intended Use Note (Visible to Owner)</label>
+                  <label htmlFor="req-purpose" className="form-label">Intended Use Note (Shared with Owner)</label>
                   <textarea
                     id="req-purpose"
                     className="form-textarea"
-                    placeholder="Briefly state your task (e.g., hanging bedroom shelf, knee injury recovery support)..."
+                    placeholder="Briefly state your task (e.g. mounting room wall shelves, ankle sprain recovery)..."
                     value={borrowPurpose}
                     onChange={(e) => setBorrowPurpose(e.target.value)}
                   />
                   <div className="form-hint">
-                    For sensitive healthcare or mobility aids, provide only what is necessary for pickup logistics.
+                    For sensitive healthcare aids, provide only what is needed for pickup coordination.
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-lg"
                   disabled={submitting || hasClientConflict}
                 >
                   {submitting ? 'Submitting request...' : 'Confirm & Submit Borrow Request'}

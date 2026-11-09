@@ -38,3 +38,4 @@ public class HandoverDtos {
         public void setConfirmedByBorrower(Boolean confirmedByBorrower) { this.confirmedByBorrower = confirmedByBorrower; }
     }
 }
+

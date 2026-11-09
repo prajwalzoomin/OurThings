@@ -60,208 +60,220 @@ export default function BrowseItems() {
 
   return (
     <div>
-      <div className="panel">
-        <div className="panel-header">
-          <div>
-            <h1 className="panel-title">Available Community Resources</h1>
-            <p className="panel-description">
-              Find and borrow shared tools, healthcare aids, and equipment in {currentCommunity ? currentCommunity.name : 'your community'}.
-            </p>
+      {/* Header Bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.65rem', margin: 0 }}>Community Resource Directory</h1>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>
+            Browse and reserve items shared by members in <strong>{currentCommunity ? currentCommunity.name : ''}</strong>
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => navigateTo('create')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          List a Resource
+        </button>
+      </div>
+
+      {/* Filter Card */}
+      <div className="card-container" style={{ padding: '1.25rem' }}>
+        {/* Category Pills Bar */}
+        <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid var(--color-border)' }}>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`nav-pill ${category === cat ? 'active' : ''}`}
+              style={{ fontSize: '0.825rem', padding: '0.4rem 0.85rem' }}
+              onClick={() => setCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Search & Dates Row */}
+        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ flex: '2', minWidth: '220px' }}>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Search by keywords (e.g. drill, wheelchair, projector)..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
           </div>
-          <div>
+
+          <div style={{ flex: '1', minWidth: '150px' }}>
+            <input
+              type="date"
+              className="form-input"
+              title="Needed from date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+          </div>
+
+          <div style={{ flex: '1', minWidth: '150px' }}>
+            <input
+              type="date"
+              className="form-input"
+              title="Needed until date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" className="btn btn-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Filter
+          </button>
+
+          {(keyword || category !== 'All Categories' || dateFrom || dateTo) && (
             <button
               type="button"
-              className="btn btn-primary"
-              onClick={() => navigateTo('create')}
+              className="btn btn-sm btn-secondary"
+              onClick={handleResetFilters}
             >
-              + List an Item to Share
+              Reset
+            </button>
+          )}
+        </form>
+      </div>
+
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      {/* Resource Cards */}
+      {loading ? (
+        <div className="state-message">
+          <p>Loading community resources...</p>
+        </div>
+      ) : items.length === 0 ? (
+        <div className="state-message">
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📦</div>
+          <h3 style={{ fontSize: '1.15rem', marginBottom: '0.35rem' }}>No resources match your filters</h3>
+          <p style={{ color: 'var(--color-text-secondary)', maxWidth: '480px', margin: '0 auto 1.25rem auto', fontSize: '0.9rem' }}>
+            No one has listed this item yet in your community. You can submit an unmet demand request so neighbours know it is needed.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => navigateTo('demands')}
+            >
+              Post an Unmet Need
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={handleResetFilters}
+            >
+              Clear Filters
             </button>
           </div>
         </div>
+      ) : (
+        <div className="resource-grid">
+          {items.map((item) => {
+            const isOwner = currentUser && item.ownerId === currentUser.id;
+            const hasConfirmedBookings = item.reservedPeriods && item.reservedPeriods.length > 0;
 
-        {/* Filter Controls */}
-        <form onSubmit={handleSearchSubmit} style={{ marginBottom: '1.25rem' }}>
-          <div className="form-grid-2" style={{ marginBottom: '0.75rem' }}>
-            <div>
-              <label htmlFor="search-keyword" className="form-label">Search by Title or Description</label>
-              <input
-                id="search-keyword"
-                type="text"
-                className="form-input"
-                placeholder="e.g. drill, wheelchair, projector, suitcase..."
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="search-category" className="form-label">Resource Category</label>
-              <select
-                id="search-category"
-                className="form-select"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+            return (
+              <div key={item.id} className="resource-card">
+                <div>
+                  <div className="resource-card-top">
+                    <span className="resource-category-pill">{item.category}</span>
+                    <StatusBadge status={item.status} />
+                  </div>
 
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1', minWidth: '150px' }}>
-              <label htmlFor="search-dateFrom" className="form-label">Needed From</label>
-              <input
-                id="search-dateFrom"
-                type="date"
-                className="form-input"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-              />
-            </div>
-            <div style={{ flex: '1', minWidth: '150px' }}>
-              <label htmlFor="search-dateTo" className="form-label">Needed Until</label>
-              <input
-                id="search-dateTo"
-                type="date"
-                className="form-input"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-              />
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button type="submit" className="btn btn-secondary">Apply Filters</button>
-              {(keyword || category !== 'All Categories' || dateFrom || dateTo) && (
-                <button
-                  type="button"
-                  className="btn btn-sm btn-secondary"
-                  onClick={handleResetFilters}
-                >
-                  Clear Filters
-                </button>
-              )}
-            </div>
-          </div>
-        </form>
+                  <h3 className="resource-title">
+                    <a
+                      href={`#item-${item.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigateTo('detail', { itemId: item.id });
+                      }}
+                    >
+                      {item.title}
+                    </a>
+                  </h3>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+                  <p className="resource-desc">{item.description}</p>
+                </div>
 
-        {loading ? (
-          <div className="state-message">
-            <p>Loading items...</p>
-          </div>
-        ) : items.length === 0 ? (
-          <div className="state-message">
-            <p>No items found matching your filter criteria in this community.</p>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-              Looking for something not yet shared? Submit an unlisted request in Unmet Demand so neighbours know what is needed.
-            </p>
-            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => navigateTo('demands')}
-              >
-                Submit Unmet Demand Request
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => navigateTo('create')}
-              >
-                List a New Resource
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="items-list">
-            {items.map((item) => {
-              const isOwner = currentUser && item.ownerId === currentUser.id;
-              const hasConfirmedBookings = item.reservedPeriods && item.reservedPeriods.length > 0;
+                <div>
+                  <div className="resource-meta-list">
+                    <div className="resource-meta-row">
+                      <svg className="meta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      <span>Location: <strong>{item.pickupLocation}</strong></span>
+                    </div>
 
-              return (
-                <div key={item.id} className="item-row">
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <h2 style={{ fontSize: '1.05rem', margin: 0 }}>
-                        <a
-                          href={`#item-${item.id}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            navigateTo('detail', { itemId: item.id });
-                          }}
-                        >
-                          {item.title}
-                        </a>
-                      </h2>
-                      <StatusBadge status={item.status} />
-                      {isOwner && (
-                        <span className="status-badge" style={{ backgroundColor: '#f0f4f8', color: '#1e3a5f', borderColor: '#bfdbfe' }}>
-                          You are the owner
+                    <div className="resource-meta-row">
+                      <svg className="meta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                      <span>Available: <strong>{item.availableFrom} to {item.availableTo}</strong></span>
+                    </div>
+
+                    <div className="resource-meta-row">
+                      <svg className="meta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      <span>Owner: <strong>{item.ownerName}</strong> ({item.itemCondition})</span>
+                    </div>
+
+                    {isOwner && (
+                      <div style={{ marginTop: '0.2rem', color: 'var(--color-brand)', fontWeight: 600, fontSize: '0.75rem' }}>
+                        &bull; You own this resource
+                      </div>
+                    )}
+
+                    {hasConfirmedBookings && (
+                      <div style={{ marginTop: '0.35rem', fontSize: '0.75rem', color: '#b45309', backgroundColor: '#fffbeb', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid #fde68a' }}>
+                        Booked: {item.reservedPeriods.map((p) => `${p.startDate} to ${p.endDate}`).join(', ')}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="resource-card-footer">
+                    <div>
+                      {item.estimatedReplacementValueInr && (
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
+                          Est. Value: Rs {Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}
                         </span>
                       )}
                     </div>
-
-                    <p style={{ margin: '0.35rem 0', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-                      {item.description}
-                    </p>
-
-                    <div className="item-meta">
-                      <div className="item-meta-item">
-                        <strong>Category:</strong> {item.category}
-                      </div>
-                      <div className="item-meta-item">
-                        <strong>Condition:</strong> {item.itemCondition}
-                      </div>
-                      <div className="item-meta-item">
-                        <strong>Pickup:</strong> {item.pickupLocation}
-                      </div>
-                      <div className="item-meta-item">
-                        <strong>Availability:</strong> {item.availableFrom} to {item.availableTo}
-                      </div>
-                      {item.estimatedReplacementValueInr && (
-                        <div className="item-meta-item">
-                          <strong>Replacement Value:</strong> Rs {Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}
-                        </div>
-                      )}
-                    </div>
-
-                    {hasConfirmedBookings && (
-                      <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#92400e', backgroundColor: '#fffbeb', padding: '0.3rem 0.5rem', borderRadius: '2px', border: '1px solid #fcd34d' }}>
-                        <strong>Scheduled Confirmed Bookings:</strong>{' '}
-                        {item.reservedPeriods.map((p, idx) => (
-                          <span key={idx} style={{ marginRight: '0.75rem' }}>
-                            {p.startDate} to {p.endDate} [{p.status}]
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', minWidth: '130px', alignItems: 'flex-end' }}>
                     <button
                       type="button"
-                      className="btn btn-secondary btn-sm"
+                      className="btn btn-primary btn-sm"
                       onClick={() => navigateTo('detail', { itemId: item.id })}
                     >
-                      View Details & Schedule
+                      {isOwner ? 'Manage Listing' : 'View Details & Reserve'}
                     </button>
-                    {!isOwner && item.status === 'AVAILABLE' && (
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        onClick={() => navigateTo('detail', { itemId: item.id })}
-                      >
-                        Request to Borrow
-                      </button>
-                    )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

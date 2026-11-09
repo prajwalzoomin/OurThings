@@ -8,13 +8,21 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div>
-          <strong>OurThings</strong>: Community Resource Sharing Platform
-          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.2rem' }}>
-            Current Community Scope: {currentCommunity ? currentCommunity.name : 'Not selected'}. All bookings, condition logs, and requests are strictly scoped to verified community members.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <span style={{ fontWeight: 800, color: 'var(--color-text-primary)', fontSize: '0.95rem' }}>
+              OurThings
+            </span>
+            <span style={{ color: 'var(--color-text-muted)' }}>&bull;</span>
+            <span style={{ color: 'var(--color-brand)', fontWeight: 600, fontSize: '0.8rem' }}>
+              Peer-to-Peer Resource Sharing
+            </span>
+          </div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+            Active Community Scope: <strong>{currentCommunity ? currentCommunity.name : 'All Communities'}</strong>. Designed for hostel wings, residential complexes, and neighbourhoods.
           </div>
         </div>
 
-        <div className="footer-links">
+        <nav className="footer-nav" aria-label="Footer links">
           <a
             href="#terms"
             onClick={(e) => {
@@ -22,7 +30,7 @@ export default function Footer() {
               navigateTo('terms');
             }}
           >
-            Reviewable Terms of Sharing
+            Terms of Sharing
           </a>
           <a
             href="#privacy"
@@ -31,9 +39,18 @@ export default function Footer() {
               navigateTo('privacy');
             }}
           >
-            Privacy & Healthcare Item Policy
+            Privacy & Sensitive Aids
           </a>
-        </div>
+          <a
+            href="#dashboard"
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo('dashboard');
+            }}
+          >
+            Community Impact
+          </a>
+        </nav>
       </div>
     </footer>
   );

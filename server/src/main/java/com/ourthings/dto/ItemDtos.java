@@ -131,3 +131,4 @@ public class ItemDtos {
         public void setReservedPeriods(List<ReservedPeriodDto> reservedPeriods) { this.reservedPeriods = reservedPeriods; }
     }
 }
+

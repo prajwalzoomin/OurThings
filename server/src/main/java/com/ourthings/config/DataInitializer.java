@@ -436,3 +436,4 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("OurThings sample community data successfully seeded!");
     }
 }
+

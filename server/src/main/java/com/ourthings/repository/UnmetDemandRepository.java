@@ -31,3 +31,4 @@ public interface UnmetDemandRepository extends JpaRepository<UnmetDemand, Long> 
 
     long countByCommunityIdAndStatus(Long communityId, String status);
 }
+

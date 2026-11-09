@@ -41,3 +41,4 @@ public interface BorrowRequestRepository extends JpaRepository<BorrowRequest, Lo
 
     long countByCommunityIdAndStatus(Long communityId, String status);
 }
+

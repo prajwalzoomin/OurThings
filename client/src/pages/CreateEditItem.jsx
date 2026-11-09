@@ -102,158 +102,167 @@ export default function CreateEditItem() {
   };
 
   return (
-    <div className="panel" style={{ maxWidth: '780px', margin: '0 auto' }}>
-      <div className="panel-header">
-        <div>
-          <h1 className="panel-title">
-            {isEditMode ? `Edit Resource: ${prefillItem.title}` : 'Share a Resource with Your Community'}
-          </h1>
-          <p className="panel-description">
-            Listing in: <strong>{currentCommunity ? currentCommunity.name : ''}</strong> | Listed by: <strong>{currentUser ? currentUser.name : ''}</strong>
-          </p>
-        </div>
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
         <button
           type="button"
           className="btn btn-secondary btn-sm"
           onClick={() => navigateTo('browse')}
         >
-          Cancel
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Listings
         </button>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="item-title" className="form-label">Resource Title *</label>
-          <input
-            id="item-title"
-            type="text"
-            className="form-input"
-            placeholder="e.g. Bosch 13mm Impact Drill, Adult Folding Crutches, Epson HD Projector"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-grid-2">
-          <div className="form-group">
-            <label htmlFor="item-category" className="form-label">Category *</label>
-            <select
-              id="item-category"
-              className="form-select"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="item-condition" className="form-label">Observed Condition *</label>
-            <select
-              id="item-condition"
-              className="form-select"
-              value={itemCondition}
-              onChange={(e) => setItemCondition(e.target.value)}
-            >
-              {CONDITIONS.map((cond) => (
-                <option key={cond} value={cond}>{cond}</option>
-              ))}
-            </select>
+      <div className="card-container">
+        <div className="card-header">
+          <div>
+            <h1 style={{ fontSize: '1.6rem', margin: 0 }}>
+              {isEditMode ? `Edit Resource: ${prefillItem.title}` : 'Share a Resource with Neighbours'}
+            </h1>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+              Listing in <strong>{currentCommunity ? currentCommunity.name : ''}</strong> as <strong>{currentUser ? currentUser.name : ''}</strong>
+            </p>
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="item-description" className="form-label">Detailed Description & Included Accessories</label>
-          <textarea
-            id="item-description"
-            className="form-textarea"
-            placeholder="Describe functionality, specifications, included cables, bits, attachments, and operating precautions..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+        {error && <div className="alert alert-danger">{error}</div>}
 
-        <div className="form-group">
-          <label htmlFor="item-location" className="form-label">Pickup & Handover Location *</label>
-          <input
-            id="item-location"
-            type="text"
-            className="form-input"
-            placeholder="e.g. Room 304 Block A, Flat 402 Block B, Gate 1 Security Desk"
-            value={pickupLocation}
-            onChange={(e) => setPickupLocation(e.target.value)}
-            required
-          />
-          <div className="form-hint">
-            Specify room number or convenient on-premises handover spot within your hostel, apartment, or neighbourhood.
-          </div>
-        </div>
-
-        <div className="form-grid-2">
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="item-avail-from" className="form-label">Available From *</label>
+            <label htmlFor="item-title" className="form-label">Resource Title *</label>
             <input
-              id="item-avail-from"
-              type="date"
+              id="item-title"
+              type="text"
               className="form-input"
-              value={availableFrom}
-              onChange={(e) => setAvailableFrom(e.target.value)}
+              placeholder="e.g. Bosch 13mm Impact Drill, Adult Folding Crutches, Epson HD Projector"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
 
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label htmlFor="item-category" className="form-label">Category *</label>
+              <select
+                id="item-category"
+                className="form-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="item-condition" className="form-label">Observed Condition *</label>
+              <select
+                id="item-condition"
+                className="form-select"
+                value={itemCondition}
+                onChange={(e) => setItemCondition(e.target.value)}
+              >
+                {CONDITIONS.map((cond) => (
+                  <option key={cond} value={cond}>{cond}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="form-group">
-            <label htmlFor="item-avail-to" className="form-label">Available Until *</label>
-            <input
-              id="item-avail-to"
-              type="date"
-              className="form-input"
-              value={availableTo}
-              onChange={(e) => setAvailableTo(e.target.value)}
-              required
+            <label htmlFor="item-description" className="form-label">Description & Included Accessories</label>
+            <textarea
+              id="item-description"
+              className="form-textarea"
+              placeholder="Describe operating condition, included accessories, chuck keys, bits, cords, or usage instructions..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="item-rep-val" className="form-label">Optional Estimated Replacement Value (INR)</label>
-          <input
-            id="item-rep-val"
-            type="number"
-            min="0"
-            step="1"
-            className="form-input"
-            placeholder="e.g. 3500 (approximate retail purchase cost)"
-            value={estimatedReplacementValueInr}
-            onChange={(e) => setEstimatedReplacementValueInr(e.target.value)}
-          />
-          <div className="form-hint">
-            Optional. If provided, this value is aggregated into community Avoided Expenditure metrics when items are borrowed rather than bought. No money is charged or collected.
+          <div className="form-group">
+            <label htmlFor="item-location" className="form-label">Pickup & Handover Location *</label>
+            <input
+              id="item-location"
+              type="text"
+              className="form-input"
+              placeholder="e.g. Room 304 Block A, Flat 402 Block B, Kaikondrahalli Gate 1"
+              value={pickupLocation}
+              onChange={(e) => setPickupLocation(e.target.value)}
+              required
+            />
+            <div className="form-hint">
+              Convenient location within your hostel or apartment complex for mutual inspection and handover.
+            </div>
           </div>
-        </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={submitting}
-          >
-            {submitting ? 'Saving listing...' : isEditMode ? 'Update Listing' : 'Publish Resource Listing'}
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => navigateTo('browse')}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label htmlFor="item-avail-from" className="form-label">Available From *</label>
+              <input
+                id="item-avail-from"
+                type="date"
+                className="form-input"
+                value={availableFrom}
+                onChange={(e) => setAvailableFrom(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="item-avail-to" className="form-label">Available Until *</label>
+              <input
+                id="item-avail-to"
+                type="date"
+                className="form-input"
+                value={availableTo}
+                onChange={(e) => setAvailableTo(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="item-rep-val" className="form-label">Estimated Replacement Purchase Value in INR (Optional)</label>
+            <input
+              id="item-rep-val"
+              type="number"
+              min="0"
+              step="1"
+              className="form-input"
+              placeholder="e.g. 3500 (approximate retail purchase cost)"
+              value={estimatedReplacementValueInr}
+              onChange={(e) => setEstimatedReplacementValueInr(e.target.value)}
+            />
+            <div className="form-hint">
+              Optional estimate used solely to calculate community Avoided Expenditure metrics when items are borrowed rather than bought. No money is charged or collected.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.75rem' }}>
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg"
+              disabled={submitting}
+            >
+              {submitting ? 'Saving listing...' : isEditMode ? 'Update Resource Listing' : 'Publish Resource Listing'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-lg"
+              onClick={() => navigateTo('browse')}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ export default function StatusBadge({ status }) {
   if (!status) return null;
   const s = status.toUpperCase();
 
-  let className = 'status-badge ';
+  let className = 'status-pill ';
   let label = status;
 
   switch (s) {
@@ -18,7 +18,7 @@ export default function StatusBadge({ status }) {
       break;
     case 'APPROVED':
       className += 'status-approved';
-      label = 'Confirmed Reservation';
+      label = 'Reserved & Approved';
       break;
     case 'ACTIVE':
       className += 'status-active';
@@ -26,11 +26,11 @@ export default function StatusBadge({ status }) {
       break;
     case 'RETURNED':
       className += 'status-returned';
-      label = 'Returned & Completed';
+      label = 'Returned & Verified';
       break;
     case 'PAUSED':
       className += 'status-paused';
-      label = 'Temporarily Paused';
+      label = 'Paused by Owner';
       break;
     case 'LENT':
       className += 'status-active';
@@ -50,10 +50,10 @@ export default function StatusBadge({ status }) {
       break;
     case 'FULFILLED':
       className += 'status-available';
-      label = 'Demand Fulfilled';
+      label = 'Fulfilled by Member';
       break;
     default:
-      className += 'status-inactive';
+      className += 'status-paused';
       label = status;
   }
 

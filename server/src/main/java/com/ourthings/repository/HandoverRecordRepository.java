@@ -13,3 +13,4 @@ public interface HandoverRecordRepository extends JpaRepository<HandoverRecord, 
     List<HandoverRecord> findByItemIdOrderByCreatedAtDesc(Long itemId);
     List<HandoverRecord> findByRequestIdIn(List<Long> requestIds);
 }
+

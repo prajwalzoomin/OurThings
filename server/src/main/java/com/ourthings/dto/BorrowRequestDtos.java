@@ -154,3 +154,4 @@ public class BorrowRequestDtos {
         public void setHandoverRecord(HandoverSummaryDto handoverRecord) { this.handoverRecord = handoverRecord; }
     }
 }
+

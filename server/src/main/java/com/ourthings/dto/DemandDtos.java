@@ -90,3 +90,4 @@ public class DemandDtos {
         public void setIsMyRequest(Boolean isMyRequest) { this.isMyRequest = isMyRequest; }
     }
 }
+

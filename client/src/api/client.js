@@ -94,3 +94,4 @@ export const api = {
   // Dashboard
   getDashboard: () => request('/api/dashboard'),
 };
+

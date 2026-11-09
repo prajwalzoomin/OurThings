@@ -8,7 +8,7 @@ export function AppProvider({ children }) {
   const [communities, setCommunities] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentCommunity, setCurrentCommunity] = useState(null);
-  const [currentTab, setCurrentTab] = useState('browse');
+  const [currentTab, setCurrentTab] = useState('home');
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [prefillItem, setPrefillItem] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -131,3 +131,4 @@ export function useApp() {
   }
   return context;
 }
+

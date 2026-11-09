@@ -14,3 +14,4 @@ public interface CommunityMembershipRepository extends JpaRepository<CommunityMe
     Optional<CommunityMembership> findByUserIdAndCommunityId(Long userId, Long communityId);
     boolean existsByUserIdAndCommunityId(Long userId, Long communityId);
 }
+

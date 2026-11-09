@@ -31,3 +31,4 @@ public interface ItemListingRepository extends JpaRepository<ItemListing, Long> 
                                   @Param("dateFrom") LocalDate dateFrom,
                                   @Param("dateTo") LocalDate dateTo);
 }
+

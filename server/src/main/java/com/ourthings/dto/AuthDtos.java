@@ -55,3 +55,4 @@ public class AuthDtos {
         public String getRole() { return role; }
     }
 }
+

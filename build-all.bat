@@ -29,3 +29,4 @@ if %errorlevel% neq 0 (
 echo ========================================================
 echo Build Succeeded! Run run-server.bat to start application.
 echo ========================================================
+

@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 
 // Pages
+import Home from './pages/Home';
 import BrowseItems from './pages/BrowseItems';
 import ItemDetail from './pages/ItemDetail';
 import CreateEditItem from './pages/CreateEditItem';
@@ -21,28 +22,75 @@ function AppContent() {
     <div className="app-wrapper">
       <Header />
 
-      {/* Global Toast Notification */}
+      {/* Global Floating Toast Notification */}
       {notification && (
-        <div style={{ maxWidth: '1160px', margin: '0.75rem auto 0 auto', padding: '0 1rem', width: '100%' }}>
-          <div className={`alert alert-${notification.type === 'error' ? 'danger' : notification.type === 'success' ? 'success' : 'info'}`}>
-            {notification.message}
+        <div
+          style={{
+            position: 'fixed',
+            top: '1.25rem',
+            right: '1.25rem',
+            zIndex: 9999,
+            maxWidth: '440px',
+            boxShadow: 'var(--shadow-lg)',
+            borderRadius: 'var(--radius-md)',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            className={`alert alert-${notification.type === 'error' ? 'danger' : notification.type === 'success' ? 'success' : 'info'}`}
+            style={{ margin: 0, padding: '0.85rem 1.25rem' }}
+          >
+            <span style={{ fontSize: '1.1rem' }}>
+              {notification.type === 'error' ? '⚠️' : notification.type === 'success' ? '✅' : 'ℹ️'}
+            </span>
+            <span style={{ fontWeight: 500 }}>{notification.message}</span>
           </div>
         </div>
       )}
 
-      {/* Quick Demo Workflow Guidance Banner */}
-      <div style={{ backgroundColor: '#fffdf5', borderBottom: '1px solid #ebd99f', padding: '0.45rem 1rem', fontSize: '0.8rem', color: '#785b12' }}>
-        <div style={{ maxWidth: '1160px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <div>
-            <strong>Interactive Verification Mode:</strong> You are logged in as <strong>{currentUser ? currentUser.name : ''}</strong> in <strong>{currentCommunity ? currentCommunity.name : ''}</strong>. Use the selectors above to switch between owner and borrower roles to verify end-to-end workflows.
+      {/* Quick Demo Workflow Guidance Subbar */}
+      <div
+        style={{
+          backgroundColor: '#f8fafc',
+          borderBottom: '1px solid var(--color-border)',
+          padding: '0.35rem 1.25rem',
+          fontSize: '0.785rem',
+          color: 'var(--color-text-secondary)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span
+              style={{
+                display: 'inline-block',
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--color-brand)',
+              }}
+            ></span>
+            <span>
+              Active Member: <strong>{currentUser ? currentUser.name : ''}</strong> &bull; Community Scope: <strong>{currentCommunity ? currentCommunity.name : ''}</strong>
+            </span>
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#8c6b16' }}>
-            All operations persist deterministically to backend database
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            Switch accounts above to test owner approvals, handover inspections & returns
           </div>
         </div>
       </div>
 
       <main className="main-content">
+        {currentTab === 'home' && <Home />}
         {currentTab === 'browse' && <BrowseItems />}
         {currentTab === 'detail' && <ItemDetail />}
         {currentTab === 'create' && <CreateEditItem />}

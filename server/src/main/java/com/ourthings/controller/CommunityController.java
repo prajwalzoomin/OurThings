@@ -45,3 +45,4 @@ public class CommunityController {
         return ResponseEntity.ok(created);
     }
 }
+

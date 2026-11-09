@@ -14,3 +14,4 @@ if exist "target\ourthings-server-1.0.0.jar" (
     echo Building and running via Maven...
     call "C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd" spring-boot:run
 )
+

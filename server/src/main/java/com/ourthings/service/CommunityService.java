@@ -29,3 +29,4 @@ public class CommunityService {
         return communityRepository.save(community);
     }
 }
+
