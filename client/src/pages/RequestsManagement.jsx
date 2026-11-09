@@ -278,7 +278,7 @@ export default function RequestsManagement() {
                         </button>
                         <button
                           type="button"
-                          className="btn btn-secondary btn-sm"
+                          className="btn btn-danger btn-sm"
                           style={{ flex: 1, padding: '0.28rem 0.35rem', fontSize: '0.72rem' }}
                           onClick={() => handleDecline(req.id)}
                         >
@@ -288,7 +288,7 @@ export default function RequestsManagement() {
                     ) : req.status === 'APPROVED' ? (
                       <button
                         type="button"
-                        className="btn btn-dark btn-sm"
+                        className="btn btn-primary btn-sm"
                         style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
                         onClick={() => openHandoverModal(req, 'handover')}
                       >
@@ -303,7 +303,25 @@ export default function RequestsManagement() {
                       >
                         Confirm Return
                       </button>
-                    ) : null
+                    ) : req.status === 'RETURNED' ? (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => navigateTo('history')}
+                      >
+                        View History Record
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => navigateTo('detail', { itemId: req.itemId })}
+                      >
+                        View Resource
+                      </button>
+                    )
                   }
                 />
               ))}
@@ -353,7 +371,7 @@ export default function RequestsManagement() {
                     (req.status === 'PENDING' || req.status === 'APPROVED') ? (
                       <button
                         type="button"
-                        className="btn btn-secondary btn-sm"
+                        className="btn btn-danger btn-sm"
                         style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
                         onClick={() => handleWithdraw(req.id)}
                       >
@@ -362,13 +380,22 @@ export default function RequestsManagement() {
                     ) : req.status === 'ACTIVE' ? (
                       <button
                         type="button"
-                        className="btn btn-secondary btn-sm"
+                        className="btn btn-primary btn-sm"
                         style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
                         onClick={() => openHandoverModal(req, 'return')}
                       >
                         Record Return
                       </button>
-                    ) : null
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => navigateTo('history')}
+                      >
+                        View Loan History
+                      </button>
+                    )
                   }
                 />
               ))}

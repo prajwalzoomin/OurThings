@@ -89,6 +89,16 @@ export default function UnmetDemandPage() {
     });
   };
 
+  const handleMarkFulfilled = async (id) => {
+    try {
+      await api.fulfillDemand(id);
+      notify('success', 'Demand inquiry marked as fulfilled.');
+      loadDemands();
+    } catch (err) {
+      notify('error', err.message || 'Failed to update demand.');
+    }
+  };
+
   return (
     <div>
       {/* Top Header Card */}
@@ -338,6 +348,22 @@ export default function UnmetDemandPage() {
                 dateLabel={d.neededFrom ? `📅 ${d.neededFrom} – ${d.neededTo || 'Open'}` : '📅 Flexible schedule'}
                 statusOverride={d.status}
                 hidePrice={true}
+                actions={
+                  d.status === 'OPEN' ? (
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      style={{ width: '100%', fontSize: '0.72rem', padding: '0.28rem 0.4rem' }}
+                      onClick={() => handleMarkFulfilled(d.id)}
+                    >
+                      ✓ Mark Fulfilled
+                    </button>
+                  ) : (
+                    <div style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--color-text-muted)', padding: '0.2rem' }}>
+                      Fulfilled in Community
+                    </div>
+                  )
+                }
               />
             ))}
           </div>

@@ -62,11 +62,6 @@ export default function ItemCard({
     >
       {/* Compact Image Showcase Area */}
       <div className="compact-card-media">
-        {/* Category Chip (Top Left) */}
-        <div className="compact-chip-category">
-          <span>{category}</span>
-        </div>
-
         {/* Live Status Badge (Top Right) */}
         <div className="compact-chip-status">
           <StatusBadge status={status} />
@@ -140,9 +135,10 @@ export default function ItemCard({
                 e.stopPropagation();
                 handleClick();
               }}
+              title="Quick glance"
+              aria-label="Quick glance"
             >
-              <span>Glance</span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>

@@ -62,7 +62,7 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
-  const { currentCommunity, navigateTo } = useApp();
+  const { currentCommunity, navigateTo, currentUser } = useApp();
   const [featuredItems, setFeaturedItems] = useState([]);
   const [stats, setStats] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -231,9 +231,25 @@ export default function Home() {
           </div>
         ) : (
           <div className="ecom-grid">
-            {featuredItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
+            {featuredItems.map((item) => {
+              const isOwner = currentUser && item.ownerId === currentUser.id;
+              return (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  actions={
+                    <button
+                      type="button"
+                      className={`btn ${isOwner ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+                      style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                      onClick={() => navigateTo('detail', { itemId: item.id })}
+                    >
+                      {isOwner ? 'Manage Listing' : item.status === 'AVAILABLE' ? 'Borrow Resource' : 'View Details'}
+                    </button>
+                  }
+                />
+              );
+            })}
           </div>
         )}
       </section>

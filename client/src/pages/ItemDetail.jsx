@@ -188,7 +188,7 @@ export default function ItemDetail() {
           )}
         </div>
 
-        {/* Product Visual Showcase Banner (Amazon / Flipkart Style) */}
+        {/* Product Visual Showcase Banner */}
         <div
           style={{
             position: 'relative',
@@ -196,7 +196,7 @@ export default function ItemDetail() {
             height: '320px',
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            backgroundColor: '#f1f5f9',
+            backgroundColor: 'var(--color-surface-hover)',
             marginBottom: '1.75rem',
             border: '1px solid var(--color-border)',
             boxShadow: 'var(--shadow-sm)',

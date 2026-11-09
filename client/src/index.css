@@ -813,12 +813,24 @@ p {
 }
 
 .btn-dark {
-  background-color: var(--color-slate-dark);
+  background-color: #0f172a;
   color: #ffffff;
+  border: 1px solid #0f172a;
 }
 
 .btn-dark:hover:not(:disabled) {
-  background-color: var(--color-slate-hover);
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .btn-dark {
+  background-color: #27272a;
+  color: #f4f4f5;
+  border: 1px solid #3f3f46;
+}
+
+[data-theme='dark'] .btn-dark:hover:not(:disabled) {
+  background-color: #3f3f46;
   color: #ffffff;
 }
 
@@ -1427,18 +1439,18 @@ p {
 
 .compact-glance-btn {
   background-color: var(--color-surface-hover);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 0.22rem 0.45rem;
-  font-size: 0.7rem;
-  font-weight: 600;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
-  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .compact-glance-btn:hover {

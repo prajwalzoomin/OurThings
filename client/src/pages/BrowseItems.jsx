@@ -185,9 +185,25 @@ export default function BrowseItems() {
         </div>
       ) : (
         <div className="ecom-grid">
-          {items.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
+          {items.map((item) => {
+            const isOwner = currentUser && item.ownerId === currentUser.id;
+            return (
+              <ItemCard
+                key={item.id}
+                item={item}
+                actions={
+                  <button
+                    type="button"
+                    className={`btn ${isOwner ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+                    style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                    onClick={() => navigateTo('detail', { itemId: item.id })}
+                  >
+                    {isOwner ? 'Manage Listing' : item.status === 'AVAILABLE' ? 'Borrow Resource' : 'View Details'}
+                  </button>
+                }
+              />
+            );
+          })}
         </div>
       )}
     </div>
