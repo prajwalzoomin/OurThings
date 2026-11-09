@@ -66,3 +66,4 @@ export function getItemImageUrl(item) {
 
   return IMAGE_MAP.drill;
 }
+

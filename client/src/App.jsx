@@ -2,6 +2,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ZenGlanceModal from './components/ZenGlanceModal';
 
 // Pages
 import Home from './pages/Home';
@@ -102,6 +103,7 @@ function AppContent() {
         {currentTab === 'privacy' && <PrivacyPage />}
       </main>
 
+      <ZenGlanceModal />
       <Footer />
     </div>
   );

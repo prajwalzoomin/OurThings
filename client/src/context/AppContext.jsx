@@ -12,6 +12,7 @@ export function AppProvider({ children }) {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [prefillItem, setPrefillItem] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [glanceItem, setGlanceItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Initialize data
@@ -99,6 +100,14 @@ export function AppProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const openGlance = (item) => {
+    setGlanceItem(item);
+  };
+
+  const closeGlance = () => {
+    setGlanceItem(null);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -110,6 +119,7 @@ export function AppProvider({ children }) {
         selectedItemId,
         prefillItem,
         notification,
+        glanceItem,
         loading,
         notify,
         switchUser,
@@ -117,6 +127,8 @@ export function AppProvider({ children }) {
         navigateTo,
         setSelectedItemId,
         setPrefillItem,
+        openGlance,
+        closeGlance,
       }}
     >
       {children}
