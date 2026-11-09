@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import StatusBadge from '../components/StatusBadge';
+import ItemCard from '../components/ItemCard';
 
 export default function BorrowingHistory() {
   const { currentUser, currentCommunity, navigateTo } = useApp();
@@ -134,112 +135,80 @@ export default function BorrowingHistory() {
           <p>No historical or active loans recorded in this category yet.</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Resource</th>
-                <th>{historyType === 'borrowed' ? 'Owner / Lender' : 'Borrower'}</th>
-                <th>Booking Window</th>
-                <th>Mutual Condition & Handover</th>
-                <th>Return Status & Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeList.map((loan) => {
-                const hr = loan.handoverRecord;
-                return (
-                  <tr key={loan.id}>
-                    <td>
+        <div className="ecom-grid">
+          {activeList.map((loan) => {
+            const hr = loan.handoverRecord;
+            const otherParty = historyType === 'borrowed' ? loan.ownerName : loan.borrowerName;
+            const otherPartyLoc = historyType === 'borrowed' ? loan.ownerRoomOrFlat : loan.borrowerRoomOrFlat;
+            const hasIssue = hr && hr.issueReported;
+            const conditionBadge = hr?.returnedAt
+              ? '✓ Returned'
+              : hr?.handedOverAt
+              ? '★ Active Loan'
+              : 'Pending Handover';
+
+            return (
+              <ItemCard
+                key={loan.id}
+                item={{
+                  id: loan.itemId,
+                  title: loan.itemTitle,
+                  category: loan.itemCategory,
+                  status: loan.status,
+                  pickupLocation: otherPartyLoc || 'Community Area',
+                  ownerName: loan.ownerName,
+                  borrowerName: loan.borrowerName,
+                  startDate: loan.startDate,
+                  endDate: loan.endDate,
+                  itemCondition: hr?.initialConditionNotes || 'Inspected',
+                  description: hr?.returnConditionNotes
+                    ? `Return condition: "${hr.returnConditionNotes}". Handover check: "${hr.initialConditionNotes || 'None'}".`
+                    : hr?.initialConditionNotes
+                    ? `Handover inspection notes: "${hr.initialConditionNotes}".`
+                    : `Booking period: ${loan.startDate} to ${loan.endDate}.`,
+                }}
+                metaSubtitle={`${historyType === 'borrowed' ? 'Owner' : 'Borrower'}: ${otherParty || 'Member'}`}
+                dateLabel={`📅 ${loan.startDate} → ${loan.endDate}`}
+                statusOverride={loan.status}
+                badgeText={conditionBadge}
+                actions={
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%' }}>
+                    {hasIssue && (
                       <div
                         style={{
+                          fontSize: '0.68rem',
+                          color: '#ef4444',
                           fontWeight: 700,
-                          fontSize: '0.95rem',
-                          color: 'var(--color-text-primary)',
-                          cursor: 'pointer',
+                          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                          border: '1px solid rgba(239, 68, 68, 0.25)',
+                          borderRadius: '4px',
+                          padding: '0.15rem 0.35rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}
-                        onClick={() => navigateTo('detail', { itemId: loan.itemId })}
+                        title={`Issue: ${hr.issueDetails}`}
                       >
-                        {loan.itemTitle}
+                        ⚠️ Issue: {hr.issueDetails}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-brand)', fontWeight: 600, marginTop: '0.15rem' }}>
-                        {loan.itemCategory}
-                      </div>
-                      <div style={{ marginTop: '0.35rem' }}>
-                        <StatusBadge status={loan.status} />
-                      </div>
-                    </td>
-
-                    <td>
-                      <div style={{ fontWeight: 600 }}>
-                        {historyType === 'borrowed' ? loan.ownerName : loan.borrowerName}
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                        {historyType === 'borrowed' ? loan.ownerRoomOrFlat : loan.borrowerRoomOrFlat}
-                      </div>
-                    </td>
-
-                    <td style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                      <div style={{ fontWeight: 600 }}>{loan.startDate}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>to {loan.endDate}</div>
-                    </td>
-
-                    <td style={{ fontSize: '0.825rem', maxWidth: '280px' }}>
-                      {hr && hr.handedOverAt ? (
-                        <div>
-                          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '0.15rem' }}>
-                            Checked: {hr.handedOverAt.replace('T', ' ').slice(0, 16)}
-                          </div>
-                          <div style={{ fontStyle: 'italic', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-                            "{hr.initialConditionNotes}"
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ color: 'var(--color-text-muted)' }}>Handover pending</span>
-                      )}
-                    </td>
-
-                    <td style={{ fontSize: '0.825rem', maxWidth: '280px' }}>
-                      {hr && hr.returnedAt ? (
-                        <div>
-                          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '0.15rem' }}>
-                            Returned: {hr.returnedAt.replace('T', ' ').slice(0, 16)}
-                          </div>
-                          <div style={{ fontStyle: 'italic', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-                            "{hr.returnConditionNotes}"
-                          </div>
-                          {hr.issueReported ? (
-                            <div
-                              style={{
-                                marginTop: '0.35rem',
-                                padding: '0.35rem 0.6rem',
-                                backgroundColor: '#fee2e2',
-                                border: '1px solid #fecdd3',
-                                borderRadius: 'var(--radius-sm)',
-                                color: '#991b1b',
-                                fontWeight: 600,
-                                fontSize: '0.75rem',
-                              }}
-                            >
-                              ⚠️ Issue: {hr.issueDetails}
-                            </div>
-                          ) : (
-                            <div style={{ marginTop: '0.25rem', color: '#166534', fontSize: '0.75rem', fontWeight: 600 }}>
-                              ✓ Returned in good order
-                            </div>
-                          )}
-                        </div>
-                      ) : loan.status === 'ACTIVE' ? (
-                        <span className="status-pill status-active">Currently in Use</span>
-                      ) : (
-                        <span style={{ color: 'var(--color-text-muted)' }}>{loan.status}</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      style={{ width: '100%', fontSize: '0.72rem', padding: '0.3rem 0.4rem', justifyContent: 'center' }}
+                      onClick={() => navigateTo('detail', { itemId: loan.itemId })}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      <span>Full Audit Record</span>
+                    </button>
+                  </div>
+                }
+              />
+            );
+          })}
         </div>
       )}
     </div>

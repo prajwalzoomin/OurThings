@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
-import StatusBadge from '../components/StatusBadge';
+import ItemCard from '../components/ItemCard';
 
 export default function RequestsManagement() {
   const { currentUser, currentCommunity, notify, navigateTo } = useApp();
@@ -243,214 +243,69 @@ export default function RequestsManagement() {
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="ecom-grid">
               {incomingRequests.map((req) => (
-                <div
+                <ItemCard
                   key={req.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: '1.25rem',
-                    boxShadow: 'var(--shadow-xs)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
+                  item={{
+                    id: req.itemId,
+                    title: req.itemTitle,
+                    category: req.itemCategory || 'Resource Loan',
+                    pickupLocation: req.itemPickupLocation,
+                    status: req.status,
+                    ownerName: currentUser ? currentUser.name : '',
+                    borrowerName: req.borrowerName,
+                    startDate: req.startDate,
+                    endDate: req.endDate,
+                    itemCondition: req.itemCondition || 'Inspected',
+                    estimatedReplacementValueInr: req.estimatedReplacementValueInr,
+                    description: req.borrowPurpose || 'Inquiry received for this resource.',
+                    reservedPeriods: req.reservedPeriods,
                   }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
-                        <span
-                          style={{
-                            fontSize: '1.1rem',
-                            fontWeight: 700,
-                            color: 'var(--color-text-primary)',
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => navigateTo('detail', { itemId: req.itemId })}
-                        >
-                          {req.itemTitle}
-                        </span>
-                        <StatusBadge status={req.status} />
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-muted)' }}>
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span>
-                          Requested by <strong>{req.borrowerName}</strong> ({req.borrowerRoomOrFlat || 'Room not stated'})
-                        </span>
-                        {req.borrowerPhone && (
-                          <>
-                            <span>&bull;</span>
-                            <span>Phone: {req.borrowerPhone}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action Buttons for Owner */}
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {req.status === 'PENDING' && (
-                        <>
-                          <button
-                            type="button"
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleApprove(req.id)}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            Approve Reservation
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-secondary btn-sm"
-                            onClick={() => handleDecline(req.id)}
-                          >
-                            Decline
-                          </button>
-                        </>
-                      )}
-
-                      {req.status === 'APPROVED' && (
-                        <button
-                          type="button"
-                          className="btn btn-dark btn-sm"
-                          onClick={() => openHandoverModal(req, 'handover')}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-                          </svg>
-                          Record Handover
-                        </button>
-                      )}
-
-                      {req.status === 'ACTIVE' && (
+                  metaSubtitle={`Borrower: ${req.borrowerName} (${req.borrowerRoomOrFlat || 'N/A'})`}
+                  statusOverride={req.status}
+                  dateLabel={`📅 ${req.startDate} – ${req.endDate}`}
+                  actions={
+                    req.status === 'PENDING' ? (
+                      <div style={{ display: 'flex', gap: '0.35rem', width: '100%' }}>
                         <button
                           type="button"
                           className="btn btn-primary btn-sm"
-                          onClick={() => openHandoverModal(req, 'return')}
+                          style={{ flex: 1, padding: '0.28rem 0.35rem', fontSize: '0.72rem' }}
+                          onClick={() => handleApprove(req.id)}
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m5 12 7-7 7 7"></path>
-                            <path d="M12 19V5"></path>
-                          </svg>
-                          Confirm Return
+                          Approve
                         </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Booking Details Grid */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                      gap: '0.75rem',
-                      backgroundColor: 'var(--color-surface-subtle)',
-                      padding: '0.85rem 1rem',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '0.825rem',
-                      border: '1px solid var(--color-border)',
-                    }}
-                  >
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.15rem' }}>
-                        Requested Period
-                      </span>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        📅 {req.startDate} to {req.endDate}
-                      </strong>
-                    </div>
-
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.15rem' }}>
-                        Pickup Location
-                      </span>
-                      <span style={{ color: 'var(--color-text-primary)' }}>
-                        📍 {req.itemPickupLocation}
-                      </span>
-                    </div>
-
-                    {req.borrowPurpose && (
-                      <div>
-                        <span style={{ color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.15rem' }}>
-                          Borrower Note
-                        </span>
-                        <span style={{ fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>
-                          "{req.borrowPurpose}"
-                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          style={{ flex: 1, padding: '0.28rem 0.35rem', fontSize: '0.72rem' }}
+                          onClick={() => handleDecline(req.id)}
+                        >
+                          Decline
+                        </button>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Conflict Notice if any */}
-                  {req.hasConflictingPendingRequests && req.status === 'PENDING' && (
-                    <div
-                      style={{
-                        backgroundColor: '#fffbeb',
-                        border: '1px solid #fde68a',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '0.65rem 0.85rem',
-                        fontSize: '0.825rem',
-                        color: '#92400e',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <span>⚠️</span>
-                      <span>
-                        <strong>Overlapping Request Notice:</strong> Another member has requested overlapping dates. Approving this request will reserve this window.
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Handover & Condition Audit Trail */}
-                  {req.handoverRecord && (
-                    <div
-                      style={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '0.85rem 1rem',
-                        fontSize: '0.825rem',
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-brand)' }}>
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                          <polyline points="14 2 14 8 20 8"></polyline>
-                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                          <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                        Mutual Handover & Condition Audit Record
-                      </div>
-
-                      {req.handoverRecord.handedOverAt && (
-                        <div style={{ color: 'var(--color-text-secondary)', marginBottom: '0.35rem' }}>
-                          <strong>Handover Checked:</strong> {req.handoverRecord.handedOverAt.replace('T', ' ').slice(0, 16)} &bull; <span style={{ fontStyle: 'italic' }}>"{req.handoverRecord.initialConditionNotes}"</span>
-                        </div>
-                      )}
-
-                      {req.handoverRecord.returnedAt && (
-                        <div style={{ color: 'var(--color-text-secondary)', borderTop: '1px dashed var(--color-border)', paddingTop: '0.35rem', marginTop: '0.35rem' }}>
-                          <strong>Return Checked:</strong> {req.handoverRecord.returnedAt.replace('T', ' ').slice(0, 16)} &bull; <span style={{ fontStyle: 'italic' }}>"{req.handoverRecord.returnConditionNotes}"</span>
-                          {req.handoverRecord.issueReported && (
-                            <div style={{ color: '#be123c', fontWeight: 600, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                              <span>⚠️ Problem Reported:</span> {req.handoverRecord.issueDetails}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                    ) : req.status === 'APPROVED' ? (
+                      <button
+                        type="button"
+                        className="btn btn-dark btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => openHandoverModal(req, 'handover')}
+                      >
+                        Record Handover
+                      </button>
+                    ) : req.status === 'ACTIVE' ? (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => openHandoverModal(req, 'return')}
+                      >
+                        Confirm Return
+                      </button>
+                    ) : null
+                  }
+                />
               ))}
             </div>
           )
@@ -473,153 +328,49 @@ export default function RequestsManagement() {
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="ecom-grid">
               {outgoingRequests.map((req) => (
-                <div
+                <ItemCard
                   key={req.id}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: '1.25rem',
-                    boxShadow: 'var(--shadow-xs)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
+                  item={{
+                    id: req.itemId,
+                    title: req.itemTitle,
+                    category: req.itemCategory || 'Resource Loan',
+                    pickupLocation: req.itemPickupLocation,
+                    status: req.status,
+                    ownerName: req.ownerName,
+                    borrowerName: currentUser ? currentUser.name : '',
+                    startDate: req.startDate,
+                    endDate: req.endDate,
+                    itemCondition: req.itemCondition || 'Inspected',
+                    estimatedReplacementValueInr: req.estimatedReplacementValueInr,
+                    description: req.borrowPurpose || 'Your outgoing borrow request.',
                   }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
-                        <span
-                          style={{
-                            fontSize: '1.1rem',
-                            fontWeight: 700,
-                            color: 'var(--color-text-primary)',
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => navigateTo('detail', { itemId: req.itemId })}
-                        >
-                          {req.itemTitle}
-                        </span>
-                        <StatusBadge status={req.status} />
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-muted)' }}>
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span>
-                          Owner: <strong>{req.ownerName}</strong> ({req.ownerRoomOrFlat || 'Room not stated'})
-                        </span>
-                        {req.ownerPhone && (
-                          <>
-                            <span>&bull;</span>
-                            <span>Phone: {req.ownerPhone}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions for Borrower */}
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {(req.status === 'PENDING' || req.status === 'APPROVED') && (
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => handleWithdraw(req.id)}
-                        >
-                          Withdraw Request
-                        </button>
-                      )}
-
-                      {req.status === 'ACTIVE' && (
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => openHandoverModal(req, 'return')}
-                        >
-                          Record Return
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Booking Details Grid */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                      gap: '0.75rem',
-                      backgroundColor: 'var(--color-surface-subtle)',
-                      padding: '0.85rem 1rem',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '0.825rem',
-                      border: '1px solid var(--color-border)',
-                    }}
-                  >
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.15rem' }}>
-                        Requested Window
-                      </span>
-                      <strong style={{ color: 'var(--color-text-primary)' }}>
-                        📅 {req.startDate} to {req.endDate}
-                      </strong>
-                    </div>
-
-                    <div>
-                      <span style={{ color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.15rem' }}>
-                        Pickup Location
-                      </span>
-                      <span style={{ color: 'var(--color-text-primary)' }}>
-                        📍 {req.itemPickupLocation}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Next Step Information Banners */}
-                  {req.status === 'APPROVED' && (
-                    <div
-                      style={{
-                        backgroundColor: '#eff6ff',
-                        border: '1px solid #bfdbfe',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '0.65rem 0.85rem',
-                        fontSize: '0.825rem',
-                        color: '#1e40af',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <span>🎉</span>
-                      <span>
-                        <strong>Reservation Confirmed!</strong> Meet the owner at <strong>{req.itemPickupLocation}</strong> on <strong>{req.startDate}</strong> to inspect the item and begin the loan.
-                      </span>
-                    </div>
-                  )}
-
-                  {req.status === 'ACTIVE' && (
-                    <div
-                      style={{
-                        backgroundColor: '#ecfdf5',
-                        border: '1px solid #a7f3d0',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '0.65rem 0.85rem',
-                        fontSize: '0.825rem',
-                        color: '#065f46',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <span>⏱️</span>
-                      <span>
-                        <strong>Item in Your Custody:</strong> Please return the item in good condition to {req.itemPickupLocation} on or before <strong>{req.endDate}</strong>.
-                      </span>
-                    </div>
-                  )}
-                </div>
+                  metaSubtitle={`Owner: ${req.ownerName} (${req.ownerRoomOrFlat || 'N/A'})`}
+                  statusOverride={req.status}
+                  dateLabel={`📅 ${req.startDate} – ${req.endDate}`}
+                  actions={
+                    (req.status === 'PENDING' || req.status === 'APPROVED') ? (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => handleWithdraw(req.id)}
+                      >
+                        Withdraw Request
+                      </button>
+                    ) : req.status === 'ACTIVE' ? (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                        onClick={() => openHandoverModal(req, 'return')}
+                      >
+                        Record Return
+                      </button>
+                    ) : null
+                  }
+                />
               ))}
             </div>
           )
@@ -646,7 +397,7 @@ export default function RequestsManagement() {
         >
           <div
             style={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--color-surface)',
               borderRadius: 'var(--radius-xl)',
               maxWidth: '560px',
               width: '100%',
@@ -657,7 +408,7 @@ export default function RequestsManagement() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.25rem', margin: 0 }}>
+                <h2 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--color-text-primary)' }}>
                   {handoverModal.type === 'handover'
                     ? 'Pre-Loan Handover Inspection'
                     : 'Observed Condition on Return'}
@@ -719,7 +470,7 @@ export default function RequestsManagement() {
               ) : (
                 <div
                   style={{
-                    backgroundColor: '#f8fafc',
+                    backgroundColor: 'var(--color-surface-hover)',
                     border: '1px solid var(--color-border)',
                     padding: '1rem',
                     borderRadius: 'var(--radius-md)',

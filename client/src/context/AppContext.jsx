@@ -13,7 +13,19 @@ export function AppProvider({ children }) {
   const [prefillItem, setPrefillItem] = useState(null);
   const [notification, setNotification] = useState(null);
   const [glanceItem, setGlanceItem] = useState(null);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('ourthings_theme') || 'dark';
+  });
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('ourthings_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Initialize data
   useEffect(() => {
@@ -120,8 +132,10 @@ export function AppProvider({ children }) {
         prefillItem,
         notification,
         glanceItem,
+        theme,
         loading,
         notify,
+        toggleTheme,
         switchUser,
         switchCommunity,
         navigateTo,

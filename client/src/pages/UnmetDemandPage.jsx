@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import StatusBadge from '../components/StatusBadge';
+import ItemCard from '../components/ItemCard';
 
 const CATEGORIES = [
   'Healthcare & Mobility',
@@ -134,19 +135,19 @@ export default function UnmetDemandPage() {
         {/* Privacy Safeguard Banner */}
         <div
           style={{
-            backgroundColor: '#f0fdf4',
-            border: '1px solid #bbf7d0',
+            backgroundColor: 'var(--color-surface-hover)',
+            border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
             padding: '0.75rem 1rem',
             marginBottom: '1.5rem',
             fontSize: '0.825rem',
-            color: '#166534',
+            color: 'var(--color-text-secondary)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.65rem',
           }}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: 'var(--color-brand)' }}>
             <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
@@ -170,66 +171,34 @@ export default function UnmetDemandPage() {
             <p>All requested items have either been fulfilled or none are currently registered in this community.</p>
           </div>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '1.25rem',
-              marginBottom: '1rem',
-            }}
-          >
+          <div className="ecom-grid" style={{ marginBottom: '1.25rem' }}>
             {aggregated.map((item, idx) => (
-              <div
+              <ItemCard
                 key={idx}
-                style={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '1.25rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  boxShadow: 'var(--shadow-xs)',
-                  transition: 'all 0.2s ease',
+                item={{
+                  title: item.displayName,
+                  category: item.category,
+                  description: `Clustered demand: ${item.normalizedName}. ${item.demandCount} member(s) in this community have registered a request for this item.`,
                 }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                    <span className="resource-category-pill">{item.category}</span>
-                    <span
-                      style={{
-                        backgroundColor: '#fffbeb',
-                        border: '1px solid #fde68a',
-                        color: '#92400e',
-                        padding: '0.2rem 0.55rem',
-                        borderRadius: 'var(--radius-full)',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                      }}
-                    >
-                      {item.demandCount} member{item.demandCount > 1 ? 's' : ''} need this
-                    </span>
-                  </div>
-
-                  <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.35rem 0' }}>{item.displayName}</h3>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '1.25rem' }}>
-                    Clustered Key: {item.normalizedName}
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  style={{ width: '100%', justifyContent: 'center' }}
-                  onClick={() => handleSupplyItem(item)}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  I have this item! List it now
-                </button>
-              </div>
+                badgeText={`${item.demandCount} needed`}
+                metaSubtitle={`Cluster: ${item.normalizedName}`}
+                dateLabel={`🔥 ${item.demandCount} member${item.demandCount > 1 ? 's' : ''} in need`}
+                hidePrice={true}
+                actions={
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    style={{ width: '100%', fontSize: '0.72rem', padding: '0.35rem 0.4rem', justifyContent: 'center' }}
+                    onClick={() => handleSupplyItem(item)}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>I have this! List it</span>
+                  </button>
+                }
+              />
             ))}
           </div>
         )}
@@ -353,37 +322,24 @@ export default function UnmetDemandPage() {
             <p>You have not registered any unlisted demand inquiries yet.</p>
           </div>
         ) : (
-          <div className="table-wrapper">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Requested Item</th>
-                  <th>Category</th>
-                  <th>Needed Window</th>
-                  <th>Private Notes</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {myDemands.map((d) => (
-                  <tr key={d.id}>
-                    <td>
-                      <strong>{d.itemName}</strong>
-                    </td>
-                    <td>{d.category}</td>
-                    <td style={{ fontSize: '0.85rem' }}>
-                      {d.neededFrom ? `${d.neededFrom} to ${d.neededTo || 'TBD'}` : 'Flexible'}
-                    </td>
-                    <td style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
-                      {d.notes || '—'}
-                    </td>
-                    <td>
-                      <StatusBadge status={d.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="ecom-grid">
+            {myDemands.map((d) => (
+              <ItemCard
+                key={d.id}
+                item={{
+                  title: d.itemName,
+                  category: d.category,
+                  status: d.status,
+                  description: d.notes || 'Unmet demand inquiry registered by you.',
+                  availableFrom: d.neededFrom,
+                  availableTo: d.neededTo,
+                }}
+                metaSubtitle={d.notes ? `Note: ${d.notes}` : 'Registered demand inquiry'}
+                dateLabel={d.neededFrom ? `📅 ${d.neededFrom} – ${d.neededTo || 'Open'}` : '📅 Flexible schedule'}
+                statusOverride={d.status}
+                hidePrice={true}
+              />
+            ))}
           </div>
         )}
       </div>

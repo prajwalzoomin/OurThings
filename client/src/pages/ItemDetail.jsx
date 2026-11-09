@@ -250,31 +250,31 @@ export default function ItemDetail() {
 
         {/* Specifications Cards Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Condition</span>
             <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
               {item.itemCondition}
             </div>
           </div>
 
-          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Pickup Location</span>
             <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
               {item.pickupLocation}
             </div>
           </div>
 
-          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Listed Availability</span>
             <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
               {item.availableFrom} to {item.availableTo}
             </div>
           </div>
 
-          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Estimated Value</span>
             <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-brand)', marginTop: '0.2rem' }}>
-              {item.estimatedReplacementValueInr ? `Rs ${Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}` : 'Not specified'}
+              {item.estimatedReplacementValueInr ? `₹${Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}` : 'Not specified'}
             </div>
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function ItemDetail() {
         </div>
 
         {/* Owner Card */}
-        <div style={{ padding: '1.25rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ padding: '1.25rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--color-text-muted)' }}>
               Listed By Community Member
@@ -301,7 +301,7 @@ export default function ItemDetail() {
             </div>
           </div>
 
-          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', backgroundColor: '#ffffff', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-surface)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)' }}>
             Verified Resident in Community
           </div>
         </div>
@@ -337,7 +337,7 @@ export default function ItemDetail() {
               </table>
             </div>
           ) : (
-            <div style={{ padding: '1rem', backgroundColor: '#f8fafc', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+            <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
               No confirmed bookings currently overlap with this item. All dates in the availability window are open for reservations.
             </div>
           )}
