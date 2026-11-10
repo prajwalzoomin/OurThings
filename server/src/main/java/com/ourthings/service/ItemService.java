@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,22 +26,57 @@ public class ItemService {
     private final UserRepository userRepository;
     private final ActivityLogRepository activityLogRepository;
     private final CommunityRepository communityRepository;
+    private final GeminiService geminiService;
 
     public ItemService(ItemListingRepository itemListingRepository,
                        BorrowRequestRepository borrowRequestRepository,
                        UserRepository userRepository,
                        ActivityLogRepository activityLogRepository,
-                       CommunityRepository communityRepository) {
+                       CommunityRepository communityRepository,
+                       GeminiService geminiService) {
         this.itemListingRepository = itemListingRepository;
         this.borrowRequestRepository = borrowRequestRepository;
         this.userRepository = userRepository;
         this.activityLogRepository = activityLogRepository;
         this.communityRepository = communityRepository;
+        this.geminiService = geminiService;
     }
 
     public List<ItemResponseDto> searchItems(Long communityId, String category, String keyword, String condition, LocalDate dateFrom, LocalDate dateTo) {
-        List<ItemListing> items = itemListingRepository.searchItems(communityId, category, keyword, condition, dateFrom, dateTo);
-        return items.stream().map(this::toResponseDto).collect(Collectors.toList());
+        return searchItems(communityId, category, keyword, condition, dateFrom, dateTo, null, null);
+    }
+
+    public List<ItemResponseDto> searchItems(Long communityId, String category, String keyword, String condition, LocalDate dateFrom, LocalDate dateTo, Double userLat, Double userLng) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String trimmed = keyword.trim();
+            Set<String> synonyms = geminiService.getSearchSynonyms(trimmed);
+            Set<Long> seenIds = new HashSet<>();
+            List<ItemListing> combined = new ArrayList<>();
+
+            // 1. Primary search with exact user keyword
+            List<ItemListing> primary = itemListingRepository.searchItems(communityId, category, trimmed, condition, dateFrom, dateTo);
+            for (ItemListing it : primary) {
+                if (seenIds.add(it.getId())) {
+                    combined.add(it);
+                }
+            }
+
+            // 2. Background semantic expansion search (matches items even if named differently)
+            for (String syn : synonyms) {
+                if (syn.equalsIgnoreCase(trimmed)) continue;
+                List<ItemListing> synMatches = itemListingRepository.searchItems(communityId, category, syn, condition, dateFrom, dateTo);
+                for (ItemListing it : synMatches) {
+                    if (seenIds.add(it.getId())) {
+                        combined.add(it);
+                    }
+                }
+            }
+
+            return combined.stream().map(it -> toResponseDto(it, userLat, userLng)).collect(Collectors.toList());
+        }
+
+        List<ItemListing> items = itemListingRepository.searchItems(communityId, category, null, condition, dateFrom, dateTo);
+        return items.stream().map(it -> toResponseDto(it, userLat, userLng)).collect(Collectors.toList());
     }
 
     public List<ItemResponseDto> getItemsByCommunity(Long communityId) {
@@ -57,10 +92,14 @@ public class ItemService {
     }
 
     public ItemResponseDto getItemById(Long id, Long communityId) {
+        return getItemById(id, communityId, null, null);
+    }
+
+    public ItemResponseDto getItemById(Long id, Long communityId, Double userLat, Double userLng) {
         ItemListing item = itemListingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found: " + id));
 
-        return toResponseDto(item);
+        return toResponseDto(item, userLat, userLng);
     }
 
     @Transactional
@@ -229,6 +268,10 @@ public class ItemService {
     }
 
     public ItemResponseDto toResponseDto(ItemListing item) {
+        return toResponseDto(item, null, null);
+    }
+
+    public ItemResponseDto toResponseDto(ItemListing item, Double userLat, Double userLng) {
         ItemResponseDto dto = new ItemResponseDto();
         dto.setId(item.getId());
         dto.setCommunityId(item.getCommunityId());
@@ -259,10 +302,10 @@ public class ItemService {
             dto.setCommunityName(comm.getName());
         });
 
-        // Compute approximate distance from community reference or default Bangalore center (12.9345, 77.6912)
+        // Compute approximate distance from user's current GPS location or default reference
         if (item.getLatitude() != null && item.getLongitude() != null) {
-            double baseLat = 12.9345;
-            double baseLng = 77.6912;
+            double baseLat = userLat != null ? userLat : 12.9345;
+            double baseLng = userLng != null ? userLng : 77.6912;
             double earthRadius = 6371; // km
             double dLat = Math.toRadians(item.getLatitude() - baseLat);
             double dLng = Math.toRadians(item.getLongitude() - baseLng);

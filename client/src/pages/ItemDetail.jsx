@@ -5,7 +5,7 @@ import StatusBadge from '../components/StatusBadge';
 import { getItemImageUrl } from '../utils/itemImages';
 
 export default function ItemDetail() {
-  const { selectedItemId, currentUser, currentCommunity, navigateTo, notify } = useApp();
+  const { selectedItemId, currentUser, currentCommunity, navigateTo, notify, setSwitchAccountModalOpen } = useApp();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -376,7 +376,20 @@ export default function ItemDetail() {
             {requestError && <div className="alert alert-danger">{requestError}</div>}
             {requestSuccess && <div className="alert alert-success">{requestSuccess}</div>}
 
-            {item.status === 'AVAILABLE' && (
+            {!currentUser ? (
+              <div style={{ marginTop: '1rem', padding: '1.25rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', maxWidth: '640px' }}>
+                <p style={{ margin: '0 0 0.85rem 0', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                  You are currently browsing in Guest mode. Please select or sign in with your resident profile to reserve this resource.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setSwitchAccountModalOpen(true)}
+                >
+                  Sign In / Select Account to Borrow
+                </button>
+              </div>
+            ) : item.status === 'AVAILABLE' && (
               <form onSubmit={handleBorrowSubmit} style={{ maxWidth: '640px' }}>
                 <div className="form-grid-2">
                   <div className="form-group">

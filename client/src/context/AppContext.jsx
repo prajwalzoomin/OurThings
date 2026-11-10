@@ -1,23 +1,32 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api, setApiContext } from '../api/client';
+import { api, setApiContext, setApiLocation } from '../api/client';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const [users, setUsers] = useState([]);
   const [communities, setCommunities] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null); // No account by default (Guest mode)
   const [currentCommunity, setCurrentCommunity] = useState(null);
   const [currentTab, setCurrentTab] = useState('home');
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [prefillItem, setPrefillItem] = useState(null);
   const [notification, setNotification] = useState(null);
   const [glanceItem, setGlanceItem] = useState(null);
-  const [communityOnly, setCommunityOnly] = useState(false); // Veg-only style toggle (default OFF: whole city visible!)
+  const [communityOnly, setCommunityOnly] = useState(false); // Default OFF: whole city visible
   const [searchQuery, setSearchQuery] = useState('');
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [aiKeyModalOpen, setAiKeyModalOpen] = useState(false);
   const [switchAccountModalOpen, setSwitchAccountModalOpen] = useState(false);
+  
+  // Precise GPS location state
+  const [userLocation, setUserLocation] = useState({
+    latitude: 12.9345,
+    longitude: 77.6912,
+    locality: 'Bengaluru (Outer Ring Rd)',
+    isGpsAccurate: false,
+    loadingLocation: false,
+  });
+
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('ourthings_theme') || 'dark';
   });
@@ -26,7 +35,7 @@ export function AppProvider({ children }) {
   const toggleCommunityOnly = () => {
     setCommunityOnly((prev) => {
       const next = !prev;
-      setApiContext(currentUser?.id, next && currentCommunity ? currentCommunity.id : null);
+      setApiContext(currentUser?.id || null, next && currentCommunity ? currentCommunity.id : null);
       notify('info', next ? `Scope filtered to: ${currentCommunity?.name}` : 'Scope expanded to: Entire City (Bengaluru)');
       return next;
     });
@@ -41,7 +50,50 @@ export function AppProvider({ children }) {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Initialize data
+  // Request browser location permission & precise GPS coordinates
+  const requestUserLocation = () => {
+    if (!navigator.geolocation) {
+      notify('info', 'Geolocation is not supported by your browser. Using Bengaluru reference.');
+      return;
+    }
+    setUserLocation((prev) => ({ ...prev, loadingLocation: true }));
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = Math.round(pos.coords.latitude * 10000) / 10000;
+        const lng = Math.round(pos.coords.longitude * 10000) / 10000;
+        setApiLocation(lat, lng);
+
+        let locName = 'Bengaluru';
+        try {
+          const parsed = await api.parseAddress(`GPS coordinates ${lat}, ${lng} Bengaluru`);
+          if (parsed && parsed.locality) {
+            locName = `${parsed.locality}, Bengaluru`;
+          } else {
+            locName = `GPS: ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+          }
+        } catch {
+          locName = `GPS: ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+        }
+
+        setUserLocation({
+          latitude: lat,
+          longitude: lng,
+          locality: locName,
+          isGpsAccurate: true,
+          loadingLocation: false,
+        });
+        notify('success', `Precise location detected: ${locName}`);
+      },
+      (err) => {
+        console.warn('Geolocation permission prompt dismissed or denied:', err.message);
+        setUserLocation((prev) => ({ ...prev, loadingLocation: false }));
+        setApiLocation(12.9345, 77.6912); // Default to Bengaluru reference center
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  };
+
+  // Initialize data (default guest mode, no auto-login)
   useEffect(() => {
     async function init() {
       try {
@@ -53,22 +105,17 @@ export function AppProvider({ children }) {
 
         setUsers(usersData || []);
         setCommunities(commsData || []);
-
-        const initialUser = usersData && usersData.length > 0 ? usersData[0] : null;
-        setCurrentUser(initialUser);
+        setCurrentUser(null); // No account by default
 
         let initialComm = null;
-        if (initialUser && initialUser.activeCommunityId) {
-          initialComm = (commsData || []).find((c) => c.id === initialUser.activeCommunityId);
-        }
-        if (!initialComm && commsData && commsData.length > 0) {
+        if (commsData && commsData.length > 0) {
           initialComm = commsData[0];
         }
         setCurrentCommunity(initialComm);
+        setApiContext(null, null); // Guest mode, city-wide
 
-        if (initialUser) {
-          setApiContext(initialUser.id, null); // Default city-wide, optional toggle enables community scope
-        }
+        // Request user's precise location on first arrival
+        requestUserLocation();
       } catch (err) {
         console.error('Initialization error:', err);
         notify('error', 'Could not connect to backend server. Make sure Spring Boot is running.');
@@ -96,21 +143,38 @@ export function AppProvider({ children }) {
       }
       setCurrentCommunity(comm);
       setApiContext(user.id, communityOnly && comm ? comm.id : null);
-      notify('info', `Active user switched to: ${user.name}`);
+      notify('success', `Signed in as: ${user.name}`);
+    }
+  };
+
+  const signOut = () => {
+    setCurrentUser(null);
+    setApiContext(null, null);
+    notify('info', 'Signed out. You are now browsing in Guest mode.');
+  };
+
+  const requireAuth = (actionCallback) => {
+    if (currentUser) {
+      actionCallback();
+    } else {
+      notify('info', 'Please sign in or select an account to perform this action.');
+      setSwitchAccountModalOpen(true);
     }
   };
 
   const switchCommunity = async (communityId) => {
     const comm = communities.find((c) => c.id === Number(communityId));
-    if (comm && currentUser) {
-      try {
-        await api.switchCommunity(comm.id);
-        setCurrentCommunity(comm);
-        setCurrentUser((prev) => ({ ...prev, activeCommunityId: comm.id }));
-        setApiContext(currentUser.id, comm.id);
-        notify('info', `Active community changed to: ${comm.name}`);
-      } catch (err) {
-        notify('error', err.message);
+    if (comm) {
+      setCurrentCommunity(comm);
+      if (currentUser) {
+        try {
+          await api.switchCommunity(comm.id);
+          setCurrentUser((prev) => ({ ...prev, activeCommunityId: comm.id }));
+          setApiContext(currentUser.id, communityOnly ? comm.id : null);
+          notify('info', `Active community changed to: ${comm.name}`);
+        } catch (err) {
+          notify('error', err.message);
+        }
       }
     }
   };
@@ -141,6 +205,8 @@ export function AppProvider({ children }) {
         communities,
         currentUser,
         setCurrentUser,
+        signOut,
+        requireAuth,
         currentCommunity,
         currentTab,
         selectedItemId,
@@ -155,10 +221,10 @@ export function AppProvider({ children }) {
         setSearchQuery,
         profileModalOpen,
         setProfileModalOpen,
-        aiKeyModalOpen,
-        setAiKeyModalOpen,
         switchAccountModalOpen,
         setSwitchAccountModalOpen,
+        userLocation,
+        requestUserLocation,
         notify,
         toggleTheme,
         switchUser,
@@ -182,4 +248,3 @@ export function useApp() {
   }
   return context;
 }
-

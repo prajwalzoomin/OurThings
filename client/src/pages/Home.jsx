@@ -62,7 +62,7 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
-  const { currentCommunity, navigateTo, currentUser } = useApp();
+  const { currentCommunity, navigateTo, currentUser, setSearchQuery, requireAuth } = useApp();
   const [featuredItems, setFeaturedItems] = useState([]);
   const [stats, setStats] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -70,12 +70,11 @@ export default function Home() {
 
   useEffect(() => {
     async function loadHomeData() {
-      if (!currentCommunity) return;
       try {
         setLoading(true);
         const [itemsData, dashboardData] = await Promise.all([
           api.getItems(),
-          api.getDashboard(),
+          api.getDashboard().catch(() => null),
         ]);
         setFeaturedItems(itemsData ? itemsData.slice(0, 6) : []);
         setStats(dashboardData);
@@ -90,11 +89,13 @@ export default function Home() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    navigateTo('browse', { keyword: searchKeyword });
+    setSearchQuery(searchKeyword);
+    navigateTo('browse');
   };
 
   const handleCategoryClick = (catName) => {
-    navigateTo('browse', { category: catName });
+    setSearchQuery('');
+    navigateTo('browse');
   };
 
   return (
@@ -279,7 +280,7 @@ export default function Home() {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() => navigateTo('create')}
+            onClick={() => requireAuth(() => navigateTo('create'))}
           >
             + List an Item to Help
           </button>

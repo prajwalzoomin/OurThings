@@ -4,7 +4,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import ZenGlanceModal from './components/ZenGlanceModal';
 import ProfileModal from './components/ProfileModal';
-import AiKeyModal from './components/AiKeyModal';
 import SwitchAccountModal from './components/SwitchAccountModal';
 
 // Pages
@@ -25,8 +24,6 @@ function AppContent() {
     notification,
     profileModalOpen,
     setProfileModalOpen,
-    aiKeyModalOpen,
-    setAiKeyModalOpen,
     switchAccountModalOpen,
     setSwitchAccountModalOpen,
   } = useApp();
@@ -76,7 +73,6 @@ function AppContent() {
 
       <ZenGlanceModal />
       <ProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
-      <AiKeyModal isOpen={aiKeyModalOpen} onClose={() => setAiKeyModalOpen(false)} />
       <SwitchAccountModal isOpen={switchAccountModalOpen} onClose={() => setSwitchAccountModalOpen(false)} />
       <Footer />
     </div>

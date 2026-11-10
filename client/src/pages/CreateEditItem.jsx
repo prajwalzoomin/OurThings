@@ -110,10 +110,10 @@ export default function CreateEditItem() {
           setLongitude(parsed.longitude);
         }
         setPickupLocation(`${parsed.premise || parsed.building || parsed.locality}${parsed.landmark ? ` (Ref: ${parsed.landmark})` : ''}`);
-        notify('success', 'Address standardized with Gemini Pro Indian postal schema.');
+        notify('success', 'Address formatted to standard postal structure.');
       }
     } catch (err) {
-      notify('error', err.message || 'AI standardization failed.');
+      notify('error', err.message || 'Address formatting failed.');
     } finally {
       setAiFormatting(false);
     }
@@ -122,6 +122,11 @@ export default function CreateEditItem() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!currentUser) {
+      setError('Please sign in or select an account before listing an item.');
+      return;
+    }
 
     if (!title.trim()) {
       setError('Resource title is required.');
@@ -283,12 +288,12 @@ export default function CreateEditItem() {
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem', color: '#8b5cf6' }}
+                  style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem' }}
                   onClick={handleAiFormatAddress}
                   disabled={aiFormatting}
-                  title="Use Gemini Pro to parse and structure Indian address"
+                  title="Automatically parse and format into standard postal address"
                 >
-                  {aiFormatting ? '✨ Formatting...' : '✨ Gemini Format'}
+                  {aiFormatting ? 'Formatting...' : 'Auto-Format Address'}
                 </button>
               </div>
             </div>

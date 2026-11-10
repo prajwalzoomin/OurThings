@@ -14,14 +14,22 @@ export default function Header() {
     searchQuery,
     setSearchQuery,
     setProfileModalOpen,
-    setAiKeyModalOpen,
     setSwitchAccountModalOpen,
+    userLocation,
+    requestUserLocation,
+    signOut,
+    requireAuth,
     notify,
   } = useApp();
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery || '');
   const dropdownRef = useRef(null);
+
+  // Sync search input with state
+  useEffect(() => {
+    setLocalSearch(searchQuery || '');
+  }, [searchQuery]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -40,12 +48,10 @@ export default function Header() {
     navigateTo('browse');
   };
 
-  const handleSignOut = () => {
-    setProfileDropdownOpen(false);
-    notify('info', 'Signed out from session. Reloading application...');
-    setTimeout(() => {
-      window.location.reload();
-    }, 800);
+  const handleShareClick = () => {
+    requireAuth(() => {
+      navigateTo('create', { prefill: null });
+    });
   };
 
   return (
@@ -54,16 +60,42 @@ export default function Header() {
       <div className="top-utility-bar">
         <div className="top-utility-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {/* City & Locality Pin */}
-            <div className="utility-chip">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-brand)' }}>
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
+            {/* Precise GPS Location Pin & Trigger */}
+            <button
+              type="button"
+              className="utility-chip"
+              onClick={requestUserLocation}
+              title="Click to detect or refresh your precise GPS location"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.15rem 0.5rem' }}
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ color: userLocation.isGpsAccurate ? 'var(--color-brand)' : 'var(--color-text-muted)' }}
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="22" y1="12" x2="18" y2="12"></line>
+                <line x1="6" y1="12" x2="2" y2="12"></line>
+                <line x1="12" y1="6" x2="12" y2="2"></line>
+                <line x1="12" y1="22" x2="12" y2="18"></line>
               </svg>
-              <span>Bengaluru</span>
-              <span style={{ color: 'var(--color-text-muted)' }}>&bull;</span>
-              <strong>{currentCommunity ? currentCommunity.name.split('(')[0].trim() : 'Local Campus'}</strong>
-            </div>
+              <span>{userLocation.locality || 'Bengaluru'}</span>
+              {userLocation.isGpsAccurate ? (
+                <span style={{ fontSize: '0.65rem', backgroundColor: 'var(--color-brand-light)', color: 'var(--color-brand)', padding: '0.05rem 0.35rem', borderRadius: '3px', fontWeight: 700 }}>
+                  GPS ACCURATE
+                </span>
+              ) : (
+                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', textDecoration: 'underline' }}>
+                  {userLocation.loadingLocation ? 'Locating...' : 'Detect GPS'}
+                </span>
+              )}
+            </button>
 
             {/* Food-Delivery "VEG ONLY" Style Scope Toggle */}
             <button
@@ -78,44 +110,19 @@ export default function Header() {
               </div>
               <span className="scope-toggle-label">
                 {communityOnly ? (
-                  <>
-                    <span style={{ color: 'var(--color-brand)', fontWeight: 700 }}>🟢 Within My Community</span>
-                  </>
+                  <span style={{ color: 'var(--color-brand)', fontWeight: 700 }}>🟢 Within My Community</span>
                 ) : (
-                  <>
-                    <span>🌐 Whole City (Bengaluru)</span>
-                  </>
+                  <span>🌐 Whole City (Bengaluru)</span>
                 )}
               </span>
             </button>
           </div>
 
-          {/* Right Action: Gemini Pro AI Status & Help */}
+          {/* Right Status Note */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <button
-              type="button"
-              onClick={() => setAiKeyModalOpen(true)}
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-full)',
-                padding: '0.2rem 0.65rem',
-                fontSize: '0.75rem',
-                color: 'var(--color-text-secondary)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                transition: 'all 0.15s ease',
-              }}
-              title="Configure Google Gemini Pro API Key (Jio Offer / Google AI Studio)"
-            >
-              <span style={{ color: '#8b5cf6' }}>✨</span>
-              <span>Gemini Pro AI Active</span>
-              <span style={{ fontSize: '0.65rem', backgroundColor: 'var(--color-brand-light)', color: 'var(--color-brand)', padding: '0.05rem 0.3rem', borderRadius: '3px', fontWeight: 700 }}>
-                JIO OFFER
-              </span>
-            </button>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+              Verified Peer Resource Sharing &bull; NHCE
+            </span>
           </div>
         </div>
       </div>
@@ -138,15 +145,15 @@ export default function Header() {
 
           {/* Flipkart / Zepto Style Global Omnibar Search */}
           <form className="header-search-form" onSubmit={handleSearchSubmit}>
-            <div className="header-search-wrapper">
-              <svg className="header-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <div className="header-search-input-wrap">
+              <svg className="header-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
               <input
                 type="text"
                 className="header-search-input"
-                placeholder="Search resources in Bengaluru (drill, projector, crutches, rucksack)..."
+                placeholder="Search tools, crutches, projector, rucksack, speaker..."
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
               />
@@ -163,14 +170,14 @@ export default function Header() {
                   &times;
                 </button>
               )}
-              <button type="submit" className="header-search-btn">
-                Search
-              </button>
             </div>
+            <button type="submit" className="header-search-btn">
+              Search
+            </button>
           </form>
 
-          {/* Navigation Links with Taskbar Indicator */}
-          <nav className="nav-links" aria-label="Main Navigation">
+          {/* Navigation Items */}
+          <nav className="header-nav">
             <button
               type="button"
               className={`nav-pill ${currentTab === 'home' ? 'active' : ''}`}
@@ -187,15 +194,15 @@ export default function Header() {
             </button>
             <button
               type="button"
-              className={`nav-pill ${currentTab === 'requests' ? 'active' : ''}`}
-              onClick={() => navigateTo('requests')}
+              className={`nav-pill ${currentTab === 'loans' ? 'active' : ''}`}
+              onClick={() => navigateTo('loans')}
             >
               Requests & Loans
             </button>
             <button
               type="button"
-              className={`nav-pill ${currentTab === 'demands' ? 'active' : ''}`}
-              onClick={() => navigateTo('demands')}
+              className={`nav-pill ${currentTab === 'unmet' ? 'active' : ''}`}
+              onClick={() => navigateTo('unmet')}
             >
               Unmet Needs
             </button>
@@ -248,7 +255,7 @@ export default function Header() {
             <button
               type="button"
               className="btn btn-primary btn-sm nav-cta-btn"
-              onClick={() => navigateTo('create', { prefill: null })}
+              onClick={handleShareClick}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -257,121 +264,134 @@ export default function Header() {
               <span>+ Share Item</span>
             </button>
 
-            {/* Zepto/Flipkart Style User Account Avatar & Dropdown */}
-            <div className="user-profile-menu-container" ref={dropdownRef}>
+            {/* Account / Sign-in Section */}
+            {currentUser ? (
+              <div className="user-profile-menu-container" ref={dropdownRef}>
+                <button
+                  type="button"
+                  className="user-profile-btn"
+                  onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                  aria-expanded={profileDropdownOpen}
+                  aria-label="User account menu"
+                >
+                  <div className="user-avatar-circle">
+                    {currentUser.avatarUrl ? (
+                      <img src={currentUser.avatarUrl} alt={currentUser.name} className="user-avatar-img" />
+                    ) : (
+                      <span>{currentUser.name?.charAt(0) || 'U'}</span>
+                    )}
+                  </div>
+                  <div className="user-profile-text-wrap">
+                    <span className="user-profile-name">{currentUser.name?.split(' ')[0]}</span>
+                    <span className="user-profile-sub">{currentUser.roomOrFlat || 'Resident'}</span>
+                  </div>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-muted)' }}>
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+
+                {/* Popover Dropdown */}
+                {profileDropdownOpen && (
+                  <div className="user-profile-popover">
+                    <div className="user-popover-header">
+                      <div className="user-avatar-large">
+                        {currentUser.avatarUrl ? (
+                          <img src={currentUser.avatarUrl} alt={currentUser.name} className="user-avatar-img" />
+                        ) : (
+                          <span>{currentUser.name?.charAt(0) || 'U'}</span>
+                        )}
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.925rem', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {currentUser.name}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.1rem' }}>
+                          {currentUser.roomOrFlat} &bull; {currentCommunity?.name?.split('(')[0].trim()}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.1rem' }}>
+                          {currentUser.phone}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="user-popover-links">
+                      <button
+                        type="button"
+                        className="user-popover-item"
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          setProfileModalOpen(true);
+                        }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>Customize Profile & PFP</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="user-popover-item"
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          setSwitchAccountModalOpen(true);
+                        }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#0284c7' }}>
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="9" cy="7" r="4"></circle>
+                          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Switch Member Persona</span>
+                      </button>
+
+                      <div style={{ height: '1px', backgroundColor: 'var(--color-border)', margin: '0.35rem 0' }} />
+
+                      <button
+                        type="button"
+                        className="user-popover-item"
+                        style={{ color: '#ef4444' }}
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          signOut();
+                        }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                          <polyline points="16 17 21 12 16 7"></polyline>
+                          <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Sign Out (Guest Mode)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
               <button
                 type="button"
-                className="user-profile-btn"
-                onClick={() => setProfileDropdownOpen((prev) => !prev)}
-                aria-expanded={profileDropdownOpen}
-                aria-label="User account menu"
+                className="btn btn-outline btn-sm"
+                onClick={() => setSwitchAccountModalOpen(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.35rem 0.85rem',
+                  fontSize: '0.825rem',
+                  fontWeight: 600,
+                  borderColor: 'var(--color-border)',
+                }}
               >
-                <div className="user-avatar-circle">
-                  {currentUser?.avatarUrl ? (
-                    <img src={currentUser.avatarUrl} alt={currentUser.name} className="user-avatar-img" />
-                  ) : (
-                    <span>{currentUser?.name?.charAt(0) || 'U'}</span>
-                  )}
-                </div>
-                <div className="user-profile-text-wrap">
-                  <span className="user-profile-name">{currentUser?.name?.split(' ')[0] || 'Member'}</span>
-                  <span className="user-profile-sub">{currentUser?.roomOrFlat || 'Room 304'}</span>
-                </div>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-muted)' }}>
-                  <polyline points="6 9 12 15 18 9"></polyline>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
                 </svg>
+                <span>Sign In / Select Profile</span>
               </button>
-
-              {/* Popover Dropdown (Zepto Style) */}
-              {profileDropdownOpen && (
-                <div className="user-profile-popover">
-                  <div className="user-popover-header">
-                    <div className="user-avatar-large">
-                      {currentUser?.avatarUrl ? (
-                        <img src={currentUser.avatarUrl} alt={currentUser.name} className="user-avatar-img" />
-                      ) : (
-                        <span>{currentUser?.name?.charAt(0) || 'U'}</span>
-                      )}
-                    </div>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.925rem', color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {currentUser?.name}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.1rem' }}>
-                        {currentUser?.roomOrFlat} &bull; {currentCommunity?.name?.split('(')[0].trim()}
-                      </div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.1rem' }}>
-                        {currentUser?.phone}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="user-popover-links">
-                    <button
-                      type="button"
-                      className="user-popover-item"
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        setProfileModalOpen(true);
-                      }}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                      </svg>
-                      <span>Customize Profile & PFP</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="user-popover-item"
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        setAiKeyModalOpen(true);
-                      }}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#8b5cf6' }}>
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                      </svg>
-                      <span>Gemini Pro AI Key (Jio Offer)</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="user-popover-item"
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        setSwitchAccountModalOpen(true);
-                      }}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#0284c7' }}>
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                      </svg>
-                      <span>Switch Testing Personas</span>
-                    </button>
-
-                    <div style={{ height: '1px', backgroundColor: 'var(--color-border)', margin: '0.35rem 0' }} />
-
-                    <button
-                      type="button"
-                      className="user-popover-item"
-                      style={{ color: '#ef4444' }}
-                      onClick={handleSignOut}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                      </svg>
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ const CATEGORIES = [
 ];
 
 export default function UnmetDemandPage() {
-  const { currentCommunity, currentUser, navigateTo, notify } = useApp();
+  const { currentCommunity, currentUser, navigateTo, notify, setSwitchAccountModalOpen } = useApp();
 
   const [aggregated, setAggregated] = useState([]);
   const [myDemands, setMyDemands] = useState([]);
@@ -52,6 +52,11 @@ export default function UnmetDemandPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      notify('info', 'Please select or sign in to your resident account to submit a request.');
+      setSwitchAccountModalOpen(true);
+      return;
+    }
     if (!itemName.trim()) {
       notify('error', 'Item name is required.');
       return;

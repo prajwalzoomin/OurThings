@@ -46,15 +46,9 @@ public class GeminiService {
         Map<String, Object> status = new HashMap<>();
         String key = getEffectiveApiKey();
         status.put("configured", key != null);
-        status.put("model", "gemini-1.5-pro");
-        status.put("provider", "Google Generative AI (Gemini Pro - Jio Offer Compatible)");
-        if (key != null) {
-            String masked = key.length() > 8 ? key.substring(0, 4) + "..." + key.substring(key.length() - 4) : "****";
-            status.put("activeKeyMasked", masked);
-        } else {
-            status.put("activeKeyMasked", null);
-            status.put("placeholderHelp", "Place your key in server/src/main/resources/application.properties as gemini.api.key=... or enter via UI settings.");
-        }
+        status.put("model", "semantic-service");
+        status.put("provider", "Community Semantic Engine");
+        status.put("activeKeyMasked", key != null ? "****" : null);
         return status;
     }
 
@@ -305,8 +299,140 @@ public class GeminiService {
         response.put("suggestedCategory", suggestedCategory);
         response.put("expandedKeywords", expandedKeywords);
         response.put("dynamicFilters", dynamicFilters);
-        response.put("aiModel", isAiConfigured() ? "Google Gemini 1.5 Pro" : "OurThings Semantic Indexer");
+        response.put("aiModel", "Semantic Search Engine");
 
         return response;
     }
+
+    /**
+     * Semantic search synonym expansion:
+     * Discovers alternative names, colloquial terms, and related items
+     * using Gemini in the background or a comprehensive domain dictionary.
+     */
+    public Set<String> getSearchSynonyms(String rawQuery) {
+        if (rawQuery == null || rawQuery.trim().isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Set<String> synonyms = new LinkedHashSet<>();
+        String cleanQuery = rawQuery.trim().toLowerCase();
+        synonyms.add(cleanQuery);
+
+        // 1. Check background Gemini API if configured
+        String apiKey = getEffectiveApiKey();
+        if (apiKey != null) {
+            try {
+                String prompt = "In a community sharing and tool library (with tools, electronics, mobility aids, travel gear, event gear), " +
+                        "the user searched for: \"" + cleanQuery.replace("\"", "'") + "\". " +
+                        "What are up to 6 exact alternative item names, equipment synonyms, or colloquial Indian terms for this item or need? " +
+                        "Return ONLY a JSON array of strings, for example [\"crutches\", \"walker\", \"walking aid\"].";
+
+                Map<String, Object> requestBody = new HashMap<>();
+                Map<String, Object> contents = new HashMap<>();
+                contents.put("parts", List.of(Map.of("text", prompt)));
+                requestBody.put("contents", List.of(contents));
+
+                Map<String, Object> genConfig = new HashMap<>();
+                genConfig.put("temperature", 0.1);
+                genConfig.put("responseMimeType", "application/json");
+                requestBody.put("generationConfig", genConfig);
+
+                String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + apiKey;
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+                ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                    JsonNode root = objectMapper.readTree(response.getBody());
+                    JsonNode textNode = root.path("candidates").path(0).path("content").path("parts").path(0).path("text");
+                    if (!textNode.isMissingNode()) {
+                        String jsonText = textNode.asText().trim();
+                        if (jsonText.startsWith("```json")) jsonText = jsonText.substring(7);
+                        if (jsonText.startsWith("```")) jsonText = jsonText.substring(3);
+                        if (jsonText.endsWith("```")) jsonText = jsonText.substring(0, jsonText.length() - 3);
+
+                        JsonNode arrayNode = objectMapper.readTree(jsonText.trim());
+                        if (arrayNode.isArray()) {
+                            for (JsonNode item : arrayNode) {
+                                String syn = item.asText().trim().toLowerCase();
+                                if (!syn.isEmpty() && syn.length() > 2) {
+                                    synonyms.add(syn);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        // 2. Comprehensive deterministic Indian & colloquial dictionary expansion
+        expandDeterministicSynonyms(cleanQuery, synonyms);
+
+        return synonyms;
+    }
+
+    private void expandDeterministicSynonyms(String query, Set<String> synonyms) {
+        String q = query.toLowerCase();
+
+        // Crutches & Mobility Aids
+        if (q.contains("walking stick") || q.contains("stick") || q.contains("cane") ||
+            q.contains("fracture") || q.contains("leg") || q.contains("sprain") ||
+            q.contains("injury") || q.contains("walker") || q.contains("crutch")) {
+            synonyms.addAll(List.of("crutch", "crutches", "underarm crutches", "mobility", "aluminum crutches", "wheelchair"));
+        }
+
+        // Wheelchair
+        if (q.contains("wheelchair") || q.contains("wheel chair") || q.contains("handicap") ||
+            q.contains("patient chair") || q.contains("commode") || q.contains("foldable chair")) {
+            synonyms.addAll(List.of("wheelchair", "foldable wheelchair", "mobility", "crutches"));
+        }
+
+        // Drill & Tools
+        if (q.contains("drill") || q.contains("drilling machine") || q.contains("bore") ||
+            q.contains("wall hole") || q.contains("screw") || q.contains("screwdriver") ||
+            q.contains("hammer") || q.contains("toolkit") || q.contains("tool kit") ||
+            q.contains("masonry") || q.contains("hardware")) {
+            synonyms.addAll(List.of("drill", "impact drill", "bosch", "masonry bits", "tools", "drill kit"));
+        }
+
+        // Projector & Cinema
+        if (q.contains("projector") || q.contains("movie") || q.contains("cinema") ||
+            q.contains("movie night") || q.contains("screen") || q.contains("hdmi") ||
+            q.contains("presentation") || q.contains("slides") || q.contains("big screen") ||
+            q.contains("beamer")) {
+            synonyms.addAll(List.of("projector", "full hd projector", "epson", "hdmi cable", "display"));
+        }
+
+        // Speaker & Sound
+        if (q.contains("speaker") || q.contains("sound") || q.contains("mic") ||
+            q.contains("microphone") || q.contains("audio") || q.contains("party") ||
+            q.contains("pa system") || q.contains("amplifier") || q.contains("bluetooth")) {
+            synonyms.addAll(List.of("speaker", "jbl", "pa speaker", "wireless microphone", "event equipment"));
+        }
+
+        // Rucksack & Travel Bag
+        if (q.contains("bag") || q.contains("travel bag") || q.contains("rucksack") ||
+            q.contains("backpack") || q.contains("luggage") || q.contains("suitcase") ||
+            q.contains("trolley") || q.contains("trekking") || q.contains("camping") ||
+            q.contains("trip")) {
+            synonyms.addAll(List.of("rucksack", "wildcraft", "trekking rucksack", "travel gear", "rain cover"));
+        }
+
+        // Blood Pressure & Medical
+        if (q.contains("bp") || q.contains("blood pressure") || q.contains("pressure machine") ||
+            q.contains("sphygmomanometer") || q.contains("pulse") || q.contains("hypertension") ||
+            q.contains("health monitor") || q.contains("cuff")) {
+            synonyms.addAll(List.of("blood pressure", "bp monitor", "omron", "digital blood pressure", "healthcare"));
+        }
+
+        // Knee Brace
+        if (q.contains("knee") || q.contains("brace") || q.contains("ortho") ||
+            q.contains("orthopedic") || q.contains("ligament") || q.contains("crepe")) {
+            synonyms.addAll(List.of("knee brace", "orthopedic", "mobility", "healthcare"));
+        }
+    }
 }
+

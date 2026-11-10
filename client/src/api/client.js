@@ -1,15 +1,22 @@
 // OurThings API Client
 
-let activeUserId = 1;
+let activeUserId = null; // Default to Guest mode (no account by default)
 let activeCommunityId = null; // Default to city-wide (all communities), toggle enables community filter
+let userLat = null;
+let userLng = null;
 
 export function setApiContext(userId, communityId) {
-  if (userId !== undefined) activeUserId = userId;
+  activeUserId = userId !== undefined ? userId : null;
   activeCommunityId = communityId !== undefined ? communityId : null;
 }
 
+export function setApiLocation(lat, lng) {
+  userLat = lat !== undefined ? lat : null;
+  userLng = lng !== undefined ? lng : null;
+}
+
 export function getApiContext() {
-  return { activeUserId, activeCommunityId };
+  return { activeUserId, activeCommunityId, userLat, userLng };
 }
 
 async function request(url, options = {}) {
@@ -17,6 +24,8 @@ async function request(url, options = {}) {
     'Content-Type': 'application/json',
     ...(activeUserId ? { 'X-User-Id': String(activeUserId) } : {}),
     ...(activeCommunityId ? { 'X-Community-Id': String(activeCommunityId) } : {}),
+    ...(userLat != null ? { 'X-User-Lat': String(userLat) } : {}),
+    ...(userLng != null ? { 'X-User-Lng': String(userLng) } : {}),
     ...options.headers,
   };
 
@@ -50,10 +59,10 @@ export const api = {
   registerUser: (payload) => request('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   switchCommunity: (communityId) => request('/api/auth/switch-community', { method: 'POST', body: JSON.stringify({ communityId }) }),
 
-  // AI & Gemini Pro Services
+  // Address & Semantic Search Services (Under the hood)
   getAiStatus: () => request('/api/ai/status'),
   setAiKey: (key) => request('/api/ai/key', { method: 'POST', body: JSON.stringify({ key }) }),
-  parseAddress: (address) => request('/api/ai/parse-address', { method: 'POST', body: JSON.stringify({ address }) }),
+  parseAddress: (rawAddress) => request('/api/ai/parse-address', { method: 'POST', body: JSON.stringify({ rawAddress }) }),
   smartSearch: (query) => request('/api/ai/smart-search', { method: 'POST', body: JSON.stringify({ query }) }),
 
   // Communities
@@ -69,6 +78,8 @@ export const api = {
     if (params.condition) query.append('condition', params.condition);
     if (params.dateFrom) query.append('dateFrom', params.dateFrom);
     if (params.dateTo) query.append('dateTo', params.dateTo);
+    if (params.userLat != null) query.append('userLat', params.userLat);
+    if (params.userLng != null) query.append('userLng', params.userLng);
     const qs = query.toString();
     return request(`/api/items${qs ? '?' + qs : ''}`);
   },

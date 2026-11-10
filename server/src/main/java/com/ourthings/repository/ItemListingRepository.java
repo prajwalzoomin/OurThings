@@ -25,6 +25,7 @@ public interface ItemListingRepository extends JpaRepository<ItemListing, Long> 
            "AND (:keyword IS NULL OR :keyword = '' OR " +
            "     LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "     LOWER(i.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "     LOWER(i.category) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "     LOWER(i.pickupLocation) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "     (i.locality IS NOT NULL AND LOWER(i.locality) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR " +
            "     (i.landmark IS NOT NULL AND LOWER(i.landmark) LIKE LOWER(CONCAT('%', :keyword, '%')))) " +

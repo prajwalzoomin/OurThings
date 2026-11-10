@@ -5,7 +5,7 @@ import StatusBadge from '../components/StatusBadge';
 import ItemCard from '../components/ItemCard';
 
 export default function BorrowingHistory() {
-  const { currentUser, currentCommunity, navigateTo } = useApp();
+  const { currentUser, currentCommunity, navigateTo, setSwitchAccountModalOpen } = useApp();
   const [historyType, setHistoryType] = useState('borrowed'); // 'borrowed' or 'lent'
   const [borrowedLoans, setBorrowedLoans] = useState([]);
   const [lentLoans, setLentLoans] = useState([]);
@@ -35,6 +35,25 @@ export default function BorrowingHistory() {
   }, [currentUser, currentCommunity]);
 
   const activeList = historyType === 'borrowed' ? borrowedLoans : lentLoans;
+
+  if (!currentUser) {
+    return (
+      <div className="card-container" style={{ textAlign: 'center', padding: '3.5rem 1.5rem' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📜</div>
+        <h2 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>Sign In to View Loan History</h2>
+        <p style={{ color: 'var(--color-text-secondary)', maxWidth: '480px', margin: '0.5rem auto 1.5rem auto', fontSize: '0.9rem' }}>
+          You are currently in guest mode. Select or sign in with your resident account to see your borrowing and lending audit logs.
+        </p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => setSwitchAccountModalOpen(true)}
+        >
+          Sign In / Select Resident Profile
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="card-container">

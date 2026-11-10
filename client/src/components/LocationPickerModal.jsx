@@ -276,7 +276,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
               disabled={aiParsing}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              <span>{aiParsing ? '✨ Refining...' : '✨ Gemini AI Standardize Address'}</span>
+              <span>{aiParsing ? 'Auto-Formatting...' : 'Auto-Format Postal Address'}</span>
             </button>
           </div>
 
@@ -428,3 +428,4 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
     </div>
   );
 }
+

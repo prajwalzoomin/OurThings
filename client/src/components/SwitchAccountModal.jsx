@@ -51,11 +51,11 @@ export default function SwitchAccountModal({ isOpen, onClose }) {
         >
           <div>
             <h2 style={{ fontSize: '1.2rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>🧪</span>
-              <span>Switch Testing Profile</span>
+              <span>👤</span>
+              <span>Sign In / Select Resident Profile</span>
             </h2>
             <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-              Quickly switch personas to test lender approvals, borrower reservations, and returns.
+              Select your community profile to borrow resources, approve requests, or list new items.
             </p>
           </div>
           <button
@@ -166,3 +166,4 @@ export default function SwitchAccountModal({ isOpen, onClose }) {
     </div>
   );
 }
+

@@ -22,7 +22,7 @@ const DISTANCES = [
 ];
 
 export default function BrowseItems() {
-  const { currentCommunity, currentUser, navigateTo, communityOnly, toggleCommunityOnly, searchQuery, setSearchQuery } = useApp();
+  const { currentCommunity, currentUser, navigateTo, communityOnly, toggleCommunityOnly, searchQuery, setSearchQuery, userLocation, requireAuth } = useApp();
 
   const [items, setItems] = useState([]);
   const [category, setCategory] = useState('All Categories');
@@ -36,10 +36,9 @@ export default function BrowseItems() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Gemini AI Smart Facets
+  // Dynamic Contextual Facets (Flipkart-style)
   const [aiFacets, setAiFacets] = useState([]);
   const [activeFacet, setActiveFacet] = useState(null);
-  const [aiModelUsed, setAiModelUsed] = useState(null);
 
   // Sync external search query from Header omnibar
   useEffect(() => {
@@ -58,6 +57,10 @@ export default function BrowseItems() {
       if (condition && condition !== 'All Conditions') params.condition = condition;
       if (dateFrom) params.dateFrom = dateFrom;
       if (dateTo) params.dateTo = dateTo;
+      if (userLocation?.latitude != null && userLocation?.longitude != null) {
+        params.userLat = userLocation.latitude;
+        params.userLng = userLocation.longitude;
+      }
 
       const data = await api.getItems(params);
       let list = data || [];
@@ -67,7 +70,7 @@ export default function BrowseItems() {
         list = list.filter((item) => (item.distanceKm || 0.4) <= maxDistanceKm);
       }
 
-      // Filter by active AI facet if selected
+      // Filter by active facet if selected
       if (activeFacet) {
         const facetLower = activeFacet.toLowerCase();
         list = list.filter((item) =>
@@ -93,7 +96,7 @@ export default function BrowseItems() {
     }
   };
 
-  // Fetch AI smart facets when keyword or category changes
+  // Fetch contextual specifications when keyword or category changes
   useEffect(() => {
     const q = keyword || (category !== 'All Categories' ? category : '');
     if (q) {
@@ -101,7 +104,6 @@ export default function BrowseItems() {
         .then((res) => {
           if (res && res.dynamicFilters) {
             setAiFacets(res.dynamicFilters);
-            setAiModelUsed(res.aiModel);
           }
         })
         .catch(() => {});
@@ -112,7 +114,7 @@ export default function BrowseItems() {
 
   useEffect(() => {
     fetchItems();
-  }, [currentCommunity, category, condition, maxDistanceKm, sortBy, communityOnly, activeFacet]);
+  }, [currentCommunity, category, condition, maxDistanceKm, sortBy, communityOnly, activeFacet, userLocation]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -153,7 +155,7 @@ export default function BrowseItems() {
         <button
           type="button"
           className="btn btn-primary btn-sm"
-          onClick={() => navigateTo('create')}
+          onClick={() => requireAuth(() => navigateTo('create'))}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -300,15 +302,12 @@ export default function BrowseItems() {
             </div>
           </div>
 
-          {/* 4. Gemini AI Dynamic Facets (Flipkart Style) */}
+          {/* 4. Specifications & Contextual Features (Flipkart Style) */}
           {aiFacets.length > 0 && (
             <div className="flipkart-filter-section" style={{ borderBottom: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: '#8b5cf6', letterSpacing: '0.04em' }}>
-                  ✨ Gemini Dynamic Specs
-                </span>
-                <span style={{ fontSize: '0.62rem', backgroundColor: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', padding: '0.05rem 0.35rem', borderRadius: '3px', fontWeight: 700 }}>
-                  AI
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', letterSpacing: '0.04em' }}>
+                  Specifications & Features
                 </span>
               </div>
 
