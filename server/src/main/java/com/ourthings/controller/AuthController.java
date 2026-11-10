@@ -44,6 +44,13 @@ public class AuthController {
         return ResponseEntity.ok(created);
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<UserDto> updateProfile(@RequestHeader("X-User-Id") Long userId,
+                                                 @RequestBody UpdateProfileRequest req) {
+        UserDto updated = authService.updateProfile(userId, req);
+        return ResponseEntity.ok(updated);
+    }
+
     @PostMapping("/switch-community")
     public ResponseEntity<UserDto> switchCommunity(@RequestHeader("X-User-Id") Long userId,
                                                    @RequestBody Map<String, Long> payload) {

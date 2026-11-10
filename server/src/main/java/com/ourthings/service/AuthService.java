@@ -86,6 +86,37 @@ public class AuthService {
         return toDto(user);
     }
 
+    @Transactional
+    public UserDto updateProfile(Long userId, UpdateProfileRequest req) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        if (req.getName() != null && !req.getName().trim().isEmpty()) {
+            user.setName(req.getName().trim());
+        }
+        if (req.getPhone() != null) {
+            user.setPhone(req.getPhone().trim());
+        }
+        if (req.getRoomOrFlat() != null) {
+            user.setRoomOrFlat(req.getRoomOrFlat().trim());
+        }
+        if (req.getAvatarUrl() != null) {
+            user.setAvatarUrl(req.getAvatarUrl().trim());
+        }
+        if (req.getAddress() != null) {
+            user.setAddress(req.getAddress().trim());
+        }
+        if (req.getCity() != null) {
+            user.setCity(req.getCity().trim());
+        }
+        if (req.getPincode() != null) {
+            user.setPincode(req.getPincode().trim());
+        }
+
+        user = userRepository.save(user);
+        return toDto(user);
+    }
+
     public UserDto toDto(User u) {
         return new UserDto(
                 u.getId(),
@@ -93,6 +124,10 @@ public class AuthService {
                 u.getEmail(),
                 u.getPhone(),
                 u.getRoomOrFlat(),
+                u.getAvatarUrl(),
+                u.getAddress(),
+                u.getCity() != null ? u.getCity() : "Bengaluru",
+                u.getPincode() != null ? u.getPincode() : "560103",
                 u.getActiveCommunityId(),
                 u.getRole()
         );

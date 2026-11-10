@@ -3,6 +3,9 @@ import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ZenGlanceModal from './components/ZenGlanceModal';
+import ProfileModal from './components/ProfileModal';
+import AiKeyModal from './components/AiKeyModal';
+import SwitchAccountModal from './components/SwitchAccountModal';
 
 // Pages
 import Home from './pages/Home';
@@ -17,7 +20,16 @@ import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 
 function AppContent() {
-  const { currentTab, notification, currentUser, currentCommunity } = useApp();
+  const {
+    currentTab,
+    notification,
+    profileModalOpen,
+    setProfileModalOpen,
+    aiKeyModalOpen,
+    setAiKeyModalOpen,
+    switchAccountModalOpen,
+    setSwitchAccountModalOpen,
+  } = useApp();
 
   return (
     <div className="app-wrapper">
@@ -49,47 +61,6 @@ function AppContent() {
         </div>
       )}
 
-      {/* Quick Demo Workflow Guidance Subbar */}
-      <div
-        style={{
-          backgroundColor: 'var(--color-surface-subtle)',
-          borderBottom: '1px solid var(--color-border)',
-          padding: '0.35rem 1.25rem',
-          fontSize: '0.785rem',
-          color: 'var(--color-text-secondary)',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1380px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0.5rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span
-              style={{
-                display: 'inline-block',
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--color-brand)',
-              }}
-            ></span>
-            <span>
-              Active Member: <strong>{currentUser ? currentUser.name : ''}</strong> &bull; Community Scope: <strong>{currentCommunity ? currentCommunity.name : ''}</strong>
-            </span>
-          </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            Switch accounts above to test owner approvals, handover inspections & returns
-          </div>
-        </div>
-      </div>
-
       <main className="main-content">
         {currentTab === 'home' && <Home />}
         {currentTab === 'browse' && <BrowseItems />}
@@ -104,6 +75,9 @@ function AppContent() {
       </main>
 
       <ZenGlanceModal />
+      <ProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
+      <AiKeyModal isOpen={aiKeyModalOpen} onClose={() => setAiKeyModalOpen(false)} />
+      <SwitchAccountModal isOpen={switchAccountModalOpen} onClose={() => setSwitchAccountModalOpen(false)} />
       <Footer />
     </div>
   );

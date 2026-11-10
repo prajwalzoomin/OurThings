@@ -258,10 +258,20 @@ export default function ItemDetail() {
           </div>
 
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Pickup Location</span>
-            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Pickup Location & GPS</span>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '0.2rem' }}>
               {item.pickupLocation}
             </div>
+            {item.formattedAddress && (
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.2rem' }}>
+                {item.formattedAddress}
+              </div>
+            )}
+            {item.latitude && item.longitude && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-brand)', marginTop: '0.25rem', fontWeight: 600 }}>
+                📍 GPS Pin: {item.latitude}, {item.longitude} {item.distanceKm ? `(~${item.distanceKm} km away)` : ''}
+              </div>
+            )}
           </div>
 
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>

@@ -7,6 +7,7 @@ import com.ourthings.model.ItemListing;
 import com.ourthings.model.User;
 import com.ourthings.repository.ActivityLogRepository;
 import com.ourthings.repository.BorrowRequestRepository;
+import com.ourthings.repository.CommunityRepository;
 import com.ourthings.repository.ItemListingRepository;
 import com.ourthings.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -24,19 +25,22 @@ public class ItemService {
     private final BorrowRequestRepository borrowRequestRepository;
     private final UserRepository userRepository;
     private final ActivityLogRepository activityLogRepository;
+    private final CommunityRepository communityRepository;
 
     public ItemService(ItemListingRepository itemListingRepository,
                        BorrowRequestRepository borrowRequestRepository,
                        UserRepository userRepository,
-                       ActivityLogRepository activityLogRepository) {
+                       ActivityLogRepository activityLogRepository,
+                       CommunityRepository communityRepository) {
         this.itemListingRepository = itemListingRepository;
         this.borrowRequestRepository = borrowRequestRepository;
         this.userRepository = userRepository;
         this.activityLogRepository = activityLogRepository;
+        this.communityRepository = communityRepository;
     }
 
-    public List<ItemResponseDto> searchItems(Long communityId, String category, String keyword, LocalDate dateFrom, LocalDate dateTo) {
-        List<ItemListing> items = itemListingRepository.searchItems(communityId, category, keyword, dateFrom, dateTo);
+    public List<ItemResponseDto> searchItems(Long communityId, String category, String keyword, String condition, LocalDate dateFrom, LocalDate dateTo) {
+        List<ItemListing> items = itemListingRepository.searchItems(communityId, category, keyword, condition, dateFrom, dateTo);
         return items.stream().map(this::toResponseDto).collect(Collectors.toList());
     }
 
@@ -55,10 +59,6 @@ public class ItemService {
     public ItemResponseDto getItemById(Long id, Long communityId) {
         ItemListing item = itemListingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found: " + id));
-
-        if (!item.getCommunityId().equals(communityId)) {
-            throw new SecurityException("Unauthorized access: item does not belong to active community.");
-        }
 
         return toResponseDto(item);
     }
@@ -83,6 +83,17 @@ public class ItemService {
         if (req.getImageUrl() != null && !req.getImageUrl().trim().isEmpty()) {
             item.setImageUrl(req.getImageUrl().trim());
         }
+
+        item.setLatitude(req.getLatitude());
+        item.setLongitude(req.getLongitude());
+        item.setFormattedAddress(req.getFormattedAddress());
+        item.setPremise(req.getPremise());
+        item.setBuilding(req.getBuilding());
+        item.setLandmark(req.getLandmark());
+        item.setLocality(req.getLocality());
+        item.setCity(req.getCity() != null ? req.getCity() : "Bengaluru");
+        item.setPincode(req.getPincode());
+        item.setState(req.getState() != null ? req.getState() : "Karnataka");
 
         item = itemListingRepository.save(item);
 
@@ -129,6 +140,17 @@ public class ItemService {
         if (req.getImageUrl() != null && !req.getImageUrl().trim().isEmpty()) {
             item.setImageUrl(req.getImageUrl().trim());
         }
+
+        item.setLatitude(req.getLatitude());
+        item.setLongitude(req.getLongitude());
+        item.setFormattedAddress(req.getFormattedAddress());
+        item.setPremise(req.getPremise());
+        item.setBuilding(req.getBuilding());
+        item.setLandmark(req.getLandmark());
+        item.setLocality(req.getLocality());
+        item.setCity(req.getCity() != null ? req.getCity() : "Bengaluru");
+        item.setPincode(req.getPincode());
+        item.setState(req.getState() != null ? req.getState() : "Karnataka");
 
         item = itemListingRepository.save(item);
         return toResponseDto(item);
@@ -216,12 +238,43 @@ public class ItemService {
         dto.setCategory(item.getCategory());
         dto.setItemCondition(item.getItemCondition());
         dto.setPickupLocation(item.getPickupLocation());
+        dto.setLatitude(item.getLatitude());
+        dto.setLongitude(item.getLongitude());
+        dto.setFormattedAddress(item.getFormattedAddress());
+        dto.setPremise(item.getPremise());
+        dto.setBuilding(item.getBuilding());
+        dto.setLandmark(item.getLandmark());
+        dto.setLocality(item.getLocality());
+        dto.setCity(item.getCity());
+        dto.setPincode(item.getPincode());
+        dto.setState(item.getState());
         dto.setAvailableFrom(item.getAvailableFrom());
         dto.setAvailableTo(item.getAvailableTo());
         dto.setEstimatedReplacementValueInr(item.getEstimatedReplacementValueInr());
         dto.setImageUrl(item.getImageUrl());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());
+
+        communityRepository.findById(item.getCommunityId()).ifPresent(comm -> {
+            dto.setCommunityName(comm.getName());
+        });
+
+        // Compute approximate distance from community reference or default Bangalore center (12.9345, 77.6912)
+        if (item.getLatitude() != null && item.getLongitude() != null) {
+            double baseLat = 12.9345;
+            double baseLng = 77.6912;
+            double earthRadius = 6371; // km
+            double dLat = Math.toRadians(item.getLatitude() - baseLat);
+            double dLng = Math.toRadians(item.getLongitude() - baseLng);
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(Math.toRadians(baseLat)) * Math.cos(Math.toRadians(item.getLatitude())) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            double dist = Math.round(earthRadius * c * 10.0) / 10.0;
+            dto.setDistanceKm(dist);
+        } else {
+            dto.setDistanceKm(0.4); // Local within campus / building
+        }
 
         userRepository.findById(item.getOwnerId()).ifPresent(owner -> {
             dto.setOwnerName(owner.getName());

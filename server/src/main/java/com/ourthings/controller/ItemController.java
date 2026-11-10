@@ -20,17 +20,18 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponseDto> getItems(@RequestHeader("X-Community-Id") Long communityId,
+    public List<ItemResponseDto> getItems(@RequestHeader(value = "X-Community-Id", required = false) Long communityId,
                                           @RequestParam(required = false) String category,
                                           @RequestParam(required = false) String keyword,
+                                          @RequestParam(required = false) String condition,
                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
-        return itemService.searchItems(communityId, category, keyword, dateFrom, dateTo);
+        return itemService.searchItems(communityId, category, keyword, condition, dateFrom, dateTo);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id,
-                                                       @RequestHeader("X-Community-Id") Long communityId) {
+                                                       @RequestHeader(value = "X-Community-Id", required = false) Long communityId) {
         return ResponseEntity.ok(itemService.getItemById(id, communityId));
     }
 

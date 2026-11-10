@@ -23,6 +23,18 @@ public class User {
     @Column(name = "room_or_flat", length = 50)
     private String roomOrFlat;
 
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+
+    @Column(length = 100)
+    private String city = "Bengaluru";
+
+    @Column(length = 20)
+    private String pincode = "560103";
+
+    @Column(length = 255)
+    private String address;
+
     @Column(name = "active_community_id")
     private Long activeCommunityId;
 
@@ -44,6 +56,17 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    public User(String name, String email, String phone, String roomOrFlat, String avatarUrl, Long activeCommunityId, String role) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.roomOrFlat = roomOrFlat;
+        this.avatarUrl = avatarUrl;
+        this.activeCommunityId = activeCommunityId;
+        this.role = role != null ? role : "MEMBER";
+        this.createdAt = LocalDateTime.now();
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -58,6 +81,18 @@ public class User {
 
     public String getRoomOrFlat() { return roomOrFlat; }
     public void setRoomOrFlat(String roomOrFlat) { this.roomOrFlat = roomOrFlat; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getPincode() { return pincode; }
+    public void setPincode(String pincode) { this.pincode = pincode; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
     public Long getActiveCommunityId() { return activeCommunityId; }
     public void setActiveCommunityId(Long activeCommunityId) { this.activeCommunityId = activeCommunityId; }

@@ -1,11 +1,11 @@
 // OurThings API Client
 
 let activeUserId = 1;
-let activeCommunityId = 1;
+let activeCommunityId = null; // Default to city-wide (all communities), toggle enables community filter
 
 export function setApiContext(userId, communityId) {
-  if (userId) activeUserId = userId;
-  if (communityId) activeCommunityId = communityId;
+  if (userId !== undefined) activeUserId = userId;
+  activeCommunityId = communityId !== undefined ? communityId : null;
 }
 
 export function getApiContext() {
@@ -15,8 +15,8 @@ export function getApiContext() {
 async function request(url, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
-    'X-User-Id': String(activeUserId),
-    'X-Community-Id': String(activeCommunityId),
+    ...(activeUserId ? { 'X-User-Id': String(activeUserId) } : {}),
+    ...(activeCommunityId ? { 'X-Community-Id': String(activeCommunityId) } : {}),
     ...options.headers,
   };
 
@@ -46,8 +46,15 @@ export const api = {
   // Auth & Context
   getUsers: () => request('/api/auth/users'),
   getCurrentUser: () => request('/api/auth/me'),
+  updateProfile: (payload) => request('/api/auth/profile', { method: 'PUT', body: JSON.stringify(payload) }),
   registerUser: (payload) => request('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   switchCommunity: (communityId) => request('/api/auth/switch-community', { method: 'POST', body: JSON.stringify({ communityId }) }),
+
+  // AI & Gemini Pro Services
+  getAiStatus: () => request('/api/ai/status'),
+  setAiKey: (key) => request('/api/ai/key', { method: 'POST', body: JSON.stringify({ key }) }),
+  parseAddress: (address) => request('/api/ai/parse-address', { method: 'POST', body: JSON.stringify({ address }) }),
+  smartSearch: (query) => request('/api/ai/smart-search', { method: 'POST', body: JSON.stringify({ query }) }),
 
   // Communities
   getCommunities: () => request('/api/communities'),
@@ -59,6 +66,7 @@ export const api = {
     const query = new URLSearchParams();
     if (params.category) query.append('category', params.category);
     if (params.keyword) query.append('keyword', params.keyword);
+    if (params.condition) query.append('condition', params.condition);
     if (params.dateFrom) query.append('dateFrom', params.dateFrom);
     if (params.dateTo) query.append('dateTo', params.dateTo);
     const qs = query.toString();

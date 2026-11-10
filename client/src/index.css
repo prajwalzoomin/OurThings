@@ -1824,3 +1824,323 @@ p {
   padding: 0.5rem 1rem;
   font-size: 0.825rem;
 }
+
+/* ==========================================================================
+   Food-Delivery "VEG ONLY" Style Scope Toggle Switch
+   ========================================================================== */
+.scope-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--color-text-secondary);
+}
+
+.scope-toggle-pill:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-focus);
+}
+
+.scope-toggle-pill.active-scope {
+  background-color: var(--color-brand-light);
+  border-color: var(--color-brand-border);
+  color: var(--color-brand);
+}
+
+.scope-toggle-indicator {
+  width: 22px;
+  height: 13px;
+  background-color: #94a3b8;
+  border-radius: 999px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.active-scope .scope-toggle-indicator {
+  background-color: var(--color-brand);
+}
+
+.scope-toggle-dot {
+  width: 9px;
+  height: 9px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+}
+
+.active-scope .scope-toggle-dot {
+  transform: translateX(9px);
+}
+
+/* ==========================================================================
+   Flipkart / Zepto Global Header Search Omnibar
+   ========================================================================== */
+.header-search-form {
+  flex: 1;
+  max-width: 380px;
+  min-width: 200px;
+}
+
+.header-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.header-search-wrapper:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 2px var(--color-brand-light);
+}
+
+.header-search-icon {
+  position: absolute;
+  left: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.header-search-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.65rem 0.45rem 2rem;
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.header-search-clear {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0 0.45rem;
+  line-height: 1;
+}
+
+.header-search-btn {
+  background-color: var(--color-surface-hover);
+  border: none;
+  border-left: 1px solid var(--color-border);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.header-search-btn:hover {
+  background-color: var(--color-brand);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Zepto / Flipkart Style User Profile Menu & Popover
+   ========================================================================== */
+.user-profile-menu-container {
+  position: relative;
+}
+
+.user-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-sans);
+}
+
+.user-profile-btn:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-focus);
+}
+
+.user-avatar-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--color-brand-light);
+  color: var(--color-brand);
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-profile-text-wrap {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.1;
+}
+
+.user-profile-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.user-profile-sub {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.user-profile-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 270px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+  animation: fadeIn 0.15s ease;
+}
+
+.user-popover-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background-color: var(--color-surface-hover);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.user-avatar-large {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--color-brand-light);
+  color: var(--color-brand);
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-popover-links {
+  padding: 0.4rem;
+}
+
+.user-popover-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.user-popover-item:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* ==========================================================================
+   Flipkart 2-Column Browse & Dynamic Filter Layout
+   ========================================================================== */
+.flipkart-layout-container {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.flipkart-filter-sidebar {
+  width: 270px;
+  flex-shrink: 0;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  position: sticky;
+  top: 76px;
+}
+
+.flipkart-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+}
+
+.flipkart-filter-section {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.flipkart-content-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.flipkart-toolbar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .flipkart-layout-container {
+    flex-direction: column;
+  }
+  .flipkart-filter-sidebar {
+    width: 100%;
+    position: static;
+  }
+}

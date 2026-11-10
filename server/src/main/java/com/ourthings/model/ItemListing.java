@@ -34,6 +34,36 @@ public class ItemListing {
     @Column(name = "pickup_location", nullable = false, length = 255)
     private String pickupLocation;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "formatted_address", length = 500)
+    private String formattedAddress;
+
+    @Column(length = 100)
+    private String premise;
+
+    @Column(length = 150)
+    private String building;
+
+    @Column(length = 150)
+    private String landmark;
+
+    @Column(length = 100)
+    private String locality;
+
+    @Column(length = 100)
+    private String city = "Bengaluru";
+
+    @Column(length = 20)
+    private String pincode = "560103";
+
+    @Column(length = 100)
+    private String state = "Karnataka";
+
     @Column(name = "available_from", nullable = false)
     private LocalDate availableFrom;
 
@@ -98,6 +128,36 @@ public class ItemListing {
 
     public String getPickupLocation() { return pickupLocation; }
     public void setPickupLocation(String pickupLocation) { this.pickupLocation = pickupLocation; }
+
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public String getFormattedAddress() { return formattedAddress; }
+    public void setFormattedAddress(String formattedAddress) { this.formattedAddress = formattedAddress; }
+
+    public String getPremise() { return premise; }
+    public void setPremise(String premise) { this.premise = premise; }
+
+    public String getBuilding() { return building; }
+    public void setBuilding(String building) { this.building = building; }
+
+    public String getLandmark() { return landmark; }
+    public void setLandmark(String landmark) { this.landmark = landmark; }
+
+    public String getLocality() { return locality; }
+    public void setLocality(String locality) { this.locality = locality; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getPincode() { return pincode; }
+    public void setPincode(String pincode) { this.pincode = pincode; }
+
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
 
     public LocalDate getAvailableFrom() { return availableFrom; }
     public void setAvailableFrom(LocalDate availableFrom) { this.availableFrom = availableFrom; }

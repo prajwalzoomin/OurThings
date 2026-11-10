@@ -17,6 +17,16 @@ public class ItemDtos {
         private LocalDate availableTo;
         private BigDecimal estimatedReplacementValueInr;
         private String imageUrl;
+        private Double latitude;
+        private Double longitude;
+        private String formattedAddress;
+        private String premise;
+        private String building;
+        private String landmark;
+        private String locality;
+        private String city;
+        private String pincode;
+        private String state;
 
         public String getTitle() { return title; }
         public void setTitle(String title) { this.title = title; }
@@ -44,6 +54,36 @@ public class ItemDtos {
 
         public String getImageUrl() { return imageUrl; }
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+        public Double getLatitude() { return latitude; }
+        public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+        public Double getLongitude() { return longitude; }
+        public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+        public String getFormattedAddress() { return formattedAddress; }
+        public void setFormattedAddress(String formattedAddress) { this.formattedAddress = formattedAddress; }
+
+        public String getPremise() { return premise; }
+        public void setPremise(String premise) { this.premise = premise; }
+
+        public String getBuilding() { return building; }
+        public void setBuilding(String building) { this.building = building; }
+
+        public String getLandmark() { return landmark; }
+        public void setLandmark(String landmark) { this.landmark = landmark; }
+
+        public String getLocality() { return locality; }
+        public void setLocality(String locality) { this.locality = locality; }
+
+        public String getCity() { return city; }
+        public void setCity(String city) { this.city = city; }
+
+        public String getPincode() { return pincode; }
+        public void setPincode(String pincode) { this.pincode = pincode; }
+
+        public String getState() { return state; }
+        public void setState(String state) { this.state = state; }
     }
 
     public static class ReservedPeriodDto {
@@ -65,6 +105,7 @@ public class ItemDtos {
     public static class ItemResponseDto {
         private Long id;
         private Long communityId;
+        private String communityName;
         private Long ownerId;
         private String ownerName;
         private String ownerPhone;
@@ -74,6 +115,17 @@ public class ItemDtos {
         private String category;
         private String itemCondition;
         private String pickupLocation;
+        private Double latitude;
+        private Double longitude;
+        private String formattedAddress;
+        private String premise;
+        private String building;
+        private String landmark;
+        private String locality;
+        private String city;
+        private String pincode;
+        private String state;
+        private Double distanceKm;
         private LocalDate availableFrom;
         private LocalDate availableTo;
         private BigDecimal estimatedReplacementValueInr;
@@ -89,6 +141,9 @@ public class ItemDtos {
 
         public Long getCommunityId() { return communityId; }
         public void setCommunityId(Long communityId) { this.communityId = communityId; }
+
+        public String getCommunityName() { return communityName; }
+        public void setCommunityName(String communityName) { this.communityName = communityName; }
 
         public Long getOwnerId() { return ownerId; }
         public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
@@ -116,6 +171,39 @@ public class ItemDtos {
 
         public String getPickupLocation() { return pickupLocation; }
         public void setPickupLocation(String pickupLocation) { this.pickupLocation = pickupLocation; }
+
+        public Double getLatitude() { return latitude; }
+        public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+        public Double getLongitude() { return longitude; }
+        public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+        public String getFormattedAddress() { return formattedAddress; }
+        public void setFormattedAddress(String formattedAddress) { this.formattedAddress = formattedAddress; }
+
+        public String getPremise() { return premise; }
+        public void setPremise(String premise) { this.premise = premise; }
+
+        public String getBuilding() { return building; }
+        public void setBuilding(String building) { this.building = building; }
+
+        public String getLandmark() { return landmark; }
+        public void setLandmark(String landmark) { this.landmark = landmark; }
+
+        public String getLocality() { return locality; }
+        public void setLocality(String locality) { this.locality = locality; }
+
+        public String getCity() { return city; }
+        public void setCity(String city) { this.city = city; }
+
+        public String getPincode() { return pincode; }
+        public void setPincode(String pincode) { this.pincode = pincode; }
+
+        public String getState() { return state; }
+        public void setState(String state) { this.state = state; }
+
+        public Double getDistanceKm() { return distanceKm; }
+        public void setDistanceKm(Double distanceKm) { this.distanceKm = distanceKm; }
 
         public LocalDate getAvailableFrom() { return availableFrom; }
         public void setAvailableFrom(LocalDate availableFrom) { this.availableFrom = availableFrom; }

@@ -43,6 +43,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (communityRepository.count() > 0) {
+            backfillAddressesIfMissing();
             return; // Already seeded
         }
 
@@ -71,50 +72,30 @@ public class DataInitializer implements CommandLineRunner {
         ));
 
         // 2. Users
-        User prajwal = userRepository.save(new User(
-                "Prajwal B (Hostel Resident)",
-                "prajwal@ourthings.local",
-                "+91 98450 12345",
-                "Hostel Room 304",
-                cauvery.getId(),
-                "MEMBER"
-        ));
+        User prajwal = new User("Prajwal B (Hostel Resident)", "prajwal@ourthings.local", "+91 98450 12345", "Hostel Room 304", cauvery.getId(), "MEMBER");
+        prajwal.setAvatarUrl("https://api.dicebear.com/7.x/bottts/svg?seed=Prajwal");
+        prajwal.setAddress("Room 304, Block A, Cauvery Hostel, NHCE Campus, Marathahalli");
+        prajwal = userRepository.save(prajwal);
 
-        User kasim = userRepository.save(new User(
-                "Mohammed Kasim (Hostel Resident)",
-                "kasim@ourthings.local",
-                "+91 98450 67890",
-                "Hostel Room 212",
-                cauvery.getId(),
-                "MEMBER"
-        ));
+        User kasim = new User("Mohammed Kasim (Hostel Resident)", "kasim@ourthings.local", "+91 98450 67890", "Hostel Room 212", cauvery.getId(), "MEMBER");
+        kasim.setAvatarUrl("https://api.dicebear.com/7.x/bottts/svg?seed=Kasim");
+        kasim.setAddress("Room 212, Block A, Cauvery Hostel, NHCE Campus, Marathahalli");
+        kasim = userRepository.save(kasim);
 
-        User ananya = userRepository.save(new User(
-                "Ananya Rao (Apartment Resident)",
-                "ananya@ourthings.local",
-                "+91 98450 44556",
-                "Flat 402, Block B",
-                greenGlen.getId(),
-                "MEMBER"
-        ));
+        User ananya = new User("Ananya Rao (Apartment Resident)", "ananya@ourthings.local", "+91 98450 44556", "Flat 402, Block B", greenGlen.getId(), "MEMBER");
+        ananya.setAvatarUrl("https://api.dicebear.com/7.x/bottts/svg?seed=Ananya");
+        ananya.setAddress("Flat 402, Block B, Green Glen Heights, Bellandur");
+        ananya = userRepository.save(ananya);
 
-        User ramesh = userRepository.save(new User(
-                "Ramesh Kumar (Apartment Resident)",
-                "ramesh@ourthings.local",
-                "+91 98450 77889",
-                "Flat 105, Block A",
-                greenGlen.getId(),
-                "MEMBER"
-        ));
+        User ramesh = new User("Ramesh Kumar (Apartment Resident)", "ramesh@ourthings.local", "+91 98450 77889", "Flat 105, Block A", greenGlen.getId(), "MEMBER");
+        ramesh.setAvatarUrl("https://api.dicebear.com/7.x/bottts/svg?seed=Ramesh");
+        ramesh.setAddress("Flat 105, Block A, Green Glen Heights, Bellandur");
+        ramesh = userRepository.save(ramesh);
 
-        User suresh = userRepository.save(new User(
-                "Dr. Suresh Hegde (Neighbourhood Lead)",
-                "suresh@ourthings.local",
-                "+91 98450 99001",
-                "#14, 2nd Cross",
-                kaikondrahalli.getId(),
-                "MEMBER"
-        ));
+        User suresh = new User("Dr. Suresh Hegde (Neighbourhood Lead)", "suresh@ourthings.local", "+91 98450 99001", "#14, 2nd Cross", kaikondrahalli.getId(), "MEMBER");
+        suresh.setAvatarUrl("https://api.dicebear.com/7.x/bottts/svg?seed=Suresh");
+        suresh.setAddress("#14, 2nd Cross, Sarjapur Road, Kaikondrahalli");
+        suresh = userRepository.save(suresh);
 
         // Memberships
         membershipRepository.save(new CommunityMembership(prajwal.getId(), cauvery.getId()));
@@ -126,7 +107,7 @@ public class DataInitializer implements CommandLineRunner {
         LocalDate today = LocalDate.now();
 
         // 3. Items in Cauvery Hostel
-        ItemListing drill = itemListingRepository.save(new ItemListing(
+        ItemListing drill = new ItemListing(
                 cauvery.getId(),
                 prajwal.getId(),
                 "[Sample] Bosch 13mm Impact Drill Kit with Masonry Bits",
@@ -137,9 +118,19 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(30),
                 today.plusDays(90),
                 BigDecimal.valueOf(3499.00)
-        ));
+        );
+        drill.setLatitude(12.9345);
+        drill.setLongitude(77.6912);
+        drill.setPremise("Room 304, 3rd Floor");
+        drill.setBuilding("Cauvery Boys Hostel (Block A)");
+        drill.setLandmark("Near NHCE Central Library");
+        drill.setLocality("Marathahalli");
+        drill.setCity("Bengaluru");
+        drill.setPincode("560103");
+        drill.setFormattedAddress("Room 304, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
+        drill = itemListingRepository.save(drill);
 
-        ItemListing crutches = itemListingRepository.save(new ItemListing(
+        ItemListing crutches = new ItemListing(
                 cauvery.getId(),
                 prajwal.getId(),
                 "[Sample] Adjustable Aluminum Underarm Crutches (Adult Pair)",
@@ -150,9 +141,19 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(10),
                 today.plusDays(120),
                 BigDecimal.valueOf(1400.00)
-        ));
+        );
+        crutches.setLatitude(12.9348);
+        crutches.setLongitude(77.6915);
+        crutches.setPremise("Room 304, 3rd Floor");
+        crutches.setBuilding("Cauvery Boys Hostel (Block A)");
+        crutches.setLandmark("Near NHCE Central Library");
+        crutches.setLocality("Marathahalli");
+        crutches.setCity("Bengaluru");
+        crutches.setPincode("560103");
+        crutches.setFormattedAddress("Room 304, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
+        crutches = itemListingRepository.save(crutches);
 
-        ItemListing projector = itemListingRepository.save(new ItemListing(
+        ItemListing projector = new ItemListing(
                 cauvery.getId(),
                 kasim.getId(),
                 "[Sample] Epson Portable Full HD Projector with HDMI Cable",
@@ -163,12 +164,21 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(20),
                 today.plusDays(60),
                 BigDecimal.valueOf(28000.00)
-        ));
+        );
+        projector.setLatitude(12.9342);
+        projector.setLongitude(77.6910);
+        projector.setPremise("Room 212, 2nd Floor");
+        projector.setBuilding("Cauvery Boys Hostel (Block A)");
+        projector.setLandmark("Near NHCE Hostel Gate 2");
+        projector.setLocality("Marathahalli");
+        projector.setCity("Bengaluru");
+        projector.setPincode("560103");
+        projector.setFormattedAddress("Room 212, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
         // Kasim's projector is currently active on loan to Prajwal
         projector.setStatus("LENT");
-        itemListingRepository.save(projector);
+        projector = itemListingRepository.save(projector);
 
-        ItemListing rucksack = itemListingRepository.save(new ItemListing(
+        ItemListing rucksack = new ItemListing(
                 cauvery.getId(),
                 kasim.getId(),
                 "[Sample] Wildcraft 65L Trekking Rucksack with Rain Cover",
@@ -179,9 +189,19 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(5),
                 today.plusDays(60),
                 BigDecimal.valueOf(3800.00)
-        ));
+        );
+        rucksack.setLatitude(12.9342);
+        rucksack.setLongitude(77.6910);
+        rucksack.setPremise("Room 212, 2nd Floor");
+        rucksack.setBuilding("Cauvery Boys Hostel (Block A)");
+        rucksack.setLandmark("Near NHCE Hostel Gate 2");
+        rucksack.setLocality("Marathahalli");
+        rucksack.setCity("Bengaluru");
+        rucksack.setPincode("560103");
+        rucksack.setFormattedAddress("Room 212, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
+        rucksack = itemListingRepository.save(rucksack);
 
-        ItemListing speaker = itemListingRepository.save(new ItemListing(
+        ItemListing speaker = new ItemListing(
                 cauvery.getId(),
                 prajwal.getId(),
                 "[Sample] JBL Portable PA Speaker with Wireless Microphone",
@@ -192,10 +212,20 @@ public class DataInitializer implements CommandLineRunner {
                 today,
                 today.plusDays(30),
                 BigDecimal.valueOf(12500.00)
-        ));
+        );
+        speaker.setLatitude(12.9345);
+        speaker.setLongitude(77.6912);
+        speaker.setPremise("Room 304, 3rd Floor");
+        speaker.setBuilding("Cauvery Boys Hostel (Block A)");
+        speaker.setLandmark("Near NHCE Central Library");
+        speaker.setLocality("Marathahalli");
+        speaker.setCity("Bengaluru");
+        speaker.setPincode("560103");
+        speaker.setFormattedAddress("Room 304, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
+        speaker = itemListingRepository.save(speaker);
 
         // 4. Items in Green Glen Heights Apartment
-        ItemListing wheelchair = itemListingRepository.save(new ItemListing(
+        ItemListing wheelchair = new ItemListing(
                 greenGlen.getId(),
                 ananya.getId(),
                 "[Sample] Foldable Adult Wheelchair with Removable Footrests",
@@ -206,9 +236,19 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(15),
                 today.plusDays(180),
                 BigDecimal.valueOf(6500.00)
-        ));
+        );
+        wheelchair.setLatitude(12.9260);
+        wheelchair.setLongitude(77.6762);
+        wheelchair.setPremise("Flat 402, 4th Floor");
+        wheelchair.setBuilding("Green Glen Heights (Block B)");
+        wheelchair.setLandmark("Near Green Glen Park & Club House");
+        wheelchair.setLocality("Bellandur");
+        wheelchair.setCity("Bengaluru");
+        wheelchair.setPincode("560103");
+        wheelchair.setFormattedAddress("Flat 402, Block B, Green Glen Heights, Bellandur, Bengaluru 560103");
+        wheelchair = itemListingRepository.save(wheelchair);
 
-        ItemListing bpMonitor = itemListingRepository.save(new ItemListing(
+        ItemListing bpMonitor = new ItemListing(
                 greenGlen.getId(),
                 ramesh.getId(),
                 "[Sample] Omron Digital Blood Pressure Monitor with Medium Cuff",
@@ -219,7 +259,17 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(40),
                 today.plusDays(180),
                 BigDecimal.valueOf(2200.00)
-        ));
+        );
+        bpMonitor.setLatitude(12.9262);
+        bpMonitor.setLongitude(77.6760);
+        bpMonitor.setPremise("Flat 105, Ground Floor");
+        bpMonitor.setBuilding("Green Glen Heights (Block A)");
+        bpMonitor.setLandmark("Near Main Security Gate");
+        bpMonitor.setLocality("Bellandur");
+        bpMonitor.setCity("Bengaluru");
+        bpMonitor.setPincode("560103");
+        bpMonitor.setFormattedAddress("Flat 105, Block A, Green Glen Heights, Bellandur, Bengaluru 560103");
+        bpMonitor = itemListingRepository.save(bpMonitor);
 
         ItemListing ladder = itemListingRepository.save(new ItemListing(
                 greenGlen.getId(),
@@ -434,6 +484,84 @@ public class DataInitializer implements CommandLineRunner {
         ));
 
         System.out.println("OurThings sample community data successfully seeded!");
+    }
+
+    private void backfillAddressesIfMissing() {
+        // Backfill users with avatars & addresses if missing
+        for (var u : userRepository.findAll()) {
+            boolean changed = false;
+            if (u.getAvatarUrl() == null || u.getAvatarUrl().isBlank()) {
+                u.setAvatarUrl("https://api.dicebear.com/7.x/bottts/svg?seed=" + u.getId() + "&backgroundColor=0f172a,1e293b,334155");
+                changed = true;
+            }
+            if (u.getCity() == null || u.getCity().isBlank()) {
+                u.setCity("Bengaluru");
+                u.setPincode("560103");
+                changed = true;
+            }
+            if (changed) {
+                userRepository.save(u);
+            }
+        }
+
+        // Backfill item listings with GPS coordinates and structured Indian addresses
+        var items = itemListingRepository.findAll();
+        for (var item : items) {
+            if (item.getLatitude() == null) {
+                if (item.getTitle().contains("Drill") || item.getTitle().contains("Speaker")) {
+                    item.setLatitude(12.9345);
+                    item.setLongitude(77.6912);
+                    item.setPremise("Room 304, 3rd Floor");
+                    item.setBuilding("Cauvery Boys Hostel (Block A)");
+                    item.setLandmark("Near NHCE Central Library");
+                    item.setLocality("Marathahalli");
+                    item.setCity("Bengaluru");
+                    item.setPincode("560103");
+                    item.setFormattedAddress("Room 304, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
+                } else if (item.getTitle().contains("Crutches") || item.getTitle().contains("Projector") || item.getTitle().contains("Rucksack")) {
+                    item.setLatitude(12.9342);
+                    item.setLongitude(77.6910);
+                    item.setPremise("Room 212, 2nd Floor");
+                    item.setBuilding("Cauvery Boys Hostel (Block A)");
+                    item.setLandmark("Near NHCE Hostel Gate 2");
+                    item.setLocality("Marathahalli");
+                    item.setCity("Bengaluru");
+                    item.setPincode("560103");
+                    item.setFormattedAddress("Room 212, Block A, Cauvery Hostel, NHCE Campus, Marathahalli, Bengaluru 560103");
+                } else if (item.getTitle().contains("Wheelchair")) {
+                    item.setLatitude(12.9260);
+                    item.setLongitude(77.6762);
+                    item.setPremise("Flat 402, Block B");
+                    item.setBuilding("Green Glen Heights");
+                    item.setLandmark("Near Green Glen Park & Club House");
+                    item.setLocality("Bellandur");
+                    item.setCity("Bengaluru");
+                    item.setPincode("560103");
+                    item.setFormattedAddress("Flat 402, Block B, Green Glen Heights, Bellandur, Bengaluru 560103");
+                } else if (item.getTitle().contains("Blood Pressure") || item.getTitle().contains("Monitor")) {
+                    item.setLatitude(12.9255);
+                    item.setLongitude(77.6758);
+                    item.setPremise("Flat 105, Ground Floor");
+                    item.setBuilding("Green Glen Heights (Block A)");
+                    item.setLandmark("Opposite Sobha Iris Gate");
+                    item.setLocality("Bellandur");
+                    item.setCity("Bengaluru");
+                    item.setPincode("560103");
+                    item.setFormattedAddress("Flat 105, Block A, Green Glen Heights, Bellandur, Bengaluru 560103");
+                } else {
+                    item.setLatitude(12.9310);
+                    item.setLongitude(77.6850);
+                    item.setPremise("Near Main Gate");
+                    item.setBuilding("Campus Wing");
+                    item.setLandmark("Near Outer Ring Road");
+                    item.setLocality("Marathahalli");
+                    item.setCity("Bengaluru");
+                    item.setPincode("560103");
+                    item.setFormattedAddress("Campus Wing, Marathahalli, Bengaluru, Karnataka 560103");
+                }
+                itemListingRepository.save(item);
+            }
+        }
     }
 }
 

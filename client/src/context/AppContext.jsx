@@ -13,10 +13,24 @@ export function AppProvider({ children }) {
   const [prefillItem, setPrefillItem] = useState(null);
   const [notification, setNotification] = useState(null);
   const [glanceItem, setGlanceItem] = useState(null);
+  const [communityOnly, setCommunityOnly] = useState(false); // Veg-only style toggle (default OFF: whole city visible!)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [aiKeyModalOpen, setAiKeyModalOpen] = useState(false);
+  const [switchAccountModalOpen, setSwitchAccountModalOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('ourthings_theme') || 'dark';
   });
   const [loading, setLoading] = useState(true);
+
+  const toggleCommunityOnly = () => {
+    setCommunityOnly((prev) => {
+      const next = !prev;
+      setApiContext(currentUser?.id, next && currentCommunity ? currentCommunity.id : null);
+      notify('info', next ? `Scope filtered to: ${currentCommunity?.name}` : 'Scope expanded to: Entire City (Bengaluru)');
+      return next;
+    });
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -52,8 +66,8 @@ export function AppProvider({ children }) {
         }
         setCurrentCommunity(initialComm);
 
-        if (initialUser && initialComm) {
-          setApiContext(initialUser.id, initialComm.id);
+        if (initialUser) {
+          setApiContext(initialUser.id, null); // Default city-wide, optional toggle enables community scope
         }
       } catch (err) {
         console.error('Initialization error:', err);
@@ -81,8 +95,8 @@ export function AppProvider({ children }) {
         comm = communities[0];
       }
       setCurrentCommunity(comm);
-      setApiContext(user.id, comm ? comm.id : 1);
-      notify('info', `Switched demo active account to: ${user.name}`);
+      setApiContext(user.id, communityOnly && comm ? comm.id : null);
+      notify('info', `Active user switched to: ${user.name}`);
     }
   };
 
@@ -126,6 +140,7 @@ export function AppProvider({ children }) {
         users,
         communities,
         currentUser,
+        setCurrentUser,
         currentCommunity,
         currentTab,
         selectedItemId,
@@ -134,6 +149,16 @@ export function AppProvider({ children }) {
         glanceItem,
         theme,
         loading,
+        communityOnly,
+        toggleCommunityOnly,
+        searchQuery,
+        setSearchQuery,
+        profileModalOpen,
+        setProfileModalOpen,
+        aiKeyModalOpen,
+        setAiKeyModalOpen,
+        switchAccountModalOpen,
+        setSwitchAccountModalOpen,
         notify,
         toggleTheme,
         switchUser,
