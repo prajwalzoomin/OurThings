@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import LocationPickerModal from '../components/LocationPickerModal';
@@ -12,6 +12,20 @@ const CATEGORIES = [
 ];
 
 const CONDITIONS = ['Like New', 'Good', 'Fair'];
+
+const PRESET_PRODUCT_PHOTOS = [
+  { name: 'Impact Drill Kit', icon: '🔌', url: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Underarm Crutches', icon: '🩼', url: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Folding Wheelchair', icon: '♿', url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Full HD Projector', icon: '📽️', url: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Portable PA Speaker', icon: '🔊', url: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80' },
+  { name: '65L Trekking Rucksack', icon: '🎒', url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Folding Ladder', icon: '🪜', url: 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Digital BP Monitor', icon: '🩺', url: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?auto=format&fit=crop&w=800&q=80' },
+  { name: 'DSLR Camera & Kit', icon: '📷', url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Camping Tent', icon: '⛺', url: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80' },
+  { name: 'Mechanic Toolkit', icon: '🔧', url: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80' },
+];
 
 export default function CreateEditItem() {
   const { currentCommunity, currentUser, prefillItem, navigateTo, notify } = useApp();
@@ -36,11 +50,71 @@ export default function CreateEditItem() {
   const [aiFormatting, setAiFormatting] = useState(false);
 
   const [imageUrl, setImageUrl] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [showUrlField, setShowUrlField] = useState(false);
+  const fileInputRef = useRef(null);
+
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
   const [estimatedReplacementValueInr, setEstimatedReplacementValueInr] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const compressAndReadImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxWidth || height > maxHeight) {
+            if (width / height > maxWidth / maxHeight) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => reject(new Error('Failed to load image for compression'));
+        img.src = event.target.result;
+      };
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      notify('error', 'Please select a valid image file (JPEG, PNG, WebP).');
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      const base64 = await compressAndReadImage(file);
+      setImageUrl(base64);
+      notify('success', 'Product photo attached successfully!');
+    } catch (err) {
+      console.error('Image upload processing failed:', err);
+      notify('error', 'Failed to process image file.');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   useEffect(() => {
     if (prefillItem) {
@@ -128,7 +202,7 @@ export default function CreateEditItem() {
     setError(null);
 
     if (!currentUser) {
-      setError('Please sign in or select an account before listing an item.');
+      setError('Please sign in or create an account before listing an item.');
       return;
     }
 
@@ -339,19 +413,236 @@ export default function CreateEditItem() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="item-image-url" className="form-label">Product Image URL (Optional)</label>
-            <input
-              id="item-image-url"
-              type="url"
-              className="form-input"
-              placeholder="https://... (Optional: leave blank for smart automatic photo matching)"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-            <div className="form-hint">
-              Leave blank to automatically match a high-definition product photo based on your item title and category.
+          {/* E-Commerce Product Photo Uploader & Selection */}
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label className="form-label" style={{ margin: 0, fontWeight: 700, fontSize: '0.9rem' }}>
+                📸 Product Photo
+              </label>
+              {imageUrl && (
+                <button
+                  type="button"
+                  onClick={() => setImageUrl('')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#ef4444',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  Remove Photo
+                </button>
+              )}
             </div>
+
+            {/* Hidden native file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleImageFileChange}
+            />
+
+            {imageUrl ? (
+              /* Photo Preview Card */
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '1.25rem',
+                  alignItems: 'center',
+                  padding: '1rem',
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: '120px',
+                    height: '100px',
+                    borderRadius: 'var(--radius-sm)',
+                    overflow: 'hidden',
+                    backgroundColor: 'var(--color-surface-hover)',
+                    flexShrink: 0,
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    alt="Product preview"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        backgroundColor: 'var(--badge-green-bg)',
+                        color: 'var(--badge-green-text)',
+                        border: '1px solid var(--badge-green-border)',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: 'var(--radius-xs)',
+                      }}
+                    >
+                      ✓ Photo Attached
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                      {imageUrl.startsWith('data:') ? 'Uploaded from device' : 'Web / Preset image'}
+                    </span>
+                  </div>
+                  <p style={{ margin: '0 0 0.65rem 0', fontSize: '0.82rem', color: 'var(--color-text-secondary)' }}>
+                    Neighbours and borrowers will see this photo on cards, search results, and glance views.
+                  </p>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                      disabled={uploadingImage}
+                    >
+                      {uploadingImage ? 'Processing...' : 'Upload Different Photo'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setShowUrlField((prev) => !prev)}
+                    >
+                      {showUrlField ? 'Hide URL' : 'Edit URL'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Empty State: Upload / Choose Preset / Enter URL */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {/* Upload from Device Dropzone */}
+                <div
+                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  style={{
+                    border: '2px dashed var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '1.5rem',
+                    textAlign: 'center',
+                    backgroundColor: 'var(--color-surface-subtle)',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.2s, background-color 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-brand)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-surface-subtle)';
+                  }}
+                >
+                  <div style={{ fontSize: '2rem', marginBottom: '0.4rem' }}>📷</div>
+                  <div style={{ fontWeight: 600, fontSize: '0.925rem', color: 'var(--color-text-primary)' }}>
+                    {uploadingImage ? 'Compressing and processing photo...' : 'Click to Upload Product Photo from Device'}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '0.2rem' }}>
+                    Supports camera capture, JPEG, PNG, WebP &bull; Instant auto-compression
+                  </div>
+                </div>
+
+                {/* Quick Stock Photos */}
+                <div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '0.4rem' }}>
+                    Or select a verified product stock photo:
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                    {PRESET_PRODUCT_PHOTOS.map((preset) => (
+                      <button
+                        key={preset.name}
+                        type="button"
+                        onClick={() => {
+                          setImageUrl(preset.url);
+                          notify('success', `Applied photo: ${preset.name}`);
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          padding: '0.3rem 0.65rem',
+                          borderRadius: 'var(--radius-full)',
+                          border: '1px solid var(--color-border)',
+                          backgroundColor: 'var(--color-surface)',
+                          fontSize: '0.75rem',
+                          color: 'var(--color-text-primary)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-brand)';
+                          e.currentTarget.style.color = 'var(--color-brand)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-border)';
+                          e.currentTarget.style.color = 'var(--color-text-primary)';
+                        }}
+                      >
+                        <span>{preset.icon}</span>
+                        <span>{preset.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Link URL fallback toggle */}
+                <div style={{ marginTop: '0.25rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlField((prev) => !prev)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--color-brand)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0,
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    {showUrlField ? '– Hide image URL input' : '+ Or paste direct web image link'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Direct Image URL input (visible when toggled or if user wants to type url) */}
+            {showUrlField && (
+              <div style={{ marginTop: '0.75rem' }}>
+                <input
+                  id="item-image-url"
+                  type="url"
+                  className="form-input"
+                  placeholder="https://images.unsplash.com/... or https://..."
+                  value={imageUrl.startsWith('data:') ? '' : imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  style={{ fontSize: '0.85rem' }}
+                />
+                <div className="form-hint" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                  Paste any valid image URL. If left empty, a matching photo is automatically chosen.
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="form-grid-2">

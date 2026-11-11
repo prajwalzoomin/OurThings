@@ -327,24 +327,7 @@ export default function Header() {
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                           <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        <span>Customize Profile & PFP</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        className="user-popover-item"
-                        onClick={() => {
-                          setProfileDropdownOpen(false);
-                          setSwitchAccountModalOpen(true);
-                        }}
-                      >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#0284c7' }}>
-                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="9" cy="7" r="4"></circle>
-                          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                        <span>Switch Member Persona</span>
+                        <span>Profile & Account Settings</span>
                       </button>
 
                       <div style={{ height: '1px', backgroundColor: 'var(--color-border)', margin: '0.35rem 0' }} />
@@ -363,7 +346,7 @@ export default function Header() {
                           <polyline points="16 17 21 12 16 7"></polyline>
                           <line x1="21" y1="12" x2="9" y2="12"></line>
                         </svg>
-                        <span>Sign Out (Guest Mode)</span>
+                        <span>Sign Out</span>
                       </button>
                     </div>
                   </div>
@@ -379,17 +362,18 @@ export default function Header() {
                   alignItems: 'center',
                   gap: '0.45rem',
                   borderRadius: 'var(--radius-full)',
-                  padding: '0.35rem 0.85rem',
+                  padding: '0.35rem 0.95rem',
                   fontSize: '0.825rem',
                   fontWeight: 600,
                   borderColor: 'var(--color-border)',
+                  backgroundColor: 'var(--color-surface)',
                 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span>Sign In / Select Profile</span>
+                <span>Sign In / Register</span>
               </button>
             )}
           </div>

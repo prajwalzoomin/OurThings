@@ -4,7 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import ZenGlanceModal from './components/ZenGlanceModal';
 import ProfileModal from './components/ProfileModal';
-import SwitchAccountModal from './components/SwitchAccountModal';
+import AuthModal from './components/AuthModal';
 
 // Pages
 import Home from './pages/Home';
@@ -73,7 +73,7 @@ function AppContent() {
 
       <ZenGlanceModal />
       <ProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
-      <SwitchAccountModal isOpen={switchAccountModalOpen} onClose={() => setSwitchAccountModalOpen(false)} />
+      <AuthModal isOpen={switchAccountModalOpen} onClose={() => setSwitchAccountModalOpen(false)} />
       <Footer />
     </div>
   );

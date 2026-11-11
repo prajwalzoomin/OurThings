@@ -55,6 +55,7 @@ export const api = {
   // Auth & Context
   getUsers: () => request('/api/auth/users'),
   getCurrentUser: () => request('/api/auth/me'),
+  login: (payload) => request('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
   updateProfile: (payload) => request('/api/auth/profile', { method: 'PUT', body: JSON.stringify(payload) }),
   registerUser: (payload) => request('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   switchCommunity: (communityId) => request('/api/auth/switch-community', { method: 'POST', body: JSON.stringify({ communityId }) }),

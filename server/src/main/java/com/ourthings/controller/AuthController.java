@@ -23,6 +23,12 @@ public class AuthController {
         return authService.getAllUsers();
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@RequestBody LoginRequest req) {
+        UserDto user = authService.login(req);
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(@RequestHeader(value = "X-User-Id", required = false) Long userId) {
         if (userId == null) {

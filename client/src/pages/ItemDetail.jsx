@@ -379,14 +379,14 @@ export default function ItemDetail() {
             {!currentUser ? (
               <div style={{ marginTop: '1rem', padding: '1.25rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', maxWidth: '640px' }}>
                 <p style={{ margin: '0 0 0.85rem 0', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-                  You are currently browsing in Guest mode. Please select or sign in with your resident profile to reserve this resource.
+                  You are currently browsing in Guest mode. Please sign in or create an account to reserve this resource.
                 </p>
                 <button
                   type="button"
                   className="btn btn-primary"
                   onClick={() => setSwitchAccountModalOpen(true)}
                 >
-                  Sign In / Select Account to Borrow
+                  Sign In to Borrow Resource
                 </button>
               </div>
             ) : item.status === 'AVAILABLE' && (

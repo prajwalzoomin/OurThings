@@ -42,6 +42,7 @@ export default function ProfileModal({ isOpen, onClose }) {
       };
       const updated = await api.updateProfile(payload);
       setCurrentUser(updated);
+      localStorage.setItem('ourthings_auth_user', JSON.stringify(updated));
       notify('success', 'Profile and avatar updated successfully!');
       onClose();
     } catch (err) {

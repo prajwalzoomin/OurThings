@@ -35,6 +35,9 @@ public class User {
     @Column(length = 255)
     private String address;
 
+    @Column(name = "password_hash", length = 255)
+    private String passwordHash;
+
     @Column(name = "active_community_id")
     private Long activeCommunityId;
 
@@ -93,6 +96,9 @@ public class User {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
     public Long getActiveCommunityId() { return activeCommunityId; }
     public void setActiveCommunityId(Long activeCommunityId) { this.activeCommunityId = activeCommunityId; }

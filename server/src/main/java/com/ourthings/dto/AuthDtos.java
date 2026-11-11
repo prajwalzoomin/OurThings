@@ -4,27 +4,56 @@ public class AuthDtos {
 
     public static class LoginRequest {
         private String email;
+        private String password;
+
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
     }
 
     public static class RegisterRequest {
         private String name;
         private String email;
         private String phone;
+        private String password;
         private String roomOrFlat;
         private Long communityId;
+        private String avatarUrl;
+        private String city;
+        private String pincode;
+        private String address;
 
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
+
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+
         public String getPhone() { return phone; }
         public void setPhone(String phone) { this.phone = phone; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+
         public String getRoomOrFlat() { return roomOrFlat; }
         public void setRoomOrFlat(String roomOrFlat) { this.roomOrFlat = roomOrFlat; }
+
         public Long getCommunityId() { return communityId; }
         public void setCommunityId(Long communityId) { this.communityId = communityId; }
+
+        public String getAvatarUrl() { return avatarUrl; }
+        public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+        public String getCity() { return city; }
+        public void setCity(String city) { this.city = city; }
+
+        public String getPincode() { return pincode; }
+        public void setPincode(String pincode) { this.pincode = pincode; }
+
+        public String getAddress() { return address; }
+        public void setAddress(String address) { this.address = address; }
     }
 
     public static class UpdateProfileRequest {

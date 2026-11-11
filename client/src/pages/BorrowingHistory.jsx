@@ -42,14 +42,14 @@ export default function BorrowingHistory() {
         <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📜</div>
         <h2 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>Sign In to View Loan History</h2>
         <p style={{ color: 'var(--color-text-secondary)', maxWidth: '480px', margin: '0.5rem auto 1.5rem auto', fontSize: '0.9rem' }}>
-          You are currently in guest mode. Select or sign in with your resident account to see your borrowing and lending audit logs.
+          You are currently in guest mode. Sign in to your account to see your borrowing and lending audit logs.
         </p>
         <button
           type="button"
           className="btn btn-primary"
           onClick={() => setSwitchAccountModalOpen(true)}
         >
-          Sign In / Select Resident Profile
+          Sign In / Create Account
         </button>
       </div>
     );

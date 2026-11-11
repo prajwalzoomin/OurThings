@@ -53,7 +53,7 @@ export default function UnmetDemandPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) {
-      notify('info', 'Please select or sign in to your resident account to submit a request.');
+      notify('info', 'Please sign in or create an account to submit a request.');
       setSwitchAccountModalOpen(true);
       return;
     }

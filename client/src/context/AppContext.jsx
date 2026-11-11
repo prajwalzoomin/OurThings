@@ -16,7 +16,7 @@ export function AppProvider({ children }) {
   const [communityOnly, setCommunityOnly] = useState(false); // Default OFF: whole city visible
   const [searchQuery, setSearchQuery] = useState('');
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [switchAccountModalOpen, setSwitchAccountModalOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   
   // Precise GPS location state
   const [userLocation, setUserLocation] = useState({
@@ -103,7 +103,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // Initialize data (default guest mode, no auto-login)
+  // Initialize data (guest mode by default or restore saved session)
   useEffect(() => {
     async function init() {
       try {
@@ -115,14 +115,39 @@ export function AppProvider({ children }) {
 
         setUsers(usersData || []);
         setCommunities(commsData || []);
-        setCurrentUser(null); // No account by default
 
         let initialComm = null;
         if (commsData && commsData.length > 0) {
           initialComm = commsData[0];
         }
-        setCurrentCommunity(initialComm);
-        setApiContext(null, null); // Guest mode, city-wide
+
+        // Check if user has an active saved session
+        const savedUserStr = localStorage.getItem('ourthings_auth_user');
+        if (savedUserStr) {
+          try {
+            const savedUser = JSON.parse(savedUserStr);
+            if (savedUser && savedUser.id) {
+              setCurrentUser(savedUser);
+              const userComm = (commsData || []).find((c) => c.id === savedUser.activeCommunityId) || initialComm;
+              setCurrentCommunity(userComm);
+              setApiContext(savedUser.id, communityOnly && userComm ? userComm.id : null);
+            } else {
+              setCurrentUser(null);
+              setCurrentCommunity(initialComm);
+              setApiContext(null, null);
+            }
+          } catch (e) {
+            console.warn('Could not restore saved session:', e);
+            localStorage.removeItem('ourthings_auth_user');
+            setCurrentUser(null);
+            setCurrentCommunity(initialComm);
+            setApiContext(null, null);
+          }
+        } else {
+          setCurrentUser(null); // Guest mode by default
+          setCurrentCommunity(initialComm);
+          setApiContext(null, null);
+        }
 
         // Request user's precise location on first arrival
         requestUserLocation();
@@ -143,10 +168,37 @@ export function AppProvider({ children }) {
     }, 6000);
   };
 
+  const login = async (identifier, password) => {
+    const user = await api.login({ email: identifier, password });
+    setCurrentUser(user);
+    localStorage.setItem('ourthings_auth_user', JSON.stringify(user));
+    let comm = communities.find((c) => c.id === user.activeCommunityId) || communities[0];
+    if (comm) {
+      setCurrentCommunity(comm);
+    }
+    setApiContext(user.id, communityOnly && comm ? comm.id : null);
+    notify('success', `Welcome back, ${user.name}!`);
+    return user;
+  };
+
+  const register = async (payload) => {
+    const user = await api.registerUser(payload);
+    setCurrentUser(user);
+    localStorage.setItem('ourthings_auth_user', JSON.stringify(user));
+    let comm = communities.find((c) => c.id === user.activeCommunityId) || communities[0];
+    if (comm) {
+      setCurrentCommunity(comm);
+    }
+    setApiContext(user.id, communityOnly && comm ? comm.id : null);
+    notify('success', `Account created successfully! Welcome, ${user.name}.`);
+    return user;
+  };
+
   const switchUser = (userId) => {
     const user = users.find((u) => u.id === Number(userId));
     if (user) {
       setCurrentUser(user);
+      localStorage.setItem('ourthings_auth_user', JSON.stringify(user));
       let comm = communities.find((c) => c.id === user.activeCommunityId);
       if (!comm && communities.length > 0) {
         comm = communities[0];
@@ -159,6 +211,7 @@ export function AppProvider({ children }) {
 
   const signOut = () => {
     setCurrentUser(null);
+    localStorage.removeItem('ourthings_auth_user');
     setApiContext(null, null);
     notify('info', 'Signed out. You are now browsing in Guest mode.');
   };
@@ -167,8 +220,8 @@ export function AppProvider({ children }) {
     if (currentUser) {
       actionCallback();
     } else {
-      notify('info', 'Please sign in or select an account to perform this action.');
-      setSwitchAccountModalOpen(true);
+      notify('info', 'Please sign in or create an account to proceed.');
+      setAuthModalOpen(true);
     }
   };
 
@@ -231,12 +284,16 @@ export function AppProvider({ children }) {
         setSearchQuery,
         profileModalOpen,
         setProfileModalOpen,
-        switchAccountModalOpen,
-        setSwitchAccountModalOpen,
+        authModalOpen,
+        setAuthModalOpen,
+        switchAccountModalOpen: authModalOpen,
+        setSwitchAccountModalOpen: setAuthModalOpen,
         userLocation,
         requestUserLocation,
         notify,
         toggleTheme,
+        login,
+        register,
         switchUser,
         switchCommunity,
         navigateTo,

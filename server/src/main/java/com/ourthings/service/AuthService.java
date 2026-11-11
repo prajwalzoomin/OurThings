@@ -43,10 +43,63 @@ public class AuthService {
         return userRepository.findByEmail(email).map(this::toDto);
     }
 
+    public static String hashPassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error hashing password", e);
+        }
+    }
+
+    public UserDto login(LoginRequest req) {
+        if (req.getEmail() == null || req.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email address or phone number is required.");
+        }
+        if (req.getPassword() == null || req.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password is required.");
+        }
+
+        String identifier = req.getEmail().trim();
+        User user = userRepository.findByEmailIgnoreCase(identifier)
+                .or(() -> userRepository.findByPhone(identifier))
+                .orElseThrow(() -> new IllegalArgumentException("No registered account found with: " + identifier));
+
+        if (user.getPasswordHash() != null && !user.getPasswordHash().isEmpty()) {
+            String enteredHash = hashPassword(req.getPassword().trim());
+            if (!user.getPasswordHash().equalsIgnoreCase(enteredHash) && !user.getPasswordHash().equals(req.getPassword().trim())) {
+                throw new IllegalArgumentException("Incorrect password. Please verify your credentials and try again.");
+            }
+        }
+
+        return toDto(user);
+    }
+
     @Transactional
     public UserDto register(RegisterRequest req) {
-        if (userRepository.findByEmail(req.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("A user with email " + req.getEmail() + " already exists.");
+        if (req.getName() == null || req.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Full name is required.");
+        }
+        if (req.getEmail() == null || req.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email address is required.");
+        }
+        if (req.getPassword() == null || req.getPassword().trim().length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long.");
+        }
+
+        String email = req.getEmail().trim().toLowerCase();
+        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
+            throw new IllegalArgumentException("An account with email " + email + " already exists. Please sign in instead.");
         }
 
         final Long resolvedCommId;
@@ -59,7 +112,23 @@ public class AuthService {
             resolvedCommId = communityRepository.findAll().stream().findFirst().map(Community::getId).orElse(null);
         }
 
-        User user = new User(req.getName(), req.getEmail(), req.getPhone(), req.getRoomOrFlat(), resolvedCommId, "MEMBER");
+        String avatar = req.getAvatarUrl();
+        if (avatar == null || avatar.trim().isEmpty()) {
+            avatar = "https://api.dicebear.com/7.x/bottts/svg?seed=" + Math.abs(email.hashCode()) + "&backgroundColor=0f172a,1e293b,334155";
+        }
+
+        User user = new User(req.getName().trim(), email, req.getPhone() != null ? req.getPhone().trim() : "", req.getRoomOrFlat() != null ? req.getRoomOrFlat().trim() : "", avatar, resolvedCommId, "MEMBER");
+        user.setPasswordHash(hashPassword(req.getPassword().trim()));
+        if (req.getCity() != null && !req.getCity().trim().isEmpty()) {
+            user.setCity(req.getCity().trim());
+        }
+        if (req.getPincode() != null && !req.getPincode().trim().isEmpty()) {
+            user.setPincode(req.getPincode().trim());
+        }
+        if (req.getAddress() != null && !req.getAddress().trim().isEmpty()) {
+            user.setAddress(req.getAddress().trim());
+        }
+
         user = userRepository.save(user);
 
         if (resolvedCommId != null) {

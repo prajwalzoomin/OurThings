@@ -73,7 +73,7 @@ public class ItemListing {
     @Column(name = "estimated_replacement_value_inr", precision = 10, scale = 2)
     private BigDecimal estimatedReplacementValueInr;
 
-    @Column(name = "image_url", length = 500)
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
     @Column(nullable = false, length = 50)

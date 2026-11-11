@@ -134,14 +134,14 @@ export default function RequestsManagement() {
         <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📋</div>
         <h2 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>Sign In to View Requests & Loans</h2>
         <p style={{ color: 'var(--color-text-secondary)', maxWidth: '480px', margin: '0.5rem auto 1.5rem auto', fontSize: '0.9rem' }}>
-          You are currently browsing in guest mode. Please select or sign in with your resident account to manage loan approvals, handovers, and returns.
+          You are currently browsing in guest mode. Please sign in to your account to manage loan approvals, handovers, and returns.
         </p>
         <button
           type="button"
           className="btn btn-primary"
           onClick={() => setSwitchAccountModalOpen(true)}
         >
-          Sign In / Select Resident Profile
+          Sign In / Create Account
         </button>
       </div>
     );
