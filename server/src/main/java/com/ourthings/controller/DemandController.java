@@ -18,14 +18,14 @@ public class DemandController {
     }
 
     @GetMapping("/aggregated")
-    public List<AggregatedDemandDto> getAggregatedDemands(@RequestHeader("X-Community-Id") Long communityId) {
-        return demandService.getAggregatedDemands(communityId);
+    public List<AggregatedDemandDto> getAggregatedDemands(@RequestHeader(value = "X-Community-Id", required = false) Long communityId) {
+        return demandService.getAggregatedDemands(communityId != null ? communityId : 1L);
     }
 
     @GetMapping("/open")
-    public List<DemandDetailDto> getOpenDemands(@RequestHeader("X-Community-Id") Long communityId,
+    public List<DemandDetailDto> getOpenDemands(@RequestHeader(value = "X-Community-Id", required = false) Long communityId,
                                                 @RequestHeader(value = "X-User-Id", required = false) Long userId) {
-        return demandService.getAllOpenDemandsScrubbed(communityId, userId != null ? userId : -1L);
+        return demandService.getAllOpenDemandsScrubbed(communityId != null ? communityId : 1L, userId != null ? userId : -1L);
     }
 
     @GetMapping("/my")

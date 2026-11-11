@@ -16,8 +16,9 @@ public class DashboardController {
     }
 
     @GetMapping
-    public ResponseEntity<DashboardResponseDto> getDashboard(@RequestHeader("X-Community-Id") Long communityId) {
-        DashboardResponseDto dashboard = dashboardService.getCommunityDashboard(communityId);
+    public ResponseEntity<DashboardResponseDto> getDashboard(@RequestHeader(value = "X-Community-Id", required = false) Long communityId) {
+        Long resolvedCommId = communityId != null ? communityId : 1L;
+        DashboardResponseDto dashboard = dashboardService.getCommunityDashboard(resolvedCommId);
         return ResponseEntity.ok(dashboard);
     }
 }
