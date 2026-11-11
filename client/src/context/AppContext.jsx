@@ -53,32 +53,42 @@ export function AppProvider({ children }) {
   // Request browser location permission & precise GPS coordinates
   const requestUserLocation = () => {
     if (!navigator.geolocation) {
-      notify('info', 'Geolocation is not supported by your browser. Using Bengaluru reference.');
+      notify('info', 'Geolocation is not supported by your browser.');
       return;
     }
     setUserLocation((prev) => ({ ...prev, loadingLocation: true }));
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = Math.round(pos.coords.latitude * 10000) / 10000;
-        const lng = Math.round(pos.coords.longitude * 10000) / 10000;
+        const lat = Number(pos.coords.latitude.toFixed(5));
+        const lng = Number(pos.coords.longitude.toFixed(5));
         setApiLocation(lat, lng);
 
         let locName = 'Bengaluru';
+        let fullAddr = '';
         try {
-          const parsed = await api.parseAddress(`GPS coordinates ${lat}, ${lng} Bengaluru`);
-          if (parsed && parsed.locality) {
-            locName = `${parsed.locality}, Bengaluru`;
+          const geo = await api.reverseGeocode(lat, lng);
+          if (geo && geo.locality) {
+            locName = geo.locality;
+            if (geo.city && !locName.toLowerCase().includes(geo.city.toLowerCase())) {
+              locName = `${geo.locality}, ${geo.city}`;
+            }
+          } else if (geo && geo.formattedAddress) {
+            locName = geo.formattedAddress.split(',').slice(0, 2).join(',').trim();
           } else {
-            locName = `GPS: ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+            locName = `GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+          }
+          if (geo && geo.formattedAddress) {
+            fullAddr = geo.formattedAddress;
           }
         } catch {
-          locName = `GPS: ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+          locName = `GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         }
 
         setUserLocation({
           latitude: lat,
           longitude: lng,
           locality: locName,
+          formattedAddress: fullAddr,
           isGpsAccurate: true,
           loadingLocation: false,
         });
@@ -87,9 +97,9 @@ export function AppProvider({ children }) {
       (err) => {
         console.warn('Geolocation permission prompt dismissed or denied:', err.message);
         setUserLocation((prev) => ({ ...prev, loadingLocation: false }));
-        setApiLocation(12.9345, 77.6912); // Default to Bengaluru reference center
+        setApiLocation(12.9345, 77.6912); // Reference center
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 

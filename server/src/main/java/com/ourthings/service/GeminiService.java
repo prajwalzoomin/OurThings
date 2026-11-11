@@ -22,6 +22,11 @@ public class GeminiService {
     private String runtimeApiKey;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final LocationService locationService;
+
+    public GeminiService(LocationService locationService) {
+        this.locationService = locationService;
+    }
 
     public String getEffectiveApiKey() {
         if (runtimeApiKey != null && !runtimeApiKey.trim().isEmpty()) {
@@ -123,100 +128,149 @@ public class GeminiService {
 
     /**
      * Intelligent Indian Address Regex and Locality Parser for Bengaluru / Karnataka.
+     * Does NOT make false assumptions or default to fake buildings/landmarks.
      */
     public Map<String, Object> deterministicParseAddress(String raw) {
-        Map<String, Object> result = new HashMap<>();
-        String text = raw.trim();
+        Map<String, Object> result = new LinkedHashMap<>();
+        String text = raw != null ? raw.trim() : "";
+
+        // Check if raw contains explicit coordinates e.g. "12.9121, 77.6446" or "GPS: 12.93, 77.69"
+        Pattern coordPat = Pattern.compile("(-?\\d{1,3}\\.\\d{3,7})[,\\s]+(-?\\d{1,3}\\.\\d{3,7})");
+        Matcher coordMat = coordPat.matcher(text);
+        if (coordMat.find()) {
+            try {
+                double cLat = Double.parseDouble(coordMat.group(1));
+                double cLng = Double.parseDouble(coordMat.group(2));
+                Map<String, Object> geo = locationService.reverseGeocode(cLat, cLng);
+                result.putAll(geo);
+                return result;
+            } catch (Exception ignored) {}
+        }
 
         // 1. Pincode (6 digits in India)
-        String pincode = "560103";
+        String pincode = "";
         Pattern pinPat = Pattern.compile("\\b(560\\d{3}|[1-9][0-9]{5})\\b");
         Matcher pinMat = pinPat.matcher(text);
         if (pinMat.find()) {
             pincode = pinMat.group(1);
         }
 
-        // 2. Room / Flat / Door Number
+        // 2. Room / Flat / Door Number (only if explicitly in user text)
         String premise = "";
         Pattern premPat = Pattern.compile("(?i)\\b(Room\\s*#?\\d+[A-Z]?|Flat\\s*#?\\d+[A-Z]?|#\\s*\\d+[-/\\d]*|Door\\s*#?\\d+)", Pattern.CASE_INSENSITIVE);
         Matcher premMat = premPat.matcher(text);
         if (premMat.find()) {
             premise = premMat.group(1);
-        } else {
-            premise = "Room / Flat Area";
         }
 
-        // 3. Landmark (Indian landmark patterns: near, opposite, behind, beside)
+        // 3. Landmark (only if explicitly in user text)
         String landmark = "";
         Pattern landPat = Pattern.compile("(?i)(near\\s+[^,]+|opp(?:osite)?\\s+[^,]+|behind\\s+[^,]+|beside\\s+[^,]+)", Pattern.CASE_INSENSITIVE);
         Matcher landMat = landPat.matcher(text);
         if (landMat.find()) {
             landmark = landMat.group(1).trim();
-        } else if (text.toLowerCase().contains("nhce") || text.toLowerCase().contains("cauvery")) {
-            landmark = "Near NHCE Central Library & Sports Ground";
-        } else if (text.toLowerCase().contains("bellandur") || text.toLowerCase().contains("green glen")) {
-            landmark = "Opposite Green Glen Children's Park";
-        } else {
-            landmark = "Near Main Community Gate";
         }
 
-        // 4. Building / Block
+        // 4. Building / Block (only if explicitly in user text)
         String building = "";
-        if (text.toLowerCase().contains("cauvery") || text.toLowerCase().contains("hostel")) {
-            building = "Cauvery Boys Hostel (Block A)";
-        } else if (text.toLowerCase().contains("green glen") || text.toLowerCase().contains("heights")) {
-            building = "Green Glen Heights Complex";
-        } else if (text.toLowerCase().contains("kaikondrahalli")) {
-            building = "Kaikondrahalli Lake Ward Layout";
-        } else {
-            building = "Residential Wing";
+        Pattern buildPat = Pattern.compile("(?i)([^,]+(?:Hostel|Apartment|Heights|Residency|Block\\s*[A-Z]|Complex|Tower|Wing|Layout))", Pattern.CASE_INSENSITIVE);
+        Matcher buildMat = buildPat.matcher(text);
+        if (buildMat.find()) {
+            building = buildMat.group(1).trim();
         }
 
-        // 5. Locality & Coordinates for Bengaluru
-        String locality = "Marathahalli";
-        double lat = 12.9345;
-        double lng = 77.6912;
+        // 5. Locality & Coordinates
+        String locality = "";
+        double defaultLat = 12.9345;
+        double defaultLng = 77.6912;
 
         String lower = text.toLowerCase();
         if (lower.contains("bellandur") || lower.contains("green glen")) {
             locality = "Bellandur";
-            lat = 12.9260;
-            lng = 77.6762;
+            defaultLat = 12.9260;
+            defaultLng = 77.6762;
+            if (pincode.isEmpty()) pincode = "560103";
         } else if (lower.contains("kaikondrahalli") || lower.contains("sarjapur")) {
             locality = "Sarjapur Road / Kaikondrahalli";
-            lat = 12.9135;
-            lng = 77.6830;
+            defaultLat = 12.9135;
+            defaultLng = 77.6830;
+            if (pincode.isEmpty()) pincode = "560035";
         } else if (lower.contains("whitefield")) {
             locality = "Whitefield";
-            lat = 12.9698;
-            lng = 77.7500;
+            defaultLat = 12.9698;
+            defaultLng = 77.7500;
+            if (pincode.isEmpty()) pincode = "560066";
         } else if (lower.contains("hsr")) {
             locality = "HSR Layout";
-            lat = 12.9121;
-            lng = 77.6446;
+            defaultLat = 12.9121;
+            defaultLng = 77.6446;
+            if (pincode.isEmpty()) pincode = "560102";
         } else if (lower.contains("koramangala")) {
             locality = "Koramangala";
-            lat = 12.9352;
-            lng = 77.6245;
+            defaultLat = 12.9352;
+            defaultLng = 77.6245;
+            if (pincode.isEmpty()) pincode = "560034";
         } else if (lower.contains("indiranagar")) {
             locality = "Indiranagar";
-            lat = 12.9784;
-            lng = 77.6408;
+            defaultLat = 12.9784;
+            defaultLng = 77.6408;
+            if (pincode.isEmpty()) pincode = "560038";
+        } else if (lower.contains("marathahalli") || lower.contains("nhce") || lower.contains("cauvery")) {
+            locality = "Marathahalli";
+            defaultLat = 12.9345;
+            defaultLng = 77.6912;
+            if (pincode.isEmpty()) pincode = "560103";
+        } else if (lower.contains("electronic city")) {
+            locality = "Electronic City";
+            defaultLat = 12.8452;
+            defaultLng = 77.6602;
+            if (pincode.isEmpty()) pincode = "560100";
+        } else if (lower.contains("btm")) {
+            locality = "BTM Layout";
+            defaultLat = 12.9166;
+            defaultLng = 77.6101;
+            if (pincode.isEmpty()) pincode = "560076";
+        } else if (lower.contains("jayanagar")) {
+            locality = "Jayanagar";
+            defaultLat = 12.9308;
+            defaultLng = 77.5838;
+            if (pincode.isEmpty()) pincode = "560011";
+        } else if (lower.contains("hebbal")) {
+            locality = "Hebbal";
+            defaultLat = 13.0358;
+            defaultLng = 77.5970;
+            if (pincode.isEmpty()) pincode = "560024";
+        } else if (lower.contains("yelahanka")) {
+            locality = "Yelahanka";
+            defaultLat = 13.1007;
+            defaultLng = 77.5963;
+            if (pincode.isEmpty()) pincode = "560064";
+        } else {
+            locality = text.split(",")[0].trim();
+            if (locality.isEmpty() || locality.length() > 40) locality = "Bengaluru";
         }
 
-        String formatted = premise + ", " + building + ", " + landmark + ", " + locality + ", Bengaluru, Karnataka " + pincode;
+        if (pincode.isEmpty()) pincode = "560103";
+
+        List<String> parts = new ArrayList<>();
+        if (!premise.isEmpty()) parts.add(premise);
+        if (!building.isEmpty()) parts.add(building);
+        if (!landmark.isEmpty()) parts.add(landmark);
+        if (!locality.isEmpty()) parts.add(locality);
+        parts.add("Bengaluru, Karnataka " + pincode);
+        String formatted = String.join(", ", parts);
 
         result.put("formattedAddress", formatted);
         result.put("premise", premise);
         result.put("building", building);
         result.put("landmark", landmark);
-        result.put("street", "Outer Ring Road");
+        result.put("street", "");
         result.put("locality", locality);
         result.put("city", "Bengaluru");
         result.put("state", "Karnataka");
         result.put("pincode", pincode);
-        result.put("latitude", lat);
-        result.put("longitude", lng);
+        result.put("latitude", defaultLat);
+        result.put("longitude", defaultLng);
 
         return result;
     }

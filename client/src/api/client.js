@@ -65,6 +65,10 @@ export const api = {
   parseAddress: (rawAddress) => request('/api/ai/parse-address', { method: 'POST', body: JSON.stringify({ rawAddress }) }),
   smartSearch: (query) => request('/api/ai/smart-search', { method: 'POST', body: JSON.stringify({ query }) }),
 
+  // Precise Real-Time Geocoding Services
+  reverseGeocode: (lat, lng) => request(`/api/location/reverse-geocode?lat=${lat}&lng=${lng}`),
+  searchLocation: (query) => request(`/api/location/search?query=${encodeURIComponent(query)}`),
+
   // Communities
   getCommunities: () => request('/api/communities'),
   getCommunity: (id) => request(`/api/communities/${id}`),

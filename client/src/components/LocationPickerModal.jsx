@@ -1,16 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
+import { useApp } from '../context/AppContext';
 
 export default function LocationPickerModal({ initialLocation, onConfirm, onClose }) {
-  const [lat, setLat] = useState(initialLocation?.latitude || 12.9345);
-  const [lng, setLng] = useState(initialLocation?.longitude || 77.6912);
+  const { userLocation } = useApp();
+
+  const startLat = initialLocation?.latitude || userLocation?.latitude || 12.9345;
+  const startLng = initialLocation?.longitude || userLocation?.longitude || 77.6912;
+
+  const [lat, setLat] = useState(startLat);
+  const [lng, setLng] = useState(startLng);
   const [premise, setPremise] = useState(initialLocation?.premise || '');
   const [building, setBuilding] = useState(initialLocation?.building || '');
   const [landmark, setLandmark] = useState(initialLocation?.landmark || '');
-  const [locality, setLocality] = useState(initialLocation?.locality || 'Marathahalli');
+  const [locality, setLocality] = useState(initialLocation?.locality || userLocation?.locality?.split(',')[0] || 'Bengaluru');
   const [city, setCity] = useState(initialLocation?.city || 'Bengaluru');
   const [pincode, setPincode] = useState(initialLocation?.pincode || '560103');
   const [formattedAddress, setFormattedAddress] = useState(initialLocation?.formattedAddress || '');
+
+  // Place search inside modal
+  const [searchPlaceQuery, setSearchPlaceQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchingPlace, setSearchingPlace] = useState(false);
 
   const [locating, setLocating] = useState(false);
   const [aiParsing, setAiParsing] = useState(false);
@@ -20,7 +31,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
 
-  // Load Leaflet dynamically if not already on window
+  // Load Leaflet dynamically
   useEffect(() => {
     let link = document.getElementById('leaflet-css');
     if (!link) {
@@ -78,34 +89,32 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
     setMapLoaded(true);
   };
 
-  const updateCoordinates = (newLat, newLng) => {
+  // Live reverse geocoding via server endpoint (no CORS blocks, accurate data)
+  const updateCoordinates = async (newLat, newLng) => {
     const fixedLat = Number(newLat.toFixed(5));
     const fixedLng = Number(newLng.toFixed(5));
     setLat(fixedLat);
     setLng(fixedLng);
 
-    // Reverse geocode via OpenStreetMap Nominatim
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${fixedLat}&lon=${fixedLng}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.address) {
-          const addr = data.address;
-          const road = addr.road || addr.street || '';
-          const sub = addr.suburb || addr.neighbourhood || addr.residential || locality;
-          const pin = addr.postcode || pincode;
-          const c = addr.city || addr.town || 'Bengaluru';
-
-          setLocality(sub);
-          setCity(c);
-          setPincode(pin);
-          if (data.display_name) {
-            setFormattedAddress(data.display_name);
-          }
+    try {
+      const geo = await api.reverseGeocode(fixedLat, fixedLng);
+      if (geo) {
+        if (geo.locality) setLocality(geo.locality);
+        if (geo.city) setCity(geo.city);
+        if (geo.pincode) setPincode(geo.pincode);
+        if (geo.street && !landmark) {
+          setLandmark(geo.street);
         }
-      })
-      .catch(() => {});
+        if (geo.formattedAddress) {
+          setFormattedAddress(geo.formattedAddress);
+        }
+      }
+    } catch (err) {
+      console.error('Reverse geocode error:', err);
+    }
   };
 
+  // High-accuracy live GPS location from device
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert('Geolocation is not supported by your browser.');
@@ -113,7 +122,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
     }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const cLat = Number(pos.coords.latitude.toFixed(5));
         const cLng = Number(pos.coords.longitude.toFixed(5));
         setLat(cLat);
@@ -123,19 +132,54 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
           mapInstanceRef.current.setView([cLat, cLng], 16);
           markerRef.current.setLatLng([cLat, cLng]);
         }
-        updateCoordinates(cLat, cLng);
+        await updateCoordinates(cLat, cLng);
         setLocating(false);
       },
       (err) => {
-        console.warn('Geolocation error:', err);
+        console.warn('Geolocation error:', err.message);
         setLocating(false);
-        // Fallback to Bangalore center
-        updateCoordinates(12.9345, 77.6912);
+        alert('Could not retrieve precise location: ' + err.message);
       },
-      { timeout: 8000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 
+  // Search places / localities to move the map
+  const handleSearchPlace = async (e) => {
+    if (e) e.preventDefault();
+    if (!searchPlaceQuery.trim()) return;
+
+    setSearchingPlace(true);
+    try {
+      const results = await api.searchLocation(searchPlaceQuery.trim());
+      setSearchResults(results || []);
+      if (results && results.length > 0) {
+        selectSearchResult(results[0]);
+      }
+    } catch (err) {
+      console.error('Place search error:', err);
+    } finally {
+      setSearchingPlace(false);
+    }
+  };
+
+  const selectSearchResult = (item) => {
+    const sLat = Number(item.latitude.toFixed(5));
+    const sLng = Number(item.longitude.toFixed(5));
+    setLat(sLat);
+    setLng(sLng);
+    if (item.locality) setLocality(item.locality);
+    if (item.city) setCity(item.city);
+    if (item.pincode) setPincode(item.pincode);
+    if (item.displayName) setFormattedAddress(item.displayName);
+
+    if (mapInstanceRef.current && markerRef.current) {
+      mapInstanceRef.current.setView([sLat, sLng], 16);
+      markerRef.current.setLatLng([sLat, sLng]);
+    }
+  };
+
+  // Format textual address fields without touching pinned coordinates
   const handleAiRefineAddress = async () => {
     setAiParsing(true);
     try {
@@ -149,17 +193,9 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
         if (res.city) setCity(res.city);
         if (res.pincode) setPincode(res.pincode);
         if (res.formattedAddress) setFormattedAddress(res.formattedAddress);
-        if (res.latitude && res.longitude) {
-          setLat(res.latitude);
-          setLng(res.longitude);
-          if (mapInstanceRef.current && markerRef.current) {
-            mapInstanceRef.current.setView([res.latitude, res.longitude], 16);
-            markerRef.current.setLatLng([res.latitude, res.longitude]);
-          }
-        }
       }
     } catch (err) {
-      console.error('AI address refine error:', err);
+      console.error('Address format error:', err);
     } finally {
       setAiParsing(false);
     }
@@ -169,6 +205,8 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
     const finalFormatted =
       formattedAddress ||
       `${premise ? `${premise}, ` : ''}${building ? `${building}, ` : ''}${landmark ? `${landmark}, ` : ''}${locality}, ${city} ${pincode}`.trim();
+
+    const pickupSummary = [premise, building, locality].filter(Boolean).join(', ') || locality;
 
     onConfirm({
       latitude: lat,
@@ -181,7 +219,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
       pincode,
       state: 'Karnataka',
       formattedAddress: finalFormatted,
-      pickupLocation: `${premise || building || locality}${landmark ? ` (Ref: ${landmark})` : ''}`,
+      pickupLocation: pickupSummary + (landmark ? ` (Near: ${landmark})` : ''),
     });
     onClose();
   };
@@ -233,10 +271,10 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
           <div>
             <h2 style={{ fontSize: '1.2rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span>📍</span>
-              <span>Pickup Location & Map Pin</span>
+              <span>Accurate Pickup Location & Pin</span>
             </h2>
             <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-              Pinpoint the pickup spot so borrowers in your community can easily collect this item.
+              Pinpoint your exact item handover location using live GPS or by searching any area.
             </p>
           </div>
           <button
@@ -257,8 +295,57 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
 
         {/* Content Body */}
         <div style={{ padding: '1.25rem', overflowY: 'auto', flex: 1 }}>
-          {/* Top GPS & AI Action Bar */}
-          <div style={{ display: 'flex', gap: '0.65rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+          {/* Search place on map */}
+          <form onSubmit={handleSearchPlace} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.65rem' }}>
+            <input
+              type="text"
+              className="form-input"
+              style={{ flex: 1, fontSize: '0.85rem', padding: '0.45rem 0.75rem' }}
+              placeholder="Search any colony, street, or landmark (e.g. HSR Layout, Indiranagar, Electronic City)..."
+              value={searchPlaceQuery}
+              onChange={(e) => setSearchPlaceQuery(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="btn btn-secondary btn-sm"
+              disabled={searchingPlace}
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {searchingPlace ? 'Searching...' : '🔍 Find Area'}
+            </button>
+          </form>
+
+          {/* Quick Place Search Result Chips */}
+          {searchResults.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', marginBottom: '0.75rem', paddingBottom: '0.2rem' }}>
+              {searchResults.map((res, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => selectSearchResult(res)}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: 'var(--color-surface-hover)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-primary)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                  }}
+                >
+                  <span>📍</span>
+                  <span>{res.locality || res.displayName.split(',')[0]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Top GPS Action Bar */}
+          <div style={{ display: 'flex', gap: '0.65rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
             <button
               type="button"
               className="btn btn-primary btn-sm"
@@ -266,7 +353,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
               disabled={locating}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              <span>{locating ? '⏳ Locating...' : '📍 Use Current GPS Location'}</span>
+              <span>{locating ? '⏳ Locating precisely...' : '📍 Use Device GPS Location'}</span>
             </button>
 
             <button
@@ -276,7 +363,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
               disabled={aiParsing}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              <span>{aiParsing ? 'Auto-Formatting...' : 'Auto-Format Postal Address'}</span>
+              <span>{aiParsing ? 'Formatting...' : 'Auto-Format Text Fields'}</span>
             </button>
           </div>
 
@@ -300,15 +387,16 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
                 bottom: '8px',
                 left: '8px',
                 zIndex: 1000,
-                backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
                 color: '#ffffff',
-                padding: '0.2rem 0.5rem',
+                padding: '0.25rem 0.6rem',
                 borderRadius: '4px',
-                fontSize: '0.72rem',
+                fontSize: '0.74rem',
                 fontWeight: 600,
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
               }}
             >
-              Lat: {lat}, Lng: {lng} • Click or drag pin to adjust
+              📍 {lat.toFixed(4)}, {lng.toFixed(4)} ({locality}) • Click or drag pin to adjust
             </div>
           </div>
 
@@ -316,13 +404,13 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <div>
               <label className="form-label" style={{ fontSize: '0.78rem' }}>
-                Flat / Room / House No *
+                Flat / Room / House No
               </label>
               <input
                 type="text"
                 className="form-input"
                 style={{ fontSize: '0.85rem', padding: '0.4rem 0.6rem' }}
-                placeholder="e.g. Room 304, 3rd Floor or Flat 402"
+                placeholder="e.g. Room 304, Flat 402, House 12"
                 value={premise}
                 onChange={(e) => setPremise(e.target.value)}
               />
@@ -330,13 +418,13 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
 
             <div>
               <label className="form-label" style={{ fontSize: '0.78rem' }}>
-                Building / Hostel Wing / Complex
+                Building / Society / Hostel Wing
               </label>
               <input
                 type="text"
                 className="form-input"
                 style={{ fontSize: '0.85rem', padding: '0.4rem 0.6rem' }}
-                placeholder="e.g. Cauvery Boys Hostel, Block A"
+                placeholder="e.g. Block A, Green Glen Heights, Sunshine Enclave"
                 value={building}
                 onChange={(e) => setBuilding(e.target.value)}
               />
@@ -345,13 +433,13 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
 
           <div style={{ marginBottom: '0.75rem' }}>
             <label className="form-label" style={{ fontSize: '0.78rem' }}>
-              Identifiable Landmark (Crucial for Indian pickup) *
+              Identifiable Landmark (Helpful for handover pickup)
             </label>
             <input
               type="text"
               className="form-input"
               style={{ fontSize: '0.85rem', padding: '0.4rem 0.6rem' }}
-              placeholder="e.g. Near NHCE Central Library, Opposite Basketball Court Gate"
+              placeholder="e.g. Near Community Library, Opposite Main Gate"
               value={landmark}
               onChange={(e) => setLandmark(e.target.value)}
             />
@@ -366,9 +454,10 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
                 type="text"
                 className="form-input"
                 style={{ fontSize: '0.85rem', padding: '0.4rem 0.6rem' }}
-                placeholder="e.g. Marathahalli / Bellandur"
+                placeholder="e.g. Indiranagar, HSR Layout, Marathahalli"
                 value={locality}
                 onChange={(e) => setLocality(e.target.value)}
+                required
               />
             </div>
 
@@ -396,6 +485,7 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
                 placeholder="560103"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -413,14 +503,14 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
           }}
         >
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
-            Coordinates: <strong>{lat}, {lng}</strong> ({locality})
+            Pinned: <strong>{lat.toFixed(4)}, {lng.toFixed(4)}</strong> ({locality})
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button type="button" className="btn btn-secondary btn-sm" onClick={onClose}>
               Cancel
             </button>
             <button type="button" className="btn btn-primary btn-sm" onClick={handleConfirm}>
-              ✓ Confirm Location
+              ✓ Confirm Pinned Location
             </button>
           </div>
         </div>
@@ -428,4 +518,3 @@ export default function LocationPickerModal({ initialLocation, onConfirm, onClos
     </div>
   );
 }
-

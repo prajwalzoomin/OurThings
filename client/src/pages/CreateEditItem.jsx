@@ -106,10 +106,14 @@ export default function CreateEditItem() {
         if (parsed.pincode) setPincode(parsed.pincode);
         if (parsed.formattedAddress) setFormattedAddress(parsed.formattedAddress);
         if (parsed.latitude && parsed.longitude) {
-          setLatitude(parsed.latitude);
-          setLongitude(parsed.longitude);
+          // Preserve precise GPS / Map pin if already chosen
+          if (!latitude || !longitude) {
+            setLatitude(parsed.latitude);
+            setLongitude(parsed.longitude);
+          }
         }
-        setPickupLocation(`${parsed.premise || parsed.building || parsed.locality}${parsed.landmark ? ` (Ref: ${parsed.landmark})` : ''}`);
+        const locationSummary = [parsed.premise, parsed.building, parsed.locality].filter(Boolean).join(', ');
+        setPickupLocation(locationSummary || parsed.locality || pickupLocation);
         notify('success', 'Address formatted to standard postal structure.');
       }
     } catch (err) {
