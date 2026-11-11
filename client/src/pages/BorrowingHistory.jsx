@@ -3,6 +3,7 @@ import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import StatusBadge from '../components/StatusBadge';
 import ItemCard from '../components/ItemCard';
+import ReviewModal from '../components/ReviewModal';
 
 export default function BorrowingHistory() {
   const { currentUser, currentCommunity, navigateTo, setSwitchAccountModalOpen } = useApp();
@@ -11,6 +12,16 @@ export default function BorrowingHistory() {
   const [lentLoans, setLentLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Review modal state
+  const [reviewModal, setReviewModal] = useState({
+    isOpen: false,
+    itemId: null,
+    requestId: null,
+    itemTitle: '',
+    revieweeName: '',
+    reviewType: 'BORROWER_TO_OWNER',
+  });
 
   useEffect(() => {
     async function fetchHistory() {
@@ -185,6 +196,9 @@ export default function BorrowingHistory() {
                     : hr?.initialConditionNotes
                     ? `Handover inspection notes: "${hr.initialConditionNotes}".`
                     : `Booking period: ${loan.startDate} to ${loan.endDate}.`,
+                  pricingType: loan.pricingType,
+                  dailyRateInr: loan.dailyRateInr,
+                  securityDepositInr: loan.securityDepositInr,
                 }}
                 metaSubtitle={`${historyType === 'borrowed' ? 'Owner' : 'Borrower'}: ${otherParty || 'Member'}`}
                 dateLabel={`📅 ${loan.startDate} → ${loan.endDate}`}
@@ -211,6 +225,25 @@ export default function BorrowingHistory() {
                         ⚠️ Issue: {hr.issueDetails}
                       </div>
                     )}
+                    {loan.status === 'RETURNED' && (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        style={{ width: '100%', fontSize: '0.72rem', padding: '0.28rem 0.4rem', justifyContent: 'center' }}
+                        onClick={() =>
+                          setReviewModal({
+                            isOpen: true,
+                            itemId: loan.itemId,
+                            requestId: loan.id,
+                            itemTitle: loan.itemTitle,
+                            revieweeName: otherParty,
+                            reviewType: historyType === 'borrowed' ? 'BORROWER_TO_OWNER' : 'OWNER_TO_BORROWER',
+                          })
+                        }
+                      >
+                        ⭐ Rate & Review
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="btn btn-secondary btn-sm"
@@ -230,6 +263,17 @@ export default function BorrowingHistory() {
           })}
         </div>
       )}
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={reviewModal.isOpen}
+        onClose={() => setReviewModal((prev) => ({ ...prev, isOpen: false }))}
+        itemId={reviewModal.itemId}
+        requestId={reviewModal.requestId}
+        itemTitle={reviewModal.itemTitle}
+        revieweeName={reviewModal.revieweeName}
+        reviewType={reviewModal.reviewType}
+      />
     </div>
   );
 }

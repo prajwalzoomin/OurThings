@@ -16,6 +16,9 @@ public class ItemDtos {
         private LocalDate availableFrom;
         private LocalDate availableTo;
         private BigDecimal estimatedReplacementValueInr;
+        private String pricingType = "FREE";
+        private BigDecimal dailyRateInr = BigDecimal.ZERO;
+        private BigDecimal securityDepositInr = BigDecimal.ZERO;
         private String imageUrl;
         private Double latitude;
         private Double longitude;
@@ -51,6 +54,15 @@ public class ItemDtos {
 
         public BigDecimal getEstimatedReplacementValueInr() { return estimatedReplacementValueInr; }
         public void setEstimatedReplacementValueInr(BigDecimal estimatedReplacementValueInr) { this.estimatedReplacementValueInr = estimatedReplacementValueInr; }
+
+        public String getPricingType() { return pricingType != null ? pricingType : "FREE"; }
+        public void setPricingType(String pricingType) { this.pricingType = pricingType; }
+
+        public BigDecimal getDailyRateInr() { return dailyRateInr != null ? dailyRateInr : BigDecimal.ZERO; }
+        public void setDailyRateInr(BigDecimal dailyRateInr) { this.dailyRateInr = dailyRateInr; }
+
+        public BigDecimal getSecurityDepositInr() { return securityDepositInr != null ? securityDepositInr : BigDecimal.ZERO; }
+        public void setSecurityDepositInr(BigDecimal securityDepositInr) { this.securityDepositInr = securityDepositInr; }
 
         public String getImageUrl() { return imageUrl; }
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
@@ -129,6 +141,9 @@ public class ItemDtos {
         private LocalDate availableFrom;
         private LocalDate availableTo;
         private BigDecimal estimatedReplacementValueInr;
+        private String pricingType = "FREE";
+        private BigDecimal dailyRateInr = BigDecimal.ZERO;
+        private BigDecimal securityDepositInr = BigDecimal.ZERO;
         private String imageUrl;
         private String status;
         private LocalDateTime createdAt;
@@ -213,6 +228,15 @@ public class ItemDtos {
 
         public BigDecimal getEstimatedReplacementValueInr() { return estimatedReplacementValueInr; }
         public void setEstimatedReplacementValueInr(BigDecimal estimatedReplacementValueInr) { this.estimatedReplacementValueInr = estimatedReplacementValueInr; }
+
+        public String getPricingType() { return pricingType != null ? pricingType : "FREE"; }
+        public void setPricingType(String pricingType) { this.pricingType = pricingType; }
+
+        public BigDecimal getDailyRateInr() { return dailyRateInr != null ? dailyRateInr : BigDecimal.ZERO; }
+        public void setDailyRateInr(BigDecimal dailyRateInr) { this.dailyRateInr = dailyRateInr; }
+
+        public BigDecimal getSecurityDepositInr() { return securityDepositInr != null ? securityDepositInr : BigDecimal.ZERO; }
+        public void setSecurityDepositInr(BigDecimal securityDepositInr) { this.securityDepositInr = securityDepositInr; }
 
         public String getImageUrl() { return imageUrl; }
         public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }

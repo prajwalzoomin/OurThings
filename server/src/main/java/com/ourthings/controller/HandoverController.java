@@ -18,18 +18,20 @@ public class HandoverController {
 
     @PostMapping("/{requestId}/handover")
     public ResponseEntity<HandoverRecord> recordHandover(@PathVariable Long requestId,
-                                                         @RequestHeader("X-Community-Id") Long communityId,
+                                                         @RequestHeader(value = "X-Community-Id", required = false) Long communityId,
                                                          @RequestHeader("X-User-Id") Long userId,
                                                          @RequestBody RecordHandoverRequest req) {
+        communityId = communityId != null ? communityId : 1L;
         HandoverRecord record = handoverService.recordHandover(requestId, communityId, userId, req);
         return ResponseEntity.ok(record);
     }
 
     @PostMapping("/{requestId}/return")
     public ResponseEntity<HandoverRecord> recordReturn(@PathVariable Long requestId,
-                                                       @RequestHeader("X-Community-Id") Long communityId,
+                                                       @RequestHeader(value = "X-Community-Id", required = false) Long communityId,
                                                        @RequestHeader("X-User-Id") Long userId,
                                                        @RequestBody RecordReturnRequest req) {
+        communityId = communityId != null ? communityId : 1L;
         HandoverRecord record = handoverService.recordReturn(requestId, communityId, userId, req);
         return ResponseEntity.ok(record);
     }

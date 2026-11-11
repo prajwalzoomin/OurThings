@@ -150,10 +150,28 @@ export default function ZenGlanceModal() {
             {/* Price & Societal Impact */}
             <div className="zen-glance-footer">
               <div className="zen-glance-price-stack">
-                <div className="zen-glance-free">FREE TO BORROW</div>
-                {glanceItem.estimatedReplacementValueInr && (
-                  <div className="zen-glance-avoided">
-                    Avoided Cost: <strong>₹{Number(glanceItem.estimatedReplacementValueInr).toLocaleString('en-IN')}</strong> (No Purchase Needed)
+                {glanceItem.pricingType === 'RENTAL' && Number(glanceItem.dailyRateInr) > 0 ? (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem' }}>
+                      <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-brand)' }}>
+                        ₹{Math.round(glanceItem.dailyRateInr)}
+                      </span>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>per day</span>
+                    </div>
+                    {glanceItem.securityDepositInr && Number(glanceItem.securityDepositInr) > 0 ? (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.15rem' }}>
+                        🛡️ ₹{Math.round(glanceItem.securityDepositInr)} Refundable Security Deposit
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="zen-glance-free">FREE TO BORROW</div>
+                    {glanceItem.estimatedReplacementValueInr && (
+                      <div className="zen-glance-avoided">
+                        Avoided Cost: <strong>₹{Number(glanceItem.estimatedReplacementValueInr).toLocaleString('en-IN')}</strong> (No Purchase Needed)
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

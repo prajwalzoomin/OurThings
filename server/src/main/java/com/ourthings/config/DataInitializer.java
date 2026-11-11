@@ -21,6 +21,9 @@ public class DataInitializer implements CommandLineRunner {
     private final HandoverRecordRepository handoverRecordRepository;
     private final UnmetDemandRepository unmetDemandRepository;
     private final ActivityLogRepository activityLogRepository;
+    private final ReviewRepository reviewRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final AppNotificationRepository notificationRepository;
 
     public DataInitializer(CommunityRepository communityRepository,
                            UserRepository userRepository,
@@ -29,7 +32,10 @@ public class DataInitializer implements CommandLineRunner {
                            BorrowRequestRepository borrowRequestRepository,
                            HandoverRecordRepository handoverRecordRepository,
                            UnmetDemandRepository unmetDemandRepository,
-                           ActivityLogRepository activityLogRepository) {
+                           ActivityLogRepository activityLogRepository,
+                           ReviewRepository reviewRepository,
+                           ChatMessageRepository chatMessageRepository,
+                           AppNotificationRepository notificationRepository) {
         this.communityRepository = communityRepository;
         this.userRepository = userRepository;
         this.membershipRepository = membershipRepository;
@@ -38,6 +44,9 @@ public class DataInitializer implements CommandLineRunner {
         this.handoverRecordRepository = handoverRecordRepository;
         this.unmetDemandRepository = unmetDemandRepository;
         this.activityLogRepository = activityLogRepository;
+        this.reviewRepository = reviewRepository;
+        this.chatMessageRepository = chatMessageRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -119,6 +128,9 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(90),
                 BigDecimal.valueOf(3499.00)
         );
+        drill.setPricingType("RENTAL");
+        drill.setDailyRateInr(BigDecimal.valueOf(150.00));
+        drill.setSecurityDepositInr(BigDecimal.valueOf(500.00));
         drill.setLatitude(12.9345);
         drill.setLongitude(77.6912);
         drill.setPremise("Room 304, 3rd Floor");
@@ -142,6 +154,9 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(120),
                 BigDecimal.valueOf(1400.00)
         );
+        crutches.setPricingType("FREE");
+        crutches.setDailyRateInr(BigDecimal.ZERO);
+        crutches.setSecurityDepositInr(BigDecimal.ZERO);
         crutches.setLatitude(12.9348);
         crutches.setLongitude(77.6915);
         crutches.setPremise("Room 304, 3rd Floor");
@@ -165,6 +180,9 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(60),
                 BigDecimal.valueOf(28000.00)
         );
+        projector.setPricingType("RENTAL");
+        projector.setDailyRateInr(BigDecimal.valueOf(350.00));
+        projector.setSecurityDepositInr(BigDecimal.valueOf(1500.00));
         projector.setLatitude(12.9342);
         projector.setLongitude(77.6910);
         projector.setPremise("Room 212, 2nd Floor");
@@ -190,6 +208,9 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(60),
                 BigDecimal.valueOf(3800.00)
         );
+        rucksack.setPricingType("RENTAL");
+        rucksack.setDailyRateInr(BigDecimal.valueOf(100.00));
+        rucksack.setSecurityDepositInr(BigDecimal.valueOf(500.00));
         rucksack.setLatitude(12.9342);
         rucksack.setLongitude(77.6910);
         rucksack.setPremise("Room 212, 2nd Floor");
@@ -213,6 +234,9 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(30),
                 BigDecimal.valueOf(12500.00)
         );
+        speaker.setPricingType("RENTAL");
+        speaker.setDailyRateInr(BigDecimal.valueOf(250.00));
+        speaker.setSecurityDepositInr(BigDecimal.valueOf(1000.00));
         speaker.setLatitude(12.9345);
         speaker.setLongitude(77.6912);
         speaker.setPremise("Room 304, 3rd Floor");
@@ -237,6 +261,9 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(180),
                 BigDecimal.valueOf(6500.00)
         );
+        wheelchair.setPricingType("FREE");
+        wheelchair.setDailyRateInr(BigDecimal.ZERO);
+        wheelchair.setSecurityDepositInr(BigDecimal.ZERO);
         wheelchair.setLatitude(12.9260);
         wheelchair.setLongitude(77.6762);
         wheelchair.setPremise("Flat 402, 4th Floor");
@@ -308,6 +335,13 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(7),
                 "Needed drill to mount wall organizer in hostel room"
         );
+        req1.setPricingType("RENTAL");
+        req1.setDailyRateInr(BigDecimal.valueOf(150.00));
+        req1.setRentalDays(4);
+        req1.setRentalTotalInr(BigDecimal.valueOf(600.00));
+        req1.setSecurityDepositInr(BigDecimal.valueOf(500.00));
+        req1.setTotalEstimatedCostInr(BigDecimal.valueOf(1100.00));
+        req1.setPaymentStatus("REFUNDED");
         req1.setStatus("RETURNED");
         req1.setCreatedAt(LocalDateTime.now().minusDays(12));
         req1 = borrowRequestRepository.save(req1);
@@ -331,6 +365,13 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(3),
                 "Mini project review presentation preparation"
         );
+        req2.setPricingType("RENTAL");
+        req2.setDailyRateInr(BigDecimal.valueOf(350.00));
+        req2.setRentalDays(6);
+        req2.setRentalTotalInr(BigDecimal.valueOf(2100.00));
+        req2.setSecurityDepositInr(BigDecimal.valueOf(1500.00));
+        req2.setTotalEstimatedCostInr(BigDecimal.valueOf(3600.00));
+        req2.setPaymentStatus("DEPOSIT_HELD");
         req2.setStatus("ACTIVE");
         req2.setCreatedAt(LocalDateTime.now().minusDays(4));
         req2 = borrowRequestRepository.save(req2);
@@ -351,6 +392,13 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(12),
                 "Ankle sprain rehabilitation support"
         );
+        req3.setPricingType("FREE");
+        req3.setDailyRateInr(BigDecimal.ZERO);
+        req3.setRentalDays(8);
+        req3.setRentalTotalInr(BigDecimal.ZERO);
+        req3.setSecurityDepositInr(BigDecimal.ZERO);
+        req3.setTotalEstimatedCostInr(BigDecimal.ZERO);
+        req3.setPaymentStatus("FREE");
         req3.setStatus("APPROVED");
         req3.setCreatedAt(LocalDateTime.now().minusDays(1));
         req3 = borrowRequestRepository.save(req3);
@@ -368,6 +416,13 @@ public class DataInitializer implements CommandLineRunner {
                 today.plusDays(4),
                 "Floor sports celebration event"
         );
+        req4.setPricingType("RENTAL");
+        req4.setDailyRateInr(BigDecimal.valueOf(250.00));
+        req4.setRentalDays(3);
+        req4.setRentalTotalInr(BigDecimal.valueOf(750.00));
+        req4.setSecurityDepositInr(BigDecimal.valueOf(1000.00));
+        req4.setTotalEstimatedCostInr(BigDecimal.valueOf(1750.00));
+        req4.setPaymentStatus("DEPOSIT_PENDING");
         req4.setStatus("PENDING");
         req4.setCreatedAt(LocalDateTime.now().minusHours(3));
         borrowRequestRepository.save(req4);
@@ -381,6 +436,13 @@ public class DataInitializer implements CommandLineRunner {
                 today.minusDays(9),
                 "Recovery support for visiting relative"
         );
+        req5.setPricingType("FREE");
+        req5.setDailyRateInr(BigDecimal.ZERO);
+        req5.setRentalDays(6);
+        req5.setRentalTotalInr(BigDecimal.ZERO);
+        req5.setSecurityDepositInr(BigDecimal.ZERO);
+        req5.setTotalEstimatedCostInr(BigDecimal.ZERO);
+        req5.setPaymentStatus("FREE");
         req5.setStatus("RETURNED");
         req5.setCreatedAt(LocalDateTime.now().minusDays(16));
         req5 = borrowRequestRepository.save(req5);
@@ -483,6 +545,81 @@ public class DataInitializer implements CommandLineRunner {
                 "New community demand logged in category: Healthcare & Mobility"
         ));
 
+        // 8. Seed Verified Community Reviews
+        reviewRepository.save(new Review(
+                drill.getId(),
+                req1.getId(),
+                kasim.getId(),
+                kasim.getName(),
+                kasim.getAvatarUrl(),
+                prajwal.getId(),
+                5,
+                "The drill kit was in perfect working order! All 6 masonry bits were included, and Prajwal handed it over right on time at Room 304.",
+                "BORROWER_TO_OWNER"
+        ));
+
+        reviewRepository.save(new Review(
+                wheelchair.getId(),
+                req5.getId(),
+                ramesh.getId(),
+                ramesh.getName(),
+                ramesh.getAvatarUrl(),
+                ananya.getId(),
+                5,
+                "Great condition, thoroughly sanitized, and folded easily into our car trunk. Ananya was exceptionally helpful when my father visited.",
+                "BORROWER_TO_OWNER"
+        ));
+
+        reviewRepository.save(new Review(
+                crutches.getId(),
+                req3.getId(),
+                kasim.getId(),
+                kasim.getName(),
+                kasim.getAvatarUrl(),
+                prajwal.getId(),
+                5,
+                "Lightweight, push-button adjustment was smooth, and arm pads were spotless. Saved me from buying a pair for a 1-week ankle sprain.",
+                "BORROWER_TO_OWNER"
+        ));
+
+        // 9. Seed Direct Peer-to-Peer Messages
+        chatMessageRepository.save(new ChatMessage(
+                speaker.getId(),
+                req4.getId(),
+                kasim.getId(),
+                kasim.getName(),
+                kasim.getAvatarUrl(),
+                prajwal.getId(),
+                "Hi Prajwal! Is the JBL speaker's wireless mic battery charged? We need it for our hostel floor celebration."
+        ));
+        chatMessageRepository.save(new ChatMessage(
+                speaker.getId(),
+                req4.getId(),
+                prajwal.getId(),
+                prajwal.getName(),
+                prajwal.getAvatarUrl(),
+                kasim.getId(),
+                "Hey Kasim! Yes, fully charged and I kept 2 spare Duracell AA batteries in the bag as well."
+        ));
+
+        // 10. Seed Notifications for Primary User
+        notificationRepository.save(new AppNotification(
+                prajwal.getId(),
+                "New Borrow Request Received",
+                "Mohammed Kasim requested to borrow your JBL Portable PA Speaker for 3 days.",
+                "NEW_REQUEST",
+                req4.getId(),
+                "REQUEST"
+        ));
+        notificationRepository.save(new AppNotification(
+                prajwal.getId(),
+                "Active Loan Underway",
+                "Handover completed for Epson Portable Full HD Projector with Kasim.",
+                "HANDOVER_READY",
+                req2.getId(),
+                "REQUEST"
+        ));
+
         System.out.println("OurThings sample community data successfully seeded!");
     }
 
@@ -560,6 +697,43 @@ public class DataInitializer implements CommandLineRunner {
                     item.setFormattedAddress("Campus Wing, Marathahalli, Bengaluru, Karnataka 560103");
                 }
                 itemListingRepository.save(item);
+            }
+
+            // Backfill pricing if missing
+            if (item.getPricingType() == null || item.getPricingType().isBlank() || "FREE".equals(item.getPricingType())) {
+                if (item.getTitle().contains("Drill")) {
+                    item.setPricingType("RENTAL");
+                    item.setDailyRateInr(BigDecimal.valueOf(150.00));
+                    item.setSecurityDepositInr(BigDecimal.valueOf(500.00));
+                    itemListingRepository.save(item);
+                } else if (item.getTitle().contains("Projector")) {
+                    item.setPricingType("RENTAL");
+                    item.setDailyRateInr(BigDecimal.valueOf(350.00));
+                    item.setSecurityDepositInr(BigDecimal.valueOf(1500.00));
+                    itemListingRepository.save(item);
+                } else if (item.getTitle().contains("Speaker")) {
+                    item.setPricingType("RENTAL");
+                    item.setDailyRateInr(BigDecimal.valueOf(250.00));
+                    item.setSecurityDepositInr(BigDecimal.valueOf(1000.00));
+                    itemListingRepository.save(item);
+                } else if (item.getTitle().contains("Rucksack")) {
+                    item.setPricingType("RENTAL");
+                    item.setDailyRateInr(BigDecimal.valueOf(100.00));
+                    item.setSecurityDepositInr(BigDecimal.valueOf(500.00));
+                    itemListingRepository.save(item);
+                }
+            }
+        }
+
+        // Backfill reviews if none exist
+        if (reviewRepository.count() == 0) {
+            var allItems = itemListingRepository.findAll();
+            var allUsers = userRepository.findAll();
+            if (!allItems.isEmpty() && allUsers.size() >= 2) {
+                var it1 = allItems.get(0);
+                var u1 = allUsers.get(0);
+                var u2 = allUsers.get(1);
+                reviewRepository.save(new Review(it1.getId(), null, u2.getId(), u2.getName(), u2.getAvatarUrl(), u1.getId(), 5, "Excellent condition! Exactly as described, and pickup was smooth and easy.", "BORROWER_TO_OWNER"));
             }
         }
     }

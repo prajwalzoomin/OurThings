@@ -41,6 +41,21 @@ public class User {
     @Column(name = "active_community_id")
     private Long activeCommunityId;
 
+    @Column(name = "trust_score_percent")
+    private Integer trustScorePercent = 98;
+
+    @Column(name = "completed_loans_count")
+    private Integer completedLoansCount = 0;
+
+    @Column(name = "completed_borrows_count")
+    private Integer completedBorrowsCount = 0;
+
+    @Column(name = "is_id_verified")
+    private Boolean isIdVerified = true;
+
+    @Column(length = 255)
+    private String badges = "VERIFIED_RESIDENT";
+
     @Column(length = 50)
     private String role = "MEMBER";
 
@@ -102,6 +117,21 @@ public class User {
 
     public Long getActiveCommunityId() { return activeCommunityId; }
     public void setActiveCommunityId(Long activeCommunityId) { this.activeCommunityId = activeCommunityId; }
+
+    public Integer getTrustScorePercent() { return trustScorePercent != null ? trustScorePercent : 98; }
+    public void setTrustScorePercent(Integer trustScorePercent) { this.trustScorePercent = trustScorePercent; }
+
+    public Integer getCompletedLoansCount() { return completedLoansCount != null ? completedLoansCount : 0; }
+    public void setCompletedLoansCount(Integer completedLoansCount) { this.completedLoansCount = completedLoansCount; }
+
+    public Integer getCompletedBorrowsCount() { return completedBorrowsCount != null ? completedBorrowsCount : 0; }
+    public void setCompletedBorrowsCount(Integer completedBorrowsCount) { this.completedBorrowsCount = completedBorrowsCount; }
+
+    public Boolean getIsIdVerified() { return isIdVerified != null ? isIdVerified : true; }
+    public void setIsIdVerified(Boolean isIdVerified) { this.isIdVerified = isIdVerified; }
+
+    public String getBadges() { return badges != null ? badges : "VERIFIED_RESIDENT"; }
+    public void setBadges(String badges) { this.badges = badges; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }

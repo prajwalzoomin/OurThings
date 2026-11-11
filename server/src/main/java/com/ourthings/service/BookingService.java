@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -117,6 +119,25 @@ public class BookingService {
                 end,
                 req.getBorrowPurpose() != null ? req.getBorrowPurpose().trim() : ""
         );
+
+        long days = ChronoUnit.DAYS.between(start, end) + 1;
+        int rentalDays = (int) Math.max(1, days);
+        String pricingType = item.getPricingType() != null ? item.getPricingType() : "FREE";
+        BigDecimal dailyRate = item.getDailyRateInr() != null ? item.getDailyRateInr() : BigDecimal.ZERO;
+        BigDecimal deposit = item.getSecurityDepositInr() != null ? item.getSecurityDepositInr() : BigDecimal.ZERO;
+        BigDecimal rentalTotal = "RENTAL".equalsIgnoreCase(pricingType) ? dailyRate.multiply(BigDecimal.valueOf(rentalDays)) : BigDecimal.ZERO;
+        BigDecimal totalEstimated = rentalTotal.add(deposit);
+        String paymentStatus = "RENTAL".equalsIgnoreCase(pricingType)
+                ? (deposit.compareTo(BigDecimal.ZERO) > 0 ? "DEPOSIT_PENDING" : "UNPAID")
+                : "FREE";
+
+        request.setPricingType(pricingType);
+        request.setDailyRateInr(dailyRate);
+        request.setRentalDays(rentalDays);
+        request.setRentalTotalInr(rentalTotal);
+        request.setSecurityDepositInr(deposit);
+        request.setTotalEstimatedCostInr(totalEstimated);
+        request.setPaymentStatus(paymentStatus);
 
         request = borrowRequestRepository.save(request);
 
@@ -245,6 +266,13 @@ public class BookingService {
         dto.setStartDate(req.getStartDate());
         dto.setEndDate(req.getEndDate());
         dto.setBorrowPurpose(req.getBorrowPurpose());
+        dto.setPricingType(req.getPricingType());
+        dto.setDailyRateInr(req.getDailyRateInr());
+        dto.setRentalDays(req.getRentalDays());
+        dto.setRentalTotalInr(req.getRentalTotalInr());
+        dto.setSecurityDepositInr(req.getSecurityDepositInr());
+        dto.setTotalEstimatedCostInr(req.getTotalEstimatedCostInr());
+        dto.setPaymentStatus(req.getPaymentStatus());
         dto.setStatus(req.getStatus());
         dto.setCreatedAt(req.getCreatedAt());
 
@@ -282,9 +310,14 @@ public class BookingService {
             hDto.setId(hr.getId());
             hDto.setHandedOverAt(hr.getHandedOverAt());
             hDto.setInitialConditionNotes(hr.getInitialConditionNotes());
+            hDto.setHandoverPhotoUrl(hr.getHandoverPhotoUrl());
             hDto.setPlannedReturnDate(hr.getPlannedReturnDate());
             hDto.setReturnedAt(hr.getReturnedAt());
             hDto.setReturnConditionNotes(hr.getReturnConditionNotes());
+            hDto.setReturnPhotoUrl(hr.getReturnPhotoUrl());
+            hDto.setDepositRefunded(hr.getDepositRefunded());
+            hDto.setDepositDeductionInr(hr.getDepositDeductionInr());
+            hDto.setDepositDeductionReason(hr.getDepositDeductionReason());
             hDto.setIssueReported(hr.getIssueReported());
             hDto.setIssueDetails(hr.getIssueDetails());
             hDto.setConfirmedByOwner(hr.getConfirmedByOwner());

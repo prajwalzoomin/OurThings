@@ -14,6 +14,14 @@ const CATEGORIES = [
 
 const CONDITIONS = ['All Conditions', 'Like New', 'Good', 'Fair'];
 
+const PRICE_FILTERS = [
+  { label: 'All Pricing', value: 'ALL' },
+  { label: '🟢 Free Only', value: 'FREE' },
+  { label: 'Under ₹100 / day', value: 'UNDER_100' },
+  { label: '₹100 – ₹250 / day', value: '100_250' },
+  { label: 'Above ₹250 / day', value: 'ABOVE_250' },
+];
+
 const DISTANCES = [
   { label: 'Entire Bengaluru', value: 999 },
   { label: '< 1 km (Local Campus / Wing)', value: 1.0 },
@@ -28,6 +36,7 @@ export default function BrowseItems() {
   const [category, setCategory] = useState('All Categories');
   const [keyword, setKeyword] = useState(searchQuery || '');
   const [condition, setCondition] = useState('All Conditions');
+  const [priceFilter, setPriceFilter] = useState('ALL');
   const [maxDistanceKm, setMaxDistanceKm] = useState(999);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -70,6 +79,17 @@ export default function BrowseItems() {
         list = list.filter((item) => (item.distanceKm || 0.4) <= maxDistanceKm);
       }
 
+      // Filter by Pricing terms
+      if (priceFilter === 'FREE') {
+        list = list.filter((item) => item.pricingType === 'FREE' || !item.dailyRateInr || Number(item.dailyRateInr) === 0);
+      } else if (priceFilter === 'UNDER_100') {
+        list = list.filter((item) => item.pricingType === 'RENTAL' && Number(item.dailyRateInr) > 0 && Number(item.dailyRateInr) <= 100);
+      } else if (priceFilter === '100_250') {
+        list = list.filter((item) => item.pricingType === 'RENTAL' && Number(item.dailyRateInr) > 100 && Number(item.dailyRateInr) <= 250);
+      } else if (priceFilter === 'ABOVE_250') {
+        list = list.filter((item) => item.pricingType === 'RENTAL' && Number(item.dailyRateInr) > 250);
+      }
+
       // Filter by active facet if selected
       if (activeFacet) {
         const facetLower = activeFacet.toLowerCase();
@@ -82,6 +102,20 @@ export default function BrowseItems() {
       // Sort
       if (sortBy === 'distance') {
         list.sort((a, b) => (a.distanceKm || 0.4) - (b.distanceKm || 0.4));
+      } else if (sortBy === 'price_asc') {
+        list.sort((a, b) => {
+          const rateA = a.pricingType === 'RENTAL' ? (Number(a.dailyRateInr) || 0) : 0;
+          const rateB = b.pricingType === 'RENTAL' ? (Number(b.dailyRateInr) || 0) : 0;
+          return rateA - rateB;
+        });
+      } else if (sortBy === 'price_desc') {
+        list.sort((a, b) => {
+          const rateA = a.pricingType === 'RENTAL' ? (Number(a.dailyRateInr) || 0) : 0;
+          const rateB = b.pricingType === 'RENTAL' ? (Number(b.dailyRateInr) || 0) : 0;
+          return rateB - rateA;
+        });
+      } else if (sortBy === 'rating') {
+        list.sort((a, b) => (b.averageRating || b.ownerTrustScore || 4.9) - (a.averageRating || a.ownerTrustScore || 4.9));
       } else if (sortBy === 'value') {
         list.sort((a, b) => (b.estimatedReplacementValueInr || 0) - (a.estimatedReplacementValueInr || 0));
       } else if (sortBy === 'newest') {
@@ -114,7 +148,7 @@ export default function BrowseItems() {
 
   useEffect(() => {
     fetchItems();
-  }, [currentCommunity, category, condition, maxDistanceKm, sortBy, communityOnly, activeFacet, userLocation]);
+  }, [currentCommunity, category, condition, priceFilter, maxDistanceKm, sortBy, communityOnly, activeFacet, userLocation]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -127,6 +161,7 @@ export default function BrowseItems() {
     setKeyword('');
     setSearchQuery('');
     setCondition('All Conditions');
+    setPriceFilter('ALL');
     setMaxDistanceKm(999);
     setDateFrom('');
     setDateTo('');
@@ -238,7 +273,39 @@ export default function BrowseItems() {
             </div>
           </div>
 
-          {/* 2. Categories Section */}
+          {/* 2. Pricing & Daily Terms Section */}
+          <div className="flipkart-filter-section">
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>
+              Pricing & Terms
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              {PRICE_FILTERS.map((pf) => (
+                <label
+                  key={pf.value}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.8rem',
+                    color: priceFilter === pf.value ? 'var(--color-brand)' : 'var(--color-text-secondary)',
+                    fontWeight: priceFilter === pf.value ? 600 : 400,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="priceFilter"
+                    checked={priceFilter === pf.value}
+                    onChange={() => setPriceFilter(pf.value)}
+                    style={{ accentColor: 'var(--color-brand)' }}
+                  />
+                  <span>{pf.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Categories Section */}
           <div className="flipkart-filter-section">
             <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>
               Categories
@@ -392,6 +459,9 @@ export default function BrowseItems() {
               >
                 <option value="relevance">Relevance</option>
                 <option value="distance">Distance (Closest First)</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="rating">Highest Rated & Trusted</option>
                 <option value="value">Avoided Value (Highest First)</option>
                 <option value="newest">Newest Listed</option>
               </select>
@@ -404,10 +474,17 @@ export default function BrowseItems() {
               Showing <strong>{items.length}</strong> resources in Bengaluru
               {keyword ? ` for "${keyword}"` : ''}
               {category !== 'All Categories' ? ` in ${category}` : ''}
+              {priceFilter !== 'ALL' ? ` (${PRICE_FILTERS.find((p) => p.value === priceFilter)?.label})` : ''}
             </div>
 
             {/* Active Pill Tags */}
             <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+              {priceFilter !== 'ALL' && (
+                <span className="utility-chip" style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderColor: 'var(--color-brand)', color: 'var(--color-brand)' }}>
+                  {PRICE_FILTERS.find((p) => p.value === priceFilter)?.label}
+                  <button type="button" onClick={() => setPriceFilter('ALL')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--color-brand)' }}>&times;</button>
+                </span>
+              )}
               {category !== 'All Categories' && (
                 <span className="utility-chip" style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem' }}>
                   {category}

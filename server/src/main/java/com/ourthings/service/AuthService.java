@@ -198,6 +198,11 @@ public class AuthService {
                 u.getCity() != null ? u.getCity() : "Bengaluru",
                 u.getPincode() != null ? u.getPincode() : "560103",
                 u.getActiveCommunityId(),
+                u.getTrustScorePercent(),
+                u.getCompletedLoansCount(),
+                u.getCompletedBorrowsCount(),
+                u.getIsIdVerified(),
+                u.getBadges(),
                 u.getRole()
         );
     }

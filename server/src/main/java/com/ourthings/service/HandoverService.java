@@ -12,6 +12,7 @@ import com.ourthings.repository.ItemListingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -53,6 +54,9 @@ public class HandoverService {
 
         record.setHandedOverAt(LocalDateTime.now());
         record.setInitialConditionNotes(req.getInitialConditionNotes() != null ? req.getInitialConditionNotes().trim() : "Checked and handed over in agreed condition.");
+        if (req.getHandoverPhotoUrl() != null && !req.getHandoverPhotoUrl().trim().isEmpty()) {
+            record.setHandoverPhotoUrl(req.getHandoverPhotoUrl().trim());
+        }
         if (req.getPlannedReturnDate() != null) {
             record.setPlannedReturnDate(req.getPlannedReturnDate());
         } else {
@@ -106,6 +110,16 @@ public class HandoverService {
 
         record.setReturnedAt(LocalDateTime.now());
         record.setReturnConditionNotes(req.getReturnConditionNotes() != null ? req.getReturnConditionNotes().trim() : "Returned and inspected.");
+        if (req.getReturnPhotoUrl() != null && !req.getReturnPhotoUrl().trim().isEmpty()) {
+            record.setReturnPhotoUrl(req.getReturnPhotoUrl().trim());
+        }
+        record.setDepositRefunded(req.getDepositRefunded() != null ? req.getDepositRefunded() : true);
+        record.setDepositDeductionInr(req.getDepositDeductionInr() != null ? req.getDepositDeductionInr() : BigDecimal.ZERO);
+        record.setDepositDeductionReason(req.getDepositDeductionReason());
+
+        if (request.getSecurityDepositInr() != null && request.getSecurityDepositInr().compareTo(BigDecimal.ZERO) > 0) {
+            request.setPaymentStatus(Boolean.FALSE.equals(req.getDepositRefunded()) ? "DEPOSIT_DEDUCTED" : "REFUNDED");
+        }
 
         boolean hasIssue = Boolean.TRUE.equals(req.getIssueReported());
         record.setIssueReported(hasIssue);

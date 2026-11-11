@@ -120,11 +120,29 @@ export default function ItemCard({
         {!hidePrice && (
           <div className="compact-card-footer">
             <div className="compact-price-wrap">
-              <span className="compact-free-tag">FREE</span>
-              {item.estimatedReplacementValueInr && (
-                <span className="compact-avoided-text" title="Estimated purchase expenditure avoided">
-                  Avoided: ₹{Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}
-                </span>
+              {item.pricingType === 'RENTAL' && Number(item.dailyRateInr) > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.925rem', color: 'var(--color-brand)' }}>
+                      ₹{Math.round(item.dailyRateInr)}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>/ day</span>
+                  </div>
+                  {item.securityDepositInr && Number(item.securityDepositInr) > 0 ? (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-secondary)', lineHeight: 1 }}>
+                      +₹{Math.round(item.securityDepositInr)} deposit
+                    </span>
+                  ) : null}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span className="compact-free-tag">FREE</span>
+                  {item.estimatedReplacementValueInr && (
+                    <span className="compact-avoided-text" title="Estimated purchase expenditure avoided">
+                      Saved: ₹{Number(item.estimatedReplacementValueInr).toLocaleString('en-IN')}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
 

@@ -73,6 +73,15 @@ public class ItemListing {
     @Column(name = "estimated_replacement_value_inr", precision = 10, scale = 2)
     private BigDecimal estimatedReplacementValueInr;
 
+    @Column(name = "pricing_type", length = 30)
+    private String pricingType = "FREE"; // FREE, RENTAL
+
+    @Column(name = "daily_rate_inr", precision = 10, scale = 2)
+    private BigDecimal dailyRateInr = BigDecimal.ZERO;
+
+    @Column(name = "security_deposit_inr", precision = 10, scale = 2)
+    private BigDecimal securityDepositInr = BigDecimal.ZERO;
+
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
@@ -167,6 +176,15 @@ public class ItemListing {
 
     public BigDecimal getEstimatedReplacementValueInr() { return estimatedReplacementValueInr; }
     public void setEstimatedReplacementValueInr(BigDecimal estimatedReplacementValueInr) { this.estimatedReplacementValueInr = estimatedReplacementValueInr; }
+
+    public String getPricingType() { return pricingType != null ? pricingType : "FREE"; }
+    public void setPricingType(String pricingType) { this.pricingType = pricingType; }
+
+    public BigDecimal getDailyRateInr() { return dailyRateInr != null ? dailyRateInr : BigDecimal.ZERO; }
+    public void setDailyRateInr(BigDecimal dailyRateInr) { this.dailyRateInr = dailyRateInr; }
+
+    public BigDecimal getSecurityDepositInr() { return securityDepositInr != null ? securityDepositInr : BigDecimal.ZERO; }
+    public void setSecurityDepositInr(BigDecimal securityDepositInr) { this.securityDepositInr = securityDepositInr; }
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }

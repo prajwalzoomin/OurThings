@@ -108,6 +108,23 @@ export const api = {
   recordHandover: (requestId, payload) => request(`/api/handovers/${requestId}/handover`, { method: 'POST', body: JSON.stringify(payload) }),
   recordReturn: (requestId, payload) => request(`/api/handovers/${requestId}/return`, { method: 'POST', body: JSON.stringify(payload) }),
 
+  // Reviews & Reputation
+  getItemReviews: (itemId) => request(`/api/reviews/item/${itemId}`),
+  getUserReviews: (userId) => request(`/api/reviews/user/${userId}`),
+  submitReview: (payload) => request('/api/reviews', { method: 'POST', body: JSON.stringify(payload) }),
+
+  // Peer-to-Peer In-App Messaging
+  getChatThread: (itemId, otherUserId) => request(`/api/chat/thread?itemId=${itemId}&otherUserId=${otherUserId}`),
+  getRequestChatThread: (requestId) => request(`/api/chat/request/${requestId}`),
+  getConversations: () => request('/api/chat/conversations'),
+  sendChatMessage: (payload) => request('/api/chat/send', { method: 'POST', body: JSON.stringify(payload) }),
+
+  // Live Notifications
+  getNotifications: () => request('/api/notifications'),
+  getUnreadNotificationCount: () => request('/api/notifications/unread-count'),
+  markNotificationRead: (id) => request(`/api/notifications/${id}/read`, { method: 'POST' }),
+  markAllNotificationsRead: () => request('/api/notifications/read-all', { method: 'POST' }),
+
   // Unmet Demand
   getAggregatedDemands: () => request('/api/demands/aggregated'),
   getOpenDemands: () => request('/api/demands/open'),

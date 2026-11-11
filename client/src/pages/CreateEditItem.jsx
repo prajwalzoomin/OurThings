@@ -57,6 +57,9 @@ export default function CreateEditItem() {
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
   const [estimatedReplacementValueInr, setEstimatedReplacementValueInr] = useState('');
+  const [pricingType, setPricingType] = useState('FREE'); // 'FREE' | 'RENTAL'
+  const [dailyRateInr, setDailyRateInr] = useState('');
+  const [securityDepositInr, setSecurityDepositInr] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -140,6 +143,9 @@ export default function CreateEditItem() {
       if (prefillItem.estimatedReplacementValueInr) {
         setEstimatedReplacementValueInr(String(prefillItem.estimatedReplacementValueInr));
       }
+      setPricingType(prefillItem.pricingType || 'FREE');
+      setDailyRateInr(prefillItem.dailyRateInr ? String(prefillItem.dailyRateInr) : '');
+      setSecurityDepositInr(prefillItem.securityDepositInr ? String(prefillItem.securityDepositInr) : '');
     } else {
       const todayStr = new Date().toISOString().slice(0, 10);
       setAvailableFrom(todayStr);
@@ -242,6 +248,9 @@ export default function CreateEditItem() {
       availableFrom,
       availableTo,
       estimatedReplacementValueInr: estimatedReplacementValueInr ? Number(estimatedReplacementValueInr) : null,
+      pricingType,
+      dailyRateInr: pricingType === 'RENTAL' && dailyRateInr ? Number(dailyRateInr) : 0,
+      securityDepositInr: pricingType === 'RENTAL' && securityDepositInr ? Number(securityDepositInr) : 0,
       imageUrl: imageUrl.trim() || null,
     };
 
@@ -684,8 +693,152 @@ export default function CreateEditItem() {
               onChange={(e) => setEstimatedReplacementValueInr(e.target.value)}
             />
             <div className="form-hint">
-              Optional estimate used solely to calculate community Avoided Expenditure metrics when items are borrowed rather than bought. No money is charged or collected.
+              Optional estimate used solely to calculate community Avoided Expenditure metrics when items are borrowed rather than bought.
             </div>
+          </div>
+
+          {/* Flexible Economic Terms: Free vs Nominal Rent + Security Deposit */}
+          <div className="form-group" style={{ backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem', marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+            <label className="form-label" style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>💰</span>
+              <span>Lending Terms & Compensation</span>
+            </label>
+            <p style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', margin: '0 0 1rem 0' }}>
+              Decide whether to share for free as goodwill, or charge a nominal daily rent to cover wear-and-tear.
+            </p>
+
+            {/* Pricing Mode Toggle */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              <div
+                onClick={() => setPricingType('FREE')}
+                style={{
+                  border: pricingType === 'FREE' ? '2px solid var(--color-brand)' : '1px solid var(--color-border)',
+                  backgroundColor: pricingType === 'FREE' ? 'var(--color-brand-light)' : 'var(--color-surface)',
+                  padding: '1rem',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                  <span style={{ fontSize: '1.2rem' }}>🤝</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.95rem', color: pricingType === 'FREE' ? 'var(--color-brand)' : 'var(--color-text-primary)' }}>
+                    Share for Free (₹0)
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                  100% free community sharing. Recommended for medical recovery aids, books, and basic household cables.
+                </div>
+              </div>
+
+              <div
+                onClick={() => setPricingType('RENTAL')}
+                style={{
+                  border: pricingType === 'RENTAL' ? '2px solid var(--color-brand)' : '1px solid var(--color-border)',
+                  backgroundColor: pricingType === 'RENTAL' ? 'var(--color-brand-light)' : 'var(--color-surface)',
+                  padding: '1rem',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                  <span style={{ fontSize: '1.2rem' }}>💵</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.95rem', color: pricingType === 'RENTAL' ? 'var(--color-brand)' : 'var(--color-text-primary)' }}>
+                    Charge Nominal Daily Rent
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                  Earn back your equipment cost. Recommended for power tools, projectors, camping gear, and cameras.
+                </div>
+              </div>
+            </div>
+
+            {/* Rental Rates Details */}
+            {pricingType === 'RENTAL' && (
+              <div style={{ backgroundColor: 'var(--color-surface)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+                <div className="form-grid-2" style={{ gap: '1rem', margin: 0 }}>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.825rem', fontWeight: 600 }}>
+                      Daily Rental Rate (₹ / Day) *
+                    </label>
+                    <input
+                      type="number"
+                      min="10"
+                      step="10"
+                      className="form-input"
+                      placeholder="e.g. 150"
+                      value={dailyRateInr}
+                      onChange={(e) => setDailyRateInr(e.target.value)}
+                      required={pricingType === 'RENTAL'}
+                    />
+                    <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.45rem', flexWrap: 'wrap' }}>
+                      {['50', '100', '150', '250', '500'].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          onClick={() => setDailyRateInr(amt)}
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: 'var(--radius-full)',
+                            border: '1px solid var(--color-border)',
+                            backgroundColor: dailyRateInr === amt ? 'var(--color-brand)' : 'var(--color-surface-hover)',
+                            color: dailyRateInr === amt ? '#fff' : 'var(--color-text-secondary)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          ₹{amt}/day
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.825rem', fontWeight: 600 }}>
+                      Refundable Security Deposit (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="50"
+                      className="form-input"
+                      placeholder="e.g. 500 (Refunded on safe return)"
+                      value={securityDepositInr}
+                      onChange={(e) => setSecurityDepositInr(e.target.value)}
+                    />
+                    <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.45rem', flexWrap: 'wrap' }}>
+                      {['0', '500', '1000', '2000'].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          onClick={() => setSecurityDepositInr(amt)}
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: 'var(--radius-full)',
+                            border: '1px solid var(--color-border)',
+                            backgroundColor: securityDepositInr === amt ? 'var(--color-brand)' : 'var(--color-surface-hover)',
+                            color: securityDepositInr === amt ? '#fff' : 'var(--color-text-secondary)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {amt === '0' ? 'No Deposit' : `₹${amt} Deposit`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '0.85rem', fontSize: '0.78rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span style={{ color: 'var(--color-brand)', fontWeight: 700 }}>💡 Summary for Borrowers:</span>
+                  <span>
+                    A 3-day booking will be ₹{(Number(dailyRateInr) || 0) * 3} rent
+                    {Number(securityDepositInr) > 0 ? ` + ₹${securityDepositInr} security deposit (fully refunded on return)` : ''}.
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.75rem' }}>

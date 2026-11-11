@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import NotificationBell from './NotificationBell';
 
 export default function Header() {
   const {
@@ -266,12 +267,14 @@ export default function Header() {
 
             {/* Account / Sign-in Section */}
             {currentUser ? (
-              <div className="user-profile-menu-container" ref={dropdownRef}>
-                <button
-                  type="button"
-                  className="user-profile-btn"
-                  onClick={() => setProfileDropdownOpen((prev) => !prev)}
-                  aria-expanded={profileDropdownOpen}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <NotificationBell />
+                <div className="user-profile-menu-container" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className="user-profile-btn"
+                    onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                    aria-expanded={profileDropdownOpen}
                   aria-label="User account menu"
                 >
                   <div className="user-avatar-circle">
@@ -351,6 +354,7 @@ export default function Header() {
                     </div>
                   </div>
                 )}
+                </div>
               </div>
             ) : (
               <button

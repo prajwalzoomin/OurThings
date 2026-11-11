@@ -98,9 +98,18 @@ public class AuthDtos {
         private String city;
         private String pincode;
         private Long activeCommunityId;
+        private Integer trustScorePercent;
+        private Integer completedLoansCount;
+        private Integer completedBorrowsCount;
+        private Boolean isIdVerified;
+        private String badges;
         private String role;
 
         public UserDto(Long id, String name, String email, String phone, String roomOrFlat, String avatarUrl, String address, String city, String pincode, Long activeCommunityId, String role) {
+            this(id, name, email, phone, roomOrFlat, avatarUrl, address, city, pincode, activeCommunityId, 98, 0, 0, true, "VERIFIED_RESIDENT", role);
+        }
+
+        public UserDto(Long id, String name, String email, String phone, String roomOrFlat, String avatarUrl, String address, String city, String pincode, Long activeCommunityId, Integer trustScorePercent, Integer completedLoansCount, Integer completedBorrowsCount, Boolean isIdVerified, String badges, String role) {
             this.id = id;
             this.name = name;
             this.email = email;
@@ -111,6 +120,11 @@ public class AuthDtos {
             this.city = city;
             this.pincode = pincode;
             this.activeCommunityId = activeCommunityId;
+            this.trustScorePercent = trustScorePercent;
+            this.completedLoansCount = completedLoansCount;
+            this.completedBorrowsCount = completedBorrowsCount;
+            this.isIdVerified = isIdVerified;
+            this.badges = badges;
             this.role = role;
         }
 
@@ -124,6 +138,11 @@ public class AuthDtos {
         public String getCity() { return city; }
         public String getPincode() { return pincode; }
         public Long getActiveCommunityId() { return activeCommunityId; }
+        public Integer getTrustScorePercent() { return trustScorePercent; }
+        public Integer getCompletedLoansCount() { return completedLoansCount; }
+        public Integer getCompletedBorrowsCount() { return completedBorrowsCount; }
+        public Boolean getIsIdVerified() { return isIdVerified; }
+        public String getBadges() { return badges; }
         public String getRole() { return role; }
     }
 }

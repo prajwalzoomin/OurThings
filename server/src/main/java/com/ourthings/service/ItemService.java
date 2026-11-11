@@ -13,6 +13,7 @@ import com.ourthings.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -123,6 +124,10 @@ public class ItemService {
             item.setImageUrl(req.getImageUrl().trim());
         }
 
+        item.setPricingType(req.getPricingType() != null ? req.getPricingType() : "FREE");
+        item.setDailyRateInr(req.getDailyRateInr() != null ? req.getDailyRateInr() : BigDecimal.ZERO);
+        item.setSecurityDepositInr(req.getSecurityDepositInr() != null ? req.getSecurityDepositInr() : BigDecimal.ZERO);
+
         item.setLatitude(req.getLatitude());
         item.setLongitude(req.getLongitude());
         item.setFormattedAddress(req.getFormattedAddress());
@@ -179,6 +184,10 @@ public class ItemService {
         if (req.getImageUrl() != null && !req.getImageUrl().trim().isEmpty()) {
             item.setImageUrl(req.getImageUrl().trim());
         }
+
+        item.setPricingType(req.getPricingType() != null ? req.getPricingType() : "FREE");
+        item.setDailyRateInr(req.getDailyRateInr() != null ? req.getDailyRateInr() : BigDecimal.ZERO);
+        item.setSecurityDepositInr(req.getSecurityDepositInr() != null ? req.getSecurityDepositInr() : BigDecimal.ZERO);
 
         item.setLatitude(req.getLatitude());
         item.setLongitude(req.getLongitude());
@@ -294,6 +303,9 @@ public class ItemService {
         dto.setAvailableFrom(item.getAvailableFrom());
         dto.setAvailableTo(item.getAvailableTo());
         dto.setEstimatedReplacementValueInr(item.getEstimatedReplacementValueInr());
+        dto.setPricingType(item.getPricingType());
+        dto.setDailyRateInr(item.getDailyRateInr());
+        dto.setSecurityDepositInr(item.getSecurityDepositInr());
         dto.setImageUrl(item.getImageUrl());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());

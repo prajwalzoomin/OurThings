@@ -1,6 +1,7 @@
 package com.ourthings.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,6 +25,9 @@ public class HandoverRecord {
     @Column(name = "initial_condition_notes", columnDefinition = "TEXT")
     private String initialConditionNotes;
 
+    @Column(name = "handover_photo_url", columnDefinition = "TEXT")
+    private String handoverPhotoUrl;
+
     @Column(name = "planned_return_date", nullable = false)
     private LocalDate plannedReturnDate;
 
@@ -32,6 +36,18 @@ public class HandoverRecord {
 
     @Column(name = "return_condition_notes", columnDefinition = "TEXT")
     private String returnConditionNotes;
+
+    @Column(name = "return_photo_url", columnDefinition = "TEXT")
+    private String returnPhotoUrl;
+
+    @Column(name = "deposit_refunded")
+    private Boolean depositRefunded = true;
+
+    @Column(name = "deposit_deduction_inr", precision = 10, scale = 2)
+    private BigDecimal depositDeductionInr = BigDecimal.ZERO;
+
+    @Column(name = "deposit_deduction_reason", columnDefinition = "TEXT")
+    private String depositDeductionReason;
 
     @Column(name = "issue_reported")
     private Boolean issueReported = false;
@@ -72,6 +88,9 @@ public class HandoverRecord {
     public String getInitialConditionNotes() { return initialConditionNotes; }
     public void setInitialConditionNotes(String initialConditionNotes) { this.initialConditionNotes = initialConditionNotes; }
 
+    public String getHandoverPhotoUrl() { return handoverPhotoUrl; }
+    public void setHandoverPhotoUrl(String handoverPhotoUrl) { this.handoverPhotoUrl = handoverPhotoUrl; }
+
     public LocalDate getPlannedReturnDate() { return plannedReturnDate; }
     public void setPlannedReturnDate(LocalDate plannedReturnDate) { this.plannedReturnDate = plannedReturnDate; }
 
@@ -80,6 +99,18 @@ public class HandoverRecord {
 
     public String getReturnConditionNotes() { return returnConditionNotes; }
     public void setReturnConditionNotes(String returnConditionNotes) { this.returnConditionNotes = returnConditionNotes; }
+
+    public String getReturnPhotoUrl() { return returnPhotoUrl; }
+    public void setReturnPhotoUrl(String returnPhotoUrl) { this.returnPhotoUrl = returnPhotoUrl; }
+
+    public Boolean getDepositRefunded() { return depositRefunded != null ? depositRefunded : true; }
+    public void setDepositRefunded(Boolean depositRefunded) { this.depositRefunded = depositRefunded; }
+
+    public BigDecimal getDepositDeductionInr() { return depositDeductionInr != null ? depositDeductionInr : BigDecimal.ZERO; }
+    public void setDepositDeductionInr(BigDecimal depositDeductionInr) { this.depositDeductionInr = depositDeductionInr; }
+
+    public String getDepositDeductionReason() { return depositDeductionReason; }
+    public void setDepositDeductionReason(String depositDeductionReason) { this.depositDeductionReason = depositDeductionReason; }
 
     public Boolean getIssueReported() { return issueReported; }
     public void setIssueReported(Boolean issueReported) { this.issueReported = issueReported; }
