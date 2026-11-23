@@ -215,7 +215,7 @@ public class GeminiService {
             defaultLat = 12.9784;
             defaultLng = 77.6408;
             if (pincode.isEmpty()) pincode = "560038";
-        } else if (lower.contains("marathahalli") || lower.contains("nhce") || lower.contains("cauvery")) {
+        } else if (lower.contains("marathahalli") || lower.contains("nhce") || lower.contains("horizon")) {
             locality = "Marathahalli";
             defaultLat = 12.9345;
             defaultLng = 77.6912;
@@ -508,7 +508,7 @@ public class GeminiService {
         String raw = input.trim();
         String lower = raw.toLowerCase();
 
-        // 1. Direct deterministic alias & substring matching (instant, reliable for NHCE, Cauvery, Green Glen, etc.)
+        // 1. Direct deterministic alias & substring matching (instant, reliable for NHCE, Green Glen, etc.)
         for (Map<String, Object> comm : existingCommunities) {
             String name = String.valueOf(comm.get("name"));
             String lowerName = name.toLowerCase();
@@ -518,14 +518,20 @@ public class GeminiService {
 
             boolean isMatch = false;
             // NHCE / New Horizon
-            if ((lower.contains("nhce") || lower.contains("horizon")) && (lowerName.contains("nhce") || lowerName.contains("cauvery") || lowerName.contains("campus") || addr.toLowerCase().contains("nhce"))) {
-                isMatch = true;
-            } else if (lower.contains("cauvery") && lowerName.contains("cauvery")) {
+            if ((lower.contains("nhce") || lower.contains("horizon") || lower.contains("new horizon")) && (lowerName.contains("nhce") || lowerName.contains("horizon") || lowerName.contains("campus") || addr.toLowerCase().contains("nhce"))) {
                 isMatch = true;
             } else if (lower.contains("green glen") || lower.contains("greenglen")) {
                 if (lowerName.contains("green glen")) isMatch = true;
             } else if (lower.contains("kaikondrahalli") || lower.contains("sarjapur")) {
                 if (lowerName.contains("kaikondrahalli")) isMatch = true;
+            } else if (lower.contains("prestige") || lower.contains("gear")) {
+                if (lowerName.contains("prestige")) isMatch = true;
+            } else if (lower.contains("adarsh") || lower.contains("palm retreat")) {
+                if (lowerName.contains("adarsh")) isMatch = true;
+            } else if (lower.contains("marathahalli") || lower.contains("spice garden")) {
+                if (lowerName.contains("marathahalli") || lowerName.contains("spice garden")) isMatch = true;
+            } else if (lower.contains("panathur") || lower.contains("balagere")) {
+                if (lowerName.contains("panathur")) isMatch = true;
             } else if (lowerName.contains(lower) || lower.contains(lowerName)) {
                 isMatch = true;
             }
@@ -551,7 +557,7 @@ public class GeminiService {
                         "User GPS coordinates (if available): " + (userLat != null ? userLat + ", " + userLng : "None") + "\n" +
                         "Existing communities in database: " + commsJson + "\n\n" +
                         "Task:\n" +
-                        "1. If user input represents or refers to any existing community (e.g. 'Nhce', 'NHCE', 'New Horizon' refers to Cauvery Boys Hostel / NHCE Campus; or 'Green Glen' refers to Green Glen Heights), match it and return its matchedCommunityId and canonicalName.\n" +
+                        "1. If user input represents or refers to any existing community (e.g. 'Nhce', 'NHCE', 'New Horizon' refers to New Horizon College of Engineering (NHCE Campus Circle); or 'Green Glen' refers to Green Glen Layout & Heights), match it and return its matchedCommunityId and canonicalName.\n" +
                         "2. If it is a new community, create a clean canonical title-case name (canonicalName), appropriate type (HOSTEL, APARTMENT, or NEIGHBOURHOOD), and standardized address (standardAddress).\n" +
                         "Return ONLY valid JSON with keys: matchedCommunityId (number or null), canonicalName (string), suggestedType (HOSTEL, APARTMENT, or NEIGHBOURHOOD), standardAddress (string), confidence (number 0.0 to 1.0).";
 

@@ -43,7 +43,7 @@ In accordance with the build brief's anti-template direction, OurThings strictly
 ## 4. Implemented User Journeys & Core Capabilities
 
 ### 1. Community Scoping & Membership Association
-- Scopes all items, requests, handovers, and demands to a defined community (e.g. *Cauvery Boys Hostel*, *Green Glen Heights Apartment*, or *Kaikondrahalli Neighbourhood*).
+- Scopes all items, requests, handovers, and demands to a defined community (e.g. *New Horizon College of Engineering Campus*, *Green Glen Heights Apartment*, or *Kaikondrahalli Neighbourhood*).
 - Server validates that members can only query or operate on resources in their active community.
 - Header includes an instant community and demo user switcher for interactive evaluation.
 
@@ -144,7 +144,7 @@ The database is pre-seeded with realistic community scenarios:
 
 | Community | Pre-seeded Resources | Demonstration Scenario |
 | :--- | :--- | :--- |
-| **Cauvery Boys Hostel** | Bosch Impact Drill Kit, Underarm Crutches, Epson HD Projector, Wildcraft Rucksack, JBL PA Speaker | Returned drill with condition log, active projector loan, approved crutches reservation, and aggregated demand for folding wheelchairs. |
+| **New Horizon College of Engineering (NHCE Campus Circle)** | Bosch Impact Drill Kit, Underarm Crutches, Epson HD Projector, Wildcraft Rucksack, JBL PA Speaker, Canon DSLR, Arduino Robotics Kit | Returned drill with condition log, active projector loan, approved crutches reservation, and aggregated demand for folding wheelchairs. |
 | **Green Glen Heights Apartment** | Adult Wheelchair, Omron Blood Pressure Monitor, 6-Step Folding Ladder, Large Suitcase | Fulfilled wheelchair borrowing with sanitized return notes, demand for infant scale and battery jump starter. |
 | **Kaikondrahalli Neighbourhood** | Community lead account for neighbourhood ward collective | Community scoping and independent inventory. |
 

@@ -200,7 +200,7 @@ public class LocationService {
 
     /**
      * Calculates the nearest real Bengaluru locality based on closest Euclidean distance,
-     * without making false assumptions like hardcoding Marathahalli or Cauvery Hostel.
+     * without making false assumptions like hardcoding static values.
      */
     public Map<String, Object> estimateBengaluruLocality(double lat, double lng) {
         Map<String, Object> result = new LinkedHashMap<>();

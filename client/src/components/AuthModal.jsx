@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
+import logoImg from '../assets/logo.png';
 
 export default function AuthModal({ isOpen, onClose }) {
   const { login, register, communities, notify, userLocation } = useApp();
@@ -20,6 +21,7 @@ export default function AuthModal({ isOpen, onClose }) {
   const [regRoomOrFlat, setRegRoomOrFlat] = useState('');
   const [regCommunityInput, setRegCommunityInput] = useState('');
   const [regCommunityId, setRegCommunityId] = useState(null);
+  const [isCommunityFocused, setIsCommunityFocused] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [regLocality, setRegLocality] = useState('');
@@ -135,7 +137,7 @@ export default function AuthModal({ isOpen, onClose }) {
       phone: regPhone.trim(),
       roomOrFlat: regRoomOrFlat.trim(),
       communityId: regCommunityId ? Number(regCommunityId) : null,
-      communityInput: regCommunityInput.trim() || (communities?.[0]?.name || 'Cauvery Boys Hostel'),
+      communityInput: regCommunityInput.trim() || (communities?.[0]?.name || 'NHCE Campus Community Circle'),
       city: 'Bengaluru',
       address: [regRoomOrFlat, regLocality || aiSuggestion?.standardAddress].filter(Boolean).join(', '),
       password: regPassword.trim(),
@@ -198,22 +200,17 @@ export default function AuthModal({ isOpen, onClose }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                <div
+                <img
+                  src={logoImg}
+                  alt="OurThings"
                   style={{
                     width: '32px',
                     height: '32px',
                     borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--color-brand)',
-                    color: '#ffffff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
+                    objectFit: 'contain',
+                    border: '1px solid var(--color-border)',
                   }}
-                >
-                  OT
-                </div>
+                />
                 <h2 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 700 }}>
                   {mode === 'signin' ? 'Sign In to Your Account' : 'Create New Account'}
                 </h2>
@@ -539,8 +536,10 @@ export default function AuthModal({ isOpen, onClose }) {
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="Type freely: e.g. NHCE, Cauvery Hostel, Green Glen..."
+                    placeholder="e.g. NHCE Campus, Bellandur, Green Glen..."
                     value={regCommunityInput}
+                    onFocus={() => setIsCommunityFocused(true)}
+                    onBlur={() => setTimeout(() => setIsCommunityFocused(false), 250)}
                     onChange={(e) => {
                       setRegCommunityInput(e.target.value);
                       setRegCommunityId(null);
@@ -548,56 +547,51 @@ export default function AuthModal({ isOpen, onClose }) {
                     required
                   />
 
-                  {/* AI Semantic Suggestion Pill / Uniform Match */}
-                  {aiSuggestion && (
+                  {/* AI Semantic Suggestion - clean & fades when blurring field */}
+                  {isCommunityFocused && aiSuggestion && (
                     <div
                       style={{
-                        marginTop: '0.4rem',
+                        marginTop: '0.35rem',
                         padding: '0.45rem 0.65rem',
                         backgroundColor: 'var(--color-surface-hover)',
-                        border: '1px solid var(--color-brand)',
+                        border: '1px solid var(--color-border)',
                         borderRadius: 'var(--radius-sm)',
                         fontSize: '0.74rem',
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: '0.2rem',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '0.5rem',
+                        transition: 'opacity 0.2s ease',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontWeight: 700, color: 'var(--color-brand)' }}>
-                          ✨ {aiSuggestion.matchedCommunityId ? 'Recognized Circle:' : 'Standardized Community:'}
-                        </span>
-                        <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
-                          {aiSuggestion.suggestedType || 'HOSTEL'}
-                        </span>
-                      </div>
-                      <div style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
-                        {aiSuggestion.canonicalName}
-                      </div>
-                      {aiSuggestion.standardAddress && (
-                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.68rem' }}>
-                          📍 {aiSuggestion.standardAddress}
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ color: 'var(--color-brand)', fontWeight: 600, fontSize: '0.7rem' }}>
+                          Suggested Community
                         </div>
-                      )}
-                      <div style={{ marginTop: '0.2rem', display: 'flex', gap: '0.5rem' }}>
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          style={{ padding: '0.15rem 0.45rem', fontSize: '0.68rem', backgroundColor: 'var(--color-brand)', color: '#fff', border: 'none' }}
-                          onClick={() => {
-                            setRegCommunityInput(aiSuggestion.canonicalName);
-                            if (aiSuggestion.matchedCommunityId) setRegCommunityId(aiSuggestion.matchedCommunityId);
-                            if (aiSuggestion.standardAddress && !regLocality) {
-                              setRegLocality(aiSuggestion.standardAddress.split(',')[0].trim());
-                            }
-                          }}
-                        >
-                          Use Standardized Form
-                        </button>
-                        <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', alignSelf: 'center' }}>
-                          (or keep your own wordings)
-                        </span>
+                        <div style={{ color: 'var(--color-text-primary)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {aiSuggestion.canonicalName}
+                        </div>
+                        {aiSuggestion.standardAddress && (
+                          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.68rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {aiSuggestion.standardAddress}
+                          </div>
+                        )}
                       </div>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem', backgroundColor: 'var(--color-brand)', color: '#fff', border: 'none', flexShrink: 0 }}
+                        onClick={() => {
+                          setRegCommunityInput(aiSuggestion.canonicalName);
+                          if (aiSuggestion.matchedCommunityId) setRegCommunityId(aiSuggestion.matchedCommunityId);
+                          if (aiSuggestion.standardAddress && !regLocality) {
+                            setRegLocality(aiSuggestion.standardAddress.split(',')[0].trim());
+                          }
+                          setIsCommunityFocused(false);
+                        }}
+                      >
+                        Select
+                      </button>
                     </div>
                   )}
                 </div>

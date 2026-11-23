@@ -1,7 +1,7 @@
 // OurThings API Client
 
 let activeUserId = null; // Default to Guest mode (no account by default)
-let activeCommunityId = 1; // Default fallback to primary community (Cauvery Boys Hostel)
+let activeCommunityId = 1; // Default fallback to primary community (NHCE Campus Circle)
 let userLat = null;
 let userLng = null;
 

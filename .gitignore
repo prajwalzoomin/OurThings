@@ -17,4 +17,7 @@ Thumbs.db
 .env
 application-local.properties
 
+# Demo Credentials
+DEMO_ACCOUNTS.md
+
 
