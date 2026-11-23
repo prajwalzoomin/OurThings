@@ -17,6 +17,12 @@ public class DemandController {
         this.demandService = demandService;
     }
 
+    @GetMapping
+    public List<DemandDetailDto> getAllOpenDemands(@RequestHeader(value = "X-Community-Id", required = false) Long communityId,
+                                                   @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        return demandService.getAllOpenDemandsScrubbed(communityId != null ? communityId : 1L, userId != null ? userId : -1L);
+    }
+
     @GetMapping("/aggregated")
     public List<AggregatedDemandDto> getAggregatedDemands(@RequestHeader(value = "X-Community-Id", required = false) Long communityId) {
         return demandService.getAggregatedDemands(communityId != null ? communityId : 1L);

@@ -26,6 +26,11 @@ public class RequestController {
         return ResponseEntity.ok(created);
     }
 
+    @GetMapping("/my")
+    public List<BorrowRequestResponseDto> getMyRequests(@RequestHeader("X-User-Id") Long userId) {
+        return bookingService.getRequestsByBorrower(userId);
+    }
+
     @GetMapping("/borrower")
     public List<BorrowRequestResponseDto> getMyBorrowRequests(@RequestHeader("X-User-Id") Long userId) {
         return bookingService.getRequestsByBorrower(userId);
