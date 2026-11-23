@@ -29,24 +29,28 @@ public class DemandController {
     }
 
     @GetMapping("/my")
-    public List<DemandDetailDto> getMyDemands(@RequestHeader("X-Community-Id") Long communityId,
-                                              @RequestHeader("X-User-Id") Long userId) {
-        return demandService.getMyDemands(communityId, userId);
+    public List<DemandDetailDto> getMyDemands(@RequestHeader(value = "X-Community-Id", required = false) Long communityId,
+                                              @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        if (userId == null) return List.of();
+        Long effectiveCommId = communityId != null ? communityId : 1L;
+        return demandService.getMyDemands(effectiveCommId, userId);
     }
 
     @PostMapping
-    public ResponseEntity<DemandDetailDto> submitDemand(@RequestHeader("X-Community-Id") Long communityId,
+    public ResponseEntity<DemandDetailDto> submitDemand(@RequestHeader(value = "X-Community-Id", required = false) Long communityId,
                                                         @RequestHeader("X-User-Id") Long userId,
                                                         @RequestBody CreateDemandRequest req) {
-        DemandDetailDto created = demandService.submitDemand(communityId, userId, req);
+        Long effectiveCommId = communityId != null ? communityId : 1L;
+        DemandDetailDto created = demandService.submitDemand(effectiveCommId, userId, req);
         return ResponseEntity.ok(created);
     }
 
     @PostMapping("/{id}/fulfill")
     public ResponseEntity<Void> fulfillDemand(@PathVariable Long id,
-                                              @RequestHeader("X-Community-Id") Long communityId,
+                                              @RequestHeader(value = "X-Community-Id", required = false) Long communityId,
                                               @RequestHeader("X-User-Id") Long userId) {
-        demandService.fulfillDemand(id, communityId, userId);
+        Long effectiveCommId = communityId != null ? communityId : 1L;
+        demandService.fulfillDemand(id, effectiveCommId, userId);
         return ResponseEntity.ok().build();
     }
 }

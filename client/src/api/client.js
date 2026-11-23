@@ -1,13 +1,13 @@
 // OurThings API Client
 
 let activeUserId = null; // Default to Guest mode (no account by default)
-let activeCommunityId = null; // Default to city-wide (all communities), toggle enables community filter
+let activeCommunityId = 1; // Default fallback to primary community (Cauvery Boys Hostel)
 let userLat = null;
 let userLng = null;
 
 export function setApiContext(userId, communityId) {
   activeUserId = userId !== undefined ? userId : null;
-  activeCommunityId = communityId !== undefined ? communityId : null;
+  activeCommunityId = communityId !== undefined && communityId !== null ? communityId : 1;
 }
 
 export function setApiLocation(lat, lng) {
