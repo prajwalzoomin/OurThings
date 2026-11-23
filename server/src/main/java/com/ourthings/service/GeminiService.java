@@ -93,7 +93,7 @@ public class GeminiService {
                 genConfig.put("responseMimeType", "application/json");
                 requestBody.put("generationConfig", genConfig);
 
-                String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + apiKey;
+                String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=" + apiKey;
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
@@ -112,7 +112,7 @@ public class GeminiService {
                         
                         @SuppressWarnings("unchecked")
                         Map<String, Object> parsed = objectMapper.readValue(jsonText.trim(), Map.class);
-                        parsed.put("source", "gemini-1.5-pro");
+                        parsed.put("source", "gemini-3.5-flash-lite");
                         return parsed;
                     }
                 }
@@ -391,7 +391,7 @@ public class GeminiService {
                 genConfig.put("responseMimeType", "application/json");
                 requestBody.put("generationConfig", genConfig);
 
-                String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" + apiKey;
+                String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=" + apiKey;
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
@@ -487,6 +487,117 @@ public class GeminiService {
             q.contains("orthopedic") || q.contains("ligament") || q.contains("crepe")) {
             synonyms.addAll(List.of("knee brace", "orthopedic", "mobility", "healthcare"));
         }
+    }
+
+    /**
+     * AI Community & Address Resolver.
+     * Takes user-typed community text (e.g. "nhce", "NHCE", "New Horizon College", "Green Glen")
+     * and matches it to known communities or normalizes it with GPS and address insights.
+     */
+    public Map<String, Object> resolveCommunity(String input, List<Map<String, Object>> existingCommunities, Double userLat, Double userLng) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (input == null || input.trim().isEmpty()) {
+            result.put("matchedCommunityId", null);
+            result.put("canonicalName", "");
+            result.put("suggestedType", "NEIGHBOURHOOD");
+            result.put("standardAddress", "");
+            result.put("confidence", 0.0);
+            return result;
+        }
+
+        String raw = input.trim();
+        String lower = raw.toLowerCase();
+
+        // 1. Direct deterministic alias & substring matching (instant, reliable for NHCE, Cauvery, Green Glen, etc.)
+        for (Map<String, Object> comm : existingCommunities) {
+            String name = String.valueOf(comm.get("name"));
+            String lowerName = name.toLowerCase();
+            Long id = ((Number) comm.get("id")).longValue();
+            String type = String.valueOf(comm.get("type"));
+            String addr = String.valueOf(comm.get("addressDescription"));
+
+            boolean isMatch = false;
+            // NHCE / New Horizon
+            if ((lower.contains("nhce") || lower.contains("horizon")) && (lowerName.contains("nhce") || lowerName.contains("cauvery") || lowerName.contains("campus") || addr.toLowerCase().contains("nhce"))) {
+                isMatch = true;
+            } else if (lower.contains("cauvery") && lowerName.contains("cauvery")) {
+                isMatch = true;
+            } else if (lower.contains("green glen") || lower.contains("greenglen")) {
+                if (lowerName.contains("green glen")) isMatch = true;
+            } else if (lower.contains("kaikondrahalli") || lower.contains("sarjapur")) {
+                if (lowerName.contains("kaikondrahalli")) isMatch = true;
+            } else if (lowerName.contains(lower) || lower.contains(lowerName)) {
+                isMatch = true;
+            }
+
+            if (isMatch) {
+                result.put("matchedCommunityId", id);
+                result.put("canonicalName", name);
+                result.put("suggestedType", type);
+                result.put("standardAddress", addr);
+                result.put("confidence", 0.98);
+                result.put("source", "deterministic-alias-match");
+                return result;
+            }
+        }
+
+        // 2. Call Gemini API for advanced semantic understanding and address normalization
+        String apiKey = getEffectiveApiKey();
+        if (apiKey != null) {
+            try {
+                String commsJson = objectMapper.writeValueAsString(existingCommunities);
+                String prompt = "You are an intelligent community circle and address normalizer for a Bengaluru / Indian community sharing app.\n" +
+                        "User typed community name or acronym: \"" + raw.replace("\"", "'") + "\"\n" +
+                        "User GPS coordinates (if available): " + (userLat != null ? userLat + ", " + userLng : "None") + "\n" +
+                        "Existing communities in database: " + commsJson + "\n\n" +
+                        "Task:\n" +
+                        "1. If user input represents or refers to any existing community (e.g. 'Nhce', 'NHCE', 'New Horizon' refers to Cauvery Boys Hostel / NHCE Campus; or 'Green Glen' refers to Green Glen Heights), match it and return its matchedCommunityId and canonicalName.\n" +
+                        "2. If it is a new community, create a clean canonical title-case name (canonicalName), appropriate type (HOSTEL, APARTMENT, or NEIGHBOURHOOD), and standardized address (standardAddress).\n" +
+                        "Return ONLY valid JSON with keys: matchedCommunityId (number or null), canonicalName (string), suggestedType (HOSTEL, APARTMENT, or NEIGHBOURHOOD), standardAddress (string), confidence (number 0.0 to 1.0).";
+
+                Map<String, Object> requestBody = new HashMap<>();
+                requestBody.put("contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))));
+                requestBody.put("generationConfig", Map.of("temperature", 0.1, "responseMimeType", "application/json"));
+
+                String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=" + apiKey;
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+                ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                    JsonNode root = objectMapper.readTree(response.getBody());
+                    JsonNode textNode = root.path("candidates").path(0).path("content").path("parts").path(0).path("text");
+                    if (!textNode.isMissingNode()) {
+                        String jsonText = textNode.asText().trim();
+                        if (jsonText.startsWith("```json")) jsonText = jsonText.substring(7);
+                        if (jsonText.startsWith("```")) jsonText = jsonText.substring(3);
+                        if (jsonText.endsWith("```")) jsonText = jsonText.substring(0, jsonText.length() - 3);
+
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> aiParsed = objectMapper.readValue(jsonText.trim(), Map.class);
+                        aiParsed.put("source", "gemini-3.5-flash-lite");
+                        return aiParsed;
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Gemini community resolution notice: " + e.getMessage());
+            }
+        }
+
+        // 3. Fallback: normalize title casing and determine type
+        String canonical = raw.substring(0, 1).toUpperCase() + raw.substring(1);
+        String type = "NEIGHBOURHOOD";
+        if (lower.contains("hostel") || lower.contains("campus") || lower.contains("college")) type = "HOSTEL";
+        else if (lower.contains("apartment") || lower.contains("heights") || lower.contains("residency") || lower.contains("enclave") || lower.contains("tower")) type = "APARTMENT";
+
+        result.put("matchedCommunityId", null);
+        result.put("canonicalName", canonical);
+        result.put("suggestedType", type);
+        result.put("standardAddress", canonical + ", Bengaluru");
+        result.put("confidence", 0.7);
+        result.put("source", "fallback-normalizer");
+        return result;
     }
 }
 

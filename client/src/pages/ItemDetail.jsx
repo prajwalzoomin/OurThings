@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import { useApp } from '../context/AppContext';
 import StatusBadge from '../components/StatusBadge';
@@ -7,7 +7,7 @@ import ChatDrawer from '../components/ChatDrawer';
 import ReviewModal from '../components/ReviewModal';
 
 export default function ItemDetail() {
-  const { selectedItemId, currentUser, currentCommunity, navigateTo, notify, setSwitchAccountModalOpen } = useApp();
+  const { selectedItemId, currentUser, currentCommunity, userLocation, navigateTo, notify, setSwitchAccountModalOpen } = useApp();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,6 +16,12 @@ export default function ItemDetail() {
   const [reviewsData, setReviewsData] = useState({ averageRating: 5.0, totalReviews: 0, reviews: [] });
   const [chatOpen, setChatOpen] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+
+  // Map and Route state
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const [showingDirections, setShowingDirections] = useState(false);
+  const [calculatedDistance, setCalculatedDistance] = useState(null);
 
   // Request form state
   const [startDate, setStartDate] = useState('');
@@ -48,6 +54,111 @@ export default function ItemDetail() {
   useEffect(() => {
     fetchItemDetail();
   }, [selectedItemId]);
+
+  // Render Leaflet Map for Item Location & Direction Route
+  useEffect(() => {
+    if (!item || !item.latitude || !item.longitude || !mapContainerRef.current) return;
+
+    // Load leaflet if needed
+    const loadLeaflet = () => {
+      let link = document.getElementById('leaflet-css');
+      if (!link) {
+        link = document.createElement('link');
+        link.id = 'leaflet-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+      }
+
+      if (!window.L) {
+        const script = document.createElement('script');
+        script.id = 'leaflet-js';
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.async = true;
+        script.onload = () => renderMap();
+        document.head.appendChild(script);
+      } else {
+        renderMap();
+      }
+    };
+
+    const renderMap = () => {
+      if (!window.L || !mapContainerRef.current) return;
+      const L = window.L;
+
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      const itemLat = item.latitude;
+      const itemLng = item.longitude;
+      const map = L.map(mapContainerRef.current).setView([itemLat, itemLng], 15);
+      mapInstanceRef.current = map;
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Item Marker
+      const itemMarker = L.marker([itemLat, itemLng])
+        .addTo(map)
+        .bindPopup(`<b>${item.title}</b><br/>${item.pickupLocation || 'Pickup Point'}`)
+        .openPopup();
+
+      // If user requested directions, add user marker and routing line
+      if (showingDirections && userLocation?.latitude && userLocation?.longitude) {
+        const userLat = userLocation.latitude;
+        const userLng = userLocation.longitude;
+
+        const userMarker = L.circleMarker([userLat, userLng], {
+          radius: 9,
+          fillColor: '#10b981',
+          color: '#ffffff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9,
+        })
+          .addTo(map)
+          .bindPopup('<b>You are here</b>');
+
+        // Draw polyline connecting user to item
+        const polyline = L.polyline(
+          [
+            [userLat, userLng],
+            [itemLat, itemLng],
+          ],
+          { color: '#10b981', weight: 4, dashArray: '6, 8', opacity: 0.85 }
+        ).addTo(map);
+
+        map.fitBounds(polyline.getBounds(), { padding: [40, 40] });
+
+        // Calculate straight line or road distance
+        const earthR = 6371;
+        const dLat = ((itemLat - userLat) * Math.PI) / 180;
+        const dLng = ((itemLng - userLng) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((userLat * Math.PI) / 180) *
+            Math.cos((itemLat * Math.PI) / 180) *
+            Math.sin(dLng / 2) *
+            Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distKm = (earthR * c).toFixed(2);
+        setCalculatedDistance(distKm);
+      }
+    };
+
+    loadLeaflet();
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [item, showingDirections, userLocation]);
 
   if (loading) {
     return (
@@ -300,6 +411,11 @@ export default function ItemDetail() {
                 📍 GPS Pin: {item.latitude}, {item.longitude} {item.distanceKm ? `(~${item.distanceKm} km away)` : ''}
               </div>
             )}
+            {calculatedDistance && (
+              <div style={{ marginTop: '0.35rem', display: 'inline-block', backgroundColor: 'var(--color-brand)', color: '#ffffff', fontWeight: 700, fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-xs)' }}>
+                🚗 Route: {calculatedDistance} KM from your location
+              </div>
+            )}
           </div>
 
           <div style={{ padding: '1rem', backgroundColor: 'var(--color-surface-hover)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
@@ -312,6 +428,53 @@ export default function ItemDetail() {
             </div>
           </div>
         </div>
+
+        {/* Interactive Pickup Location Map & Directions */}
+        {item.latitude && item.longitude && (
+          <div style={{ marginBottom: '2.5rem', padding: '1.25rem', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>📍 Pickup Spot & Route Map</h3>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                  {item.pickupLocation} {item.formattedAddress ? `• ${item.formattedAddress}` : ''}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {calculatedDistance && (
+                  <span style={{ fontWeight: 800, color: 'var(--color-brand)', fontSize: '0.9rem', backgroundColor: 'var(--color-brand-light)', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-sm)' }}>
+                    🎯 {calculatedDistance} KM away
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  style={{
+                    backgroundColor: showingDirections ? 'var(--color-brand)' : 'var(--color-surface-hover)',
+                    color: showingDirections ? '#ffffff' : 'var(--color-text-primary)',
+                    fontWeight: 600,
+                  }}
+                  onClick={() => {
+                    setShowingDirections((prev) => !prev);
+                  }}
+                >
+                  {showingDirections ? '✕ Hide Direction Route' : '🧭 Show Direction from Me'}
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={mapContainerRef}
+              style={{
+                width: '100%',
+                height: '240px',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                border: '1px solid var(--color-border)',
+                zIndex: 1,
+              }}
+            />
+          </div>
+        )}
 
         {/* Description */}
         <div style={{ marginBottom: '2rem' }}>

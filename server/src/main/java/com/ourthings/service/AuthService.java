@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,13 +21,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
     private final CommunityMembershipRepository membershipRepository;
+    private final CommunityService communityService;
 
     public AuthService(UserRepository userRepository,
                        CommunityRepository communityRepository,
-                       CommunityMembershipRepository membershipRepository) {
+                       CommunityMembershipRepository membershipRepository,
+                       CommunityService communityService) {
         this.userRepository = userRepository;
         this.communityRepository = communityRepository;
         this.membershipRepository = membershipRepository;
+        this.communityService = communityService;
     }
 
     public List<UserDto> getAllUsers() {
@@ -108,6 +112,15 @@ public class AuthService {
             communityRepository.findById(reqId)
                     .orElseThrow(() -> new IllegalArgumentException("Community not found with id: " + reqId));
             resolvedCommId = reqId;
+        } else if (req.getCommunityInput() != null && !req.getCommunityInput().trim().isEmpty()) {
+            Map<String, Object> resolution = communityService.resolveOrSuggestCommunity(req.getCommunityInput().trim(), null, null);
+            Long matchedId = resolution.get("matchedCommunityId") != null ? ((Number) resolution.get("matchedCommunityId")).longValue() : null;
+            String canonicalName = resolution.get("canonicalName") != null ? String.valueOf(resolution.get("canonicalName")) : req.getCommunityInput().trim();
+            String suggestedType = resolution.get("suggestedType") != null ? String.valueOf(resolution.get("suggestedType")) : "NEIGHBOURHOOD";
+            String standardAddress = resolution.get("standardAddress") != null ? String.valueOf(resolution.get("standardAddress")) : "";
+
+            Community comm = communityService.findOrCreateByResolution(req.getCommunityInput().trim(), matchedId, canonicalName, suggestedType, standardAddress);
+            resolvedCommId = comm.getId();
         } else {
             resolvedCommId = communityRepository.findAll().stream().findFirst().map(Community::getId).orElse(null);
         }

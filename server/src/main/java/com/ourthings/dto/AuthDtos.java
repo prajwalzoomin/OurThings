@@ -20,6 +20,7 @@ public class AuthDtos {
         private String password;
         private String roomOrFlat;
         private Long communityId;
+        private String communityInput;
         private String avatarUrl;
         private String city;
         private String pincode;
@@ -42,6 +43,9 @@ public class AuthDtos {
 
         public Long getCommunityId() { return communityId; }
         public void setCommunityId(Long communityId) { this.communityId = communityId; }
+
+        public String getCommunityInput() { return communityInput; }
+        public void setCommunityInput(String communityInput) { this.communityInput = communityInput; }
 
         public String getAvatarUrl() { return avatarUrl; }
         public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }

@@ -30,9 +30,12 @@ const DISTANCES = [
 ];
 
 export default function BrowseItems() {
-  const { currentCommunity, currentUser, navigateTo, communityOnly, toggleCommunityOnly, searchQuery, setSearchQuery, userLocation, requireAuth } = useApp();
+  const { currentCommunity, currentUser, navigateTo, communityOnly, toggleCommunityOnly, searchQuery, setSearchQuery, userLocation, requireAuth, notify } = useApp();
 
+  const [activeTab, setActiveTab] = useState('available'); // 'available' | 'unlisted_requests'
   const [items, setItems] = useState([]);
+  const [openDemands, setOpenDemands] = useState([]);
+  const [demandsLoading, setDemandsLoading] = useState(false);
   const [category, setCategory] = useState('All Categories');
   const [keyword, setKeyword] = useState(searchQuery || '');
   const [condition, setCondition] = useState('All Conditions');
@@ -44,6 +47,10 @@ export default function BrowseItems() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Lend Offer Modal State
+  const [offerModalDemand, setOfferModalDemand] = useState(null);
+  const [keepListingOpen, setKeepListingOpen] = useState(true);
 
   // Dynamic Contextual Facets (Flipkart-style)
   const [aiFacets, setAiFacets] = useState([]);
@@ -130,7 +137,43 @@ export default function BrowseItems() {
     }
   };
 
-  // Fetch contextual specifications when keyword or category changes
+  // Fetch open unlisted requests
+  const fetchOpenDemands = async () => {
+    try {
+      setDemandsLoading(true);
+      const data = await api.getOpenDemands();
+      setOpenDemands(data || []);
+    } catch (e) {
+      console.warn('Could not load unlisted requests:', e);
+    } finally {
+      setDemandsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOpenDemands();
+  }, [currentCommunity]);
+
+  const handleOfferToLendConfirm = async () => {
+    if (!offerModalDemand) return;
+    try {
+      // Navigate to create listing prefilled with the requested item details
+      navigateTo('create', {
+        prefill: {
+          title: offerModalDemand.itemName,
+          category: offerModalDemand.category,
+          neededFrom: offerModalDemand.neededFrom,
+          neededTo: offerModalDemand.neededTo,
+          description: `Offered to fulfill neighbor request for: ${offerModalDemand.itemName}${offerModalDemand.notes ? `\nNote: ${offerModalDemand.notes}` : ''}`,
+          fulfillDemandId: offerModalDemand.id,
+          keepOpenAfterRequest: keepListingOpen,
+        },
+      });
+      setOfferModalDemand(null);
+    } catch (e) {
+      notify('error', 'Could not initiate lending offer.');
+    }
+  };
   useEffect(() => {
     const q = keyword || (category !== 'All Categories' ? category : '');
     if (q) {
@@ -418,6 +461,26 @@ export default function BrowseItems() {
         {/* RIGHT CONTENT AREA: PRODUCTS & SEARCH BAR                    */}
         {/* ============================================================ */}
         <main className="flipkart-content-area">
+          {/* View Mode Tabs: Explore Available vs Unlisted Requests */}
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
+            <button
+              type="button"
+              className={`btn btn-sm ${activeTab === 'available' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ fontWeight: 700 }}
+              onClick={() => setActiveTab('available')}
+            >
+              📦 Available Items ({items.length})
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${activeTab === 'unlisted_requests' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ fontWeight: 700 }}
+              onClick={() => setActiveTab('unlisted_requests')}
+            >
+              🙋 Unlisted Requests by Neighbours ({openDemands.length})
+            </button>
+          </div>
+
           {/* Top Search Bar & Sort Dropdown */}
           <div className="flipkart-toolbar">
             <form onSubmit={handleSearchSubmit} style={{ flex: 1, minWidth: '220px' }}>
@@ -506,52 +569,246 @@ export default function BrowseItems() {
             </div>
           </div>
 
-          {/* Product Items Grid */}
-          {loading ? (
-            <div className="state-message">
-              <p>Scanning community inventory across Bengaluru...</p>
-            </div>
-          ) : error ? (
-            <div className="alert alert-danger">{error}</div>
-          ) : items.length === 0 ? (
-            <div className="state-message">
-              <div className="state-message-icon">🔍</div>
-              <h3>No resources found matching criteria</h3>
-              <p>Try widening your search keywords, turning off distance filters, or posting an unmet need for neighbours.</p>
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
-                <button type="button" className="btn btn-primary btn-sm" onClick={() => navigateTo('demands')}>
-                  + Post an Unmet Need
-                </button>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={handleResetFilters}>
-                  Reset All Filters
-                </button>
+          {/* Main Grid: Either Items or Unlisted Requests */}
+          {activeTab === 'available' ? (
+            loading ? (
+              <div className="state-message">
+                <p>Scanning community inventory across Bengaluru...</p>
               </div>
-            </div>
-          ) : (
-            <div className="ecom-grid">
-              {items.map((item) => {
-                const isOwner = currentUser && item.ownerId === currentUser.id;
-                const isSameCommunity = currentUser && item.communityId === currentUser.activeCommunityId;
+            ) : error ? (
+              <div className="alert alert-danger">{error}</div>
+            ) : items.length === 0 ? (
+              <div className="state-message">
+                <div className="state-message-icon">🔍</div>
+                <h3>No resources found matching criteria</h3>
+                <p>Try widening your search keywords, turning off distance filters, or posting an unmet need for neighbours.</p>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => navigateTo('demands')}>
+                    + Post an Unmet Need
+                  </button>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={handleResetFilters}>
+                    Reset All Filters
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="ecom-grid">
+                {items.map((item) => {
+                  const isOwner = currentUser && item.ownerId === currentUser.id;
+                  const isSameCommunity = currentUser && item.communityId === currentUser.activeCommunityId;
 
-                return (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    metaSubtitle={`📍 ${item.locality || 'Bengaluru'} • ~${item.distanceKm || 0.4} km away`}
-                    badgeText={isSameCommunity ? '★ Same Community' : null}
-                    actions={
-                      <button
-                        type="button"
-                        className={`btn ${isOwner ? 'btn-secondary' : 'btn-primary'} btn-sm`}
-                        style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
-                        onClick={() => navigateTo('detail', { itemId: item.id })}
-                      >
-                        {isOwner ? 'Manage Listing' : item.status === 'AVAILABLE' ? 'Borrow Resource' : 'View Details'}
-                      </button>
-                    }
-                  />
-                );
-              })}
+                  return (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      metaSubtitle={`📍 ${item.locality || 'Bengaluru'} • ~${item.distanceKm || 0.4} km away`}
+                      badgeText={isSameCommunity ? '★ Same Community' : null}
+                      actions={
+                        <button
+                          type="button"
+                          className={`btn ${isOwner ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+                          style={{ width: '100%', padding: '0.28rem 0.4rem', fontSize: '0.72rem' }}
+                          onClick={() => navigateTo('detail', { itemId: item.id })}
+                        >
+                          {isOwner ? 'Manage Listing' : item.status === 'AVAILABLE' ? 'Borrow Resource' : 'View Details'}
+                        </button>
+                      }
+                    />
+                  );
+                })}
+              </div>
+            )
+          ) : (
+            /* Unlisted Demands Tab */
+            demandsLoading ? (
+              <div className="state-message">
+                <p>Loading unlisted requests from neighbours...</p>
+              </div>
+            ) : openDemands.length === 0 ? (
+              <div className="state-message">
+                <div className="state-message-icon">🤝</div>
+                <h3>No unfulfilled requests in this circle</h3>
+                <p>All items have been fulfilled or have active listings! Need something yourself?</p>
+                <div style={{ marginTop: '1rem' }}>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => navigateTo('demands')}>
+                    + Post an Unlisted Item Request
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '0.85rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    Neighbours are looking for these items. Have one lying idle at home or hostel? Offer to lend!
+                  </span>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => navigateTo('demands')}>
+                    + Post New Request
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                  {openDemands.map((demand) => (
+                    <div
+                      key={demand.id}
+                      style={{
+                        padding: '1.25rem',
+                        backgroundColor: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-lg)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '0.85rem',
+                        boxShadow: 'var(--shadow-xs)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                          <span style={{ fontSize: '0.7rem', backgroundColor: 'var(--color-brand-light)', color: 'var(--color-brand)', fontWeight: 700, padding: '0.15rem 0.5rem', borderRadius: 'var(--radius-xs)' }}>
+                            {demand.category}
+                          </span>
+                          <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
+                            {new Date(demand.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <h4 style={{ fontSize: '1.05rem', fontWeight: 700, margin: '0 0 0.35rem 0', color: 'var(--color-text-primary)' }}>
+                          {demand.itemName}
+                        </h4>
+                        {(demand.neededFrom || demand.neededTo) && (
+                          <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: '0.35rem' }}>
+                            📅 Needed: {demand.neededFrom || 'ASAP'} to {demand.neededTo || 'Flexible'}
+                          </div>
+                        )}
+                        {demand.notes && (
+                          <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0, fontStyle: 'italic' }}>
+                            &ldquo;{demand.notes}&rdquo;
+                          </p>
+                        )}
+                      </div>
+
+                      <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm"
+                          style={{ flex: 1, fontWeight: 700 }}
+                          onClick={() => requireAuth(() => setOfferModalDemand(demand))}
+                        >
+                          🤝 Offer to Lend
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          )}
+
+          {/* Offer to Lend Choice Modal */}
+          {offerModalDemand && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1rem',
+              }}
+              onClick={() => setOfferModalDemand(null)}
+            >
+              <div
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-lg)',
+                  maxWidth: '460px',
+                  width: '100%',
+                  padding: '1.5rem',
+                  boxShadow: 'var(--shadow-xl)',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 0.5rem 0' }}>
+                  🤝 Offer to Lend: {offerModalDemand.itemName}
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
+                  You are offering to lend this item to fulfill a neighbor's request. How would you like this item listed after this request is completed?
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      padding: '0.75rem',
+                      border: `1px solid ${!keepListingOpen ? 'var(--color-brand)' : 'var(--color-border)'}`,
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: !keepListingOpen ? 'var(--color-surface-hover)' : 'transparent',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="lendOption"
+                      checked={!keepListingOpen}
+                      onChange={() => setKeepListingOpen(false)}
+                      style={{ marginTop: '0.2rem', accentColor: 'var(--color-brand)' }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                        🔒 Only for this request
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                        Listing automatically pauses or unlists once this specific borrow request concludes.
+                      </div>
+                    </div>
+                  </label>
+
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      padding: '0.75rem',
+                      border: `1px solid ${keepListingOpen ? 'var(--color-brand)' : 'var(--color-border)'}`,
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: keepListingOpen ? 'var(--color-surface-hover)' : 'transparent',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="lendOption"
+                      checked={keepListingOpen}
+                      onChange={() => setKeepListingOpen(true)}
+                      style={{ marginTop: '0.2rem', accentColor: 'var(--color-brand)' }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                        🌐 Keep open in community catalog
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                        Keep item available in the directory for other neighbours to discover and borrow in future.
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setOfferModalDemand(null)}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={handleOfferToLendConfirm}>
+                    Continue to Listing Details &rarr;
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </main>

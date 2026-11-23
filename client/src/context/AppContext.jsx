@@ -18,14 +18,40 @@ export function AppProvider({ children }) {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   
-  // Precise GPS location state
-  const [userLocation, setUserLocation] = useState({
-    latitude: 12.9345,
-    longitude: 77.6912,
-    locality: 'Bengaluru (Outer Ring Rd)',
-    isGpsAccurate: false,
-    loadingLocation: false,
+  // Precise GPS & Manual Location state
+  const [userLocation, setUserLocation] = useState(() => {
+    const savedLoc = localStorage.getItem('ourthings_manual_location');
+    if (savedLoc) {
+      try {
+        return JSON.parse(savedLoc);
+      } catch (e) {}
+    }
+    return {
+      latitude: 12.9345,
+      longitude: 77.6912,
+      locality: 'Bengaluru (Outer Ring Rd)',
+      formattedAddress: 'Outer Ring Road, Panathur / Marathahalli, Bengaluru',
+      isGpsAccurate: false,
+      loadingLocation: false,
+    };
   });
+
+  const setManualLocation = (newLoc) => {
+    const formatted = {
+      latitude: newLoc.latitude,
+      longitude: newLoc.longitude,
+      locality: newLoc.locality || 'Bengaluru',
+      formattedAddress: newLoc.formattedAddress || newLoc.locality || '',
+      isGpsAccurate: false,
+      loadingLocation: false,
+    };
+    setUserLocation(formatted);
+    setApiLocation(newLoc.latitude, newLoc.longitude);
+    try {
+      localStorage.setItem('ourthings_manual_location', JSON.stringify(formatted));
+    } catch (e) {}
+    notify('success', `Location updated to: ${formatted.locality}`);
+  };
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('ourthings_theme') || 'dark';
@@ -81,7 +107,23 @@ export function AppProvider({ children }) {
             fullAddr = geo.formattedAddress;
           }
         } catch {
-          locName = `GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+          // If server was offline during startup, perform direct OpenStreetMap reverse lookup in browser
+          try {
+            const osmRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18`, {
+              headers: { Accept: 'application/json' }
+            });
+            if (osmRes.ok) {
+              const osmData = await osmRes.json();
+              const addr = osmData.address || {};
+              const landmark = addr.amenity || addr.building || addr.suburb || addr.neighbourhood || addr.quarter || addr.road;
+              if (landmark) {
+                locName = addr.city ? `${landmark}, ${addr.city}` : landmark;
+              }
+              fullAddr = osmData.display_name || '';
+            }
+          } catch {
+            locName = `GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+          }
         }
 
         setUserLocation({
@@ -149,8 +191,11 @@ export function AppProvider({ children }) {
           setApiContext(null, null);
         }
 
-        // Request user's precise location on first arrival
-        requestUserLocation();
+        // Optional: only request GPS automatically if user has not set a manual location
+        const hasManual = localStorage.getItem('ourthings_manual_location');
+        if (!hasManual) {
+          // Keep default center, do not aggressively prompt permission unless user clicks 'Detect Live GPS'
+        }
       } catch (err) {
         console.error('Initialization error:', err);
         notify('error', 'Could not connect to backend server. Make sure Spring Boot is running.');
@@ -165,7 +210,7 @@ export function AppProvider({ children }) {
     setNotification({ type, message });
     setTimeout(() => {
       setNotification((curr) => (curr && curr.message === message ? null : curr));
-    }, 6000);
+    }, 2800);
   };
 
   const login = async (identifier, password) => {
@@ -290,6 +335,7 @@ export function AppProvider({ children }) {
         setSwitchAccountModalOpen: setAuthModalOpen,
         userLocation,
         requestUserLocation,
+        setManualLocation,
         notify,
         toggleTheme,
         login,

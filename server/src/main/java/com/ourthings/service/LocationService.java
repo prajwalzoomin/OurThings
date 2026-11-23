@@ -81,15 +81,18 @@ public class LocationService {
                 JsonNode root = objectMapper.readTree(response.getBody());
                 JsonNode addr = root.path("address");
 
+                String amenity = addr.path("amenity").asText("");
+                if (amenity.isEmpty()) amenity = addr.path("building").asText("");
+
                 String road = addr.path("road").asText("");
                 if (road.isEmpty()) road = addr.path("pedestrian").asText("");
                 if (road.isEmpty()) road = addr.path("street").asText("");
 
                 String locality = addr.path("suburb").asText("");
                 if (locality.isEmpty()) locality = addr.path("neighbourhood").asText("");
+                if (locality.isEmpty()) locality = addr.path("quarter").asText("");
                 if (locality.isEmpty()) locality = addr.path("residential").asText("");
                 if (locality.isEmpty()) locality = addr.path("subdistrict").asText("");
-                if (locality.isEmpty()) locality = addr.path("quarter").asText("");
 
                 String city = addr.path("city").asText("");
                 if (city.isEmpty()) city = addr.path("town").asText("");
@@ -102,7 +105,17 @@ public class LocationService {
 
                 String displayName = root.path("display_name").asText("");
 
-                String resolvedLocality = !locality.isEmpty() ? locality : (!road.isEmpty() ? road : city);
+                // Priority for locality: Amenity/Landmark > Neighbourhood/Suburb > Road > City
+                String resolvedLocality;
+                if (!amenity.isEmpty()) {
+                    resolvedLocality = amenity + (!locality.isEmpty() ? ", " + locality : "");
+                } else if (!locality.isEmpty()) {
+                    resolvedLocality = locality;
+                } else if (!road.isEmpty()) {
+                    resolvedLocality = road;
+                } else {
+                    resolvedLocality = city;
+                }
 
                 result.put("locality", resolvedLocality);
                 result.put("street", road);

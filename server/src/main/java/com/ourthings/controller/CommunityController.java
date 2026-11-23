@@ -44,5 +44,16 @@ public class CommunityController {
         Community created = communityService.createCommunity(name.trim(), type.trim(), description, address);
         return ResponseEntity.ok(created);
     }
+
+    @PostMapping("/resolve")
+    public ResponseEntity<Map<String, Object>> resolveCommunity(
+            @RequestBody Map<String, Object> body,
+            @RequestHeader(value = "X-User-Lat", required = false) Double headerLat,
+            @RequestHeader(value = "X-User-Lng", required = false) Double headerLng) {
+        String query = body.get("query") != null ? String.valueOf(body.get("query")) : "";
+        Double lat = body.get("latitude") != null ? Double.valueOf(String.valueOf(body.get("latitude"))) : headerLat;
+        Double lng = body.get("longitude") != null ? Double.valueOf(String.valueOf(body.get("longitude"))) : headerLng;
+        return ResponseEntity.ok(communityService.resolveOrSuggestCommunity(query, lat, lng));
+    }
 }
 

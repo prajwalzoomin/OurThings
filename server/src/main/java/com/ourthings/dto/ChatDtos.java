@@ -105,3 +105,4 @@ public class ChatDtos {
         public void setUnreadCount(Integer unreadCount) { this.unreadCount = unreadCount; }
     }
 }
+

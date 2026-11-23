@@ -74,6 +74,7 @@ export const api = {
   getCommunities: () => request('/api/communities'),
   getCommunity: (id) => request(`/api/communities/${id}`),
   createCommunity: (payload) => request('/api/communities', { method: 'POST', body: JSON.stringify(payload) }),
+  resolveCommunity: (query, latitude, longitude) => request('/api/communities/resolve', { method: 'POST', body: JSON.stringify({ query, latitude, longitude }) }),
 
   // Items
   getItems: (params = {}) => {

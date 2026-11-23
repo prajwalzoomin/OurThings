@@ -284,3 +284,4 @@ export default function ChatDrawer({ isOpen, onClose, itemId, otherUserId, other
     </div>
   );
 }
+

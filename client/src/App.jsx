@@ -35,6 +35,8 @@ function AppContent() {
       {/* Global Floating Toast Notification */}
       {notification && (
         <div
+          onClick={() => setNotification(null)}
+          title="Click to dismiss"
           style={{
             position: 'fixed',
             top: '1.25rem',
@@ -44,16 +46,19 @@ function AppContent() {
             boxShadow: 'var(--shadow-lg)',
             borderRadius: 'var(--radius-md)',
             overflow: 'hidden',
+            cursor: 'pointer',
+            animation: 'fadeIn 0.2s ease-out',
           }}
         >
           <div
             className={`alert alert-${notification.type === 'error' ? 'danger' : notification.type === 'success' ? 'success' : 'info'}`}
-            style={{ margin: 0, padding: '0.85rem 1.25rem' }}
+            style={{ margin: 0, padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', gap: '0.65rem' }}
           >
-            <span style={{ fontSize: '1.1rem' }}>
+            <span style={{ fontSize: '1.05rem' }}>
               {notification.type === 'error' ? '⚠️' : notification.type === 'success' ? '✅' : 'ℹ️'}
             </span>
-            <span style={{ fontWeight: 500 }}>{notification.message}</span>
+            <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{notification.message}</span>
+            <span style={{ marginLeft: 'auto', opacity: 0.6, fontSize: '1.1rem', lineHeight: 1 }}>&times;</span>
           </div>
         </div>
       )}

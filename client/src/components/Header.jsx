@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import NotificationBell from './NotificationBell';
+import LocationPickerModal from './LocationPickerModal';
+import logoImg from '../assets/logo.png';
 
 export default function Header() {
   const {
@@ -18,6 +20,7 @@ export default function Header() {
     setSwitchAccountModalOpen,
     userLocation,
     requestUserLocation,
+    setManualLocation,
     signOut,
     requireAuth,
     notify,
@@ -25,6 +28,7 @@ export default function Header() {
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery || '');
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Sync search input with state
@@ -61,42 +65,54 @@ export default function Header() {
       <div className="top-utility-bar">
         <div className="top-utility-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {/* Precise GPS Location Pin & Trigger */}
-            <button
-              type="button"
-              className="utility-chip"
-              onClick={requestUserLocation}
-              title="Click to detect or refresh your precise GPS location"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.15rem 0.5rem' }}
-            >
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ color: userLocation.isGpsAccurate ? 'var(--color-brand)' : 'var(--color-text-muted)' }}
+            {/* Location selector chip: Click opens modal to manually search/type address or use live GPS */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <button
+                type="button"
+                className="utility-chip"
+                onClick={() => setLocationPickerOpen(true)}
+                title="Click to search address or pin any area on Map"
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.15rem 0.5rem' }}
               >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="22" y1="12" x2="18" y2="12"></line>
-                <line x1="6" y1="12" x2="2" y2="12"></line>
-                <line x1="12" y1="6" x2="12" y2="2"></line>
-                <line x1="12" y1="22" x2="12" y2="18"></line>
-              </svg>
-              <span>{userLocation.locality || 'Bengaluru'}</span>
-              {userLocation.isGpsAccurate ? (
-                <span style={{ fontSize: '0.65rem', backgroundColor: 'var(--color-brand-light)', color: 'var(--color-brand)', padding: '0.05rem 0.35rem', borderRadius: '3px', fontWeight: 700 }}>
-                  GPS ACCURATE
-                </span>
-              ) : (
-                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', textDecoration: 'underline' }}>
-                  {userLocation.loadingLocation ? 'Locating...' : 'Detect GPS'}
-                </span>
-              )}
-            </button>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ color: userLocation.isGpsAccurate ? 'var(--color-brand)' : 'var(--color-text-muted)' }}
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="22" y1="12" x2="18" y2="12"></line>
+                  <line x1="6" y1="12" x2="2" y2="12"></line>
+                  <line x1="12" y1="6" x2="12" y2="2"></line>
+                  <line x1="12" y1="22" x2="12" y2="18"></line>
+                </svg>
+                <span>{userLocation.locality || 'Bengaluru'}</span>
+                {userLocation.isGpsAccurate ? (
+                  <span style={{ fontSize: '0.65rem', backgroundColor: 'var(--color-brand-light)', color: 'var(--color-brand)', padding: '0.05rem 0.35rem', borderRadius: '3px', fontWeight: 700 }}>
+                    LIVE GPS
+                  </span>
+                ) : (
+                  <span style={{ fontSize: '0.65rem', color: 'var(--color-brand)', textDecoration: 'underline' }}>
+                    Change Area
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                style={{ padding: '0.1rem 0.4rem', fontSize: '0.68rem', height: 'auto', lineHeight: 1.2 }}
+                onClick={requestUserLocation}
+                title="Detect precise GPS location right now"
+              >
+                {userLocation.loadingLocation ? 'Locating...' : '📍 Use Live GPS'}
+              </button>
+            </div>
 
             {/* Food-Delivery "VEG ONLY" Style Scope Toggle */}
             <button
@@ -137,7 +153,12 @@ export default function Header() {
             style={{ cursor: 'pointer' }}
             onClick={() => navigateTo('home')}
           >
-            <div className="brand-logo-icon">OT</div>
+            <img
+              src={logoImg}
+              alt="OurThings Logo"
+              className="brand-logo-img"
+              style={{ width: '36px', height: '36px', objectFit: 'contain', borderRadius: 'var(--radius-sm)' }}
+            />
             <div className="brand-text-block">
               <span className="brand-title">OurThings</span>
               <span className="brand-subtitle">Community Resource Sharing</span>
@@ -383,6 +404,18 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* Global Location Picker Modal */}
+      {locationPickerOpen && (
+        <LocationPickerModal
+          initialLocation={userLocation}
+          onConfirm={(selected) => {
+            setManualLocation(selected);
+            setLocationPickerOpen(false);
+          }}
+          onClose={() => setLocationPickerOpen(false)}
+        />
+      )}
     </header>
   );
 }
