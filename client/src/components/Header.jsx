@@ -380,19 +380,8 @@ export default function Header() {
             ) : (
               <button
                 type="button"
-                className="btn btn-outline btn-sm"
+                className="nav-auth-btn"
                 onClick={() => setSwitchAccountModalOpen(true)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  borderRadius: 'var(--radius-full)',
-                  padding: '0.35rem 0.95rem',
-                  fontSize: '0.825rem',
-                  fontWeight: 600,
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-surface)',
-                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
