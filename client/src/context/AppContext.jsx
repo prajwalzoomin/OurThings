@@ -283,6 +283,9 @@ export function AppProvider({ children }) {
         } catch (err) {
           notify('error', err.message);
         }
+      } else {
+        setApiContext(null, communityOnly ? comm.id : null);
+        notify('info', `Community selected: ${comm.name}`);
       }
     }
   };

@@ -1,13 +1,13 @@
 // OurThings API Client
 
 let activeUserId = null; // Default to Guest mode (no account by default)
-let activeCommunityId = 1; // Default fallback to primary community (NHCE Campus Circle)
+let activeCommunityId = null; // Default to null (whole city mode)
 let userLat = null;
 let userLng = null;
 
 export function setApiContext(userId, communityId) {
   activeUserId = userId !== undefined ? userId : null;
-  activeCommunityId = communityId !== undefined && communityId !== null ? communityId : 1;
+  activeCommunityId = communityId !== undefined && communityId !== null ? communityId : null;
 }
 
 export function setApiLocation(lat, lng) {

@@ -3,6 +3,15 @@ import { useApp } from '../context/AppContext';
 import { api } from '../api/client';
 import logoImg from '../assets/logo.png';
 
+const DEMO_PERSONAS = [
+  { name: 'Prajwal B', role: 'NHCE Campus (Drill & Aid Owner)', email: 'prajwal@ourthings.local', community: 'NHCE' },
+  { name: 'Mohammed Kasim', role: 'NHCE Campus (Projector & Rucksack)', email: 'kasim@ourthings.local', community: 'NHCE' },
+  { name: 'Ananya Rao', role: 'Green Glen (Wheelchair & Luggage)', email: 'ananya.rao@ourthings.local', community: 'Green Glen' },
+  { name: 'Nikhil Kamath', role: 'Prestige Enclave (DeWalt Tool Owner)', email: 'nikhil.k@ourthings.local', community: 'Prestige' },
+  { name: 'Preeti Narang', role: 'Adarsh Palm Retreat (Yoga & Trek)', email: 'preeti.n@ourthings.local', community: 'Adarsh' },
+  { name: 'Abhinav Shukla', role: 'Spice Garden (Laser Meter & DIY)', email: 'abhinav.s@ourthings.local', community: 'Marathahalli' },
+];
+
 export default function AuthModal({ isOpen, onClose }) {
   const { login, register, communities, notify, userLocation } = useApp();
 
@@ -83,6 +92,22 @@ export default function AuthModal({ isOpen, onClose }) {
     setSignInPassword('');
     setRegPassword('');
     setRegConfirmPassword('');
+  };
+
+  const handleQuickDemoSignIn = async (email) => {
+    setError(null);
+    setSignInIdentifier(email);
+    setSignInPassword('Demo@1234');
+    try {
+      setSubmitting(true);
+      await login(email, 'Demo@1234');
+      resetForm();
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Failed to sign in with demo account.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleSignIn = async (e) => {
@@ -314,7 +339,47 @@ export default function AuthModal({ isOpen, onClose }) {
 
           {mode === 'signin' ? (
             /* Sign In Form */
-            <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {/* Quick Demo Logins Bar */}
+              <div style={{ padding: '0.75rem 0.85rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--color-border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-brand)' }}>
+                    ⚡ Demo Quick Sign-In (1-Click)
+                  </span>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
+                    Pass: Demo@1234
+                  </span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.35rem' }}>
+                  {DEMO_PERSONAS.map((p) => (
+                    <button
+                      key={p.email}
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => handleQuickDemoSignIn(p.email)}
+                      className="btn btn-secondary btn-sm"
+                      style={{
+                        padding: '0.25rem 0.45rem',
+                        fontSize: '0.72rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        textAlign: 'left',
+                        backgroundColor: 'var(--color-surface)',
+                        lineHeight: 1.2,
+                        borderRadius: 'var(--radius-sm)',
+                      }}
+                      title={`Sign in as ${p.name} (${p.role})`}
+                    >
+                      <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{p.name}</span>
+                      <span style={{ fontSize: '0.64rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
+                        {p.community}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>
                   Email Address or Mobile Number
@@ -533,19 +598,56 @@ export default function AuthModal({ isOpen, onClose }) {
                       </span>
                     )}
                   </div>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g. NHCE Campus, Bellandur, Green Glen..."
-                    value={regCommunityInput}
-                    onFocus={() => setIsCommunityFocused(true)}
-                    onBlur={() => setTimeout(() => setIsCommunityFocused(false), 250)}
+
+                  <select
+                    className="form-select"
+                    style={{ marginBottom: '0.35rem', fontSize: '0.8rem' }}
+                    value={regCommunityId ? String(regCommunityId) : (regCommunityInput ? 'custom' : '')}
                     onChange={(e) => {
-                      setRegCommunityInput(e.target.value);
-                      setRegCommunityId(null);
+                      const val = e.target.value;
+                      if (val === 'custom') {
+                        setRegCommunityId(null);
+                        setRegCommunityInput('');
+                      } else if (val) {
+                        const comm = communities.find((c) => c.id === Number(val));
+                        if (comm) {
+                          setRegCommunityId(comm.id);
+                          setRegCommunityInput(comm.name);
+                          if (comm.address && !regLocality) {
+                            const parts = comm.address.split(',');
+                            setRegLocality(parts[parts.length - 3]?.trim() || parts[0]?.trim());
+                          }
+                        }
+                      } else {
+                        setRegCommunityId(null);
+                        setRegCommunityInput('');
+                      }
                     }}
-                    required
-                  />
+                  >
+                    <option value="">-- Select Verified Community Circle --</option>
+                    {(communities || []).map((c) => (
+                      <option key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </option>
+                    ))}
+                    <option value="custom">✏️ Enter Custom Neighbourhood / Colony...</option>
+                  </select>
+
+                  {(!regCommunityId || regCommunityInput === '') && (
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. NHCE Campus, Bellandur, Green Glen..."
+                      value={regCommunityInput}
+                      onFocus={() => setIsCommunityFocused(true)}
+                      onBlur={() => setTimeout(() => setIsCommunityFocused(false), 250)}
+                      onChange={(e) => {
+                        setRegCommunityInput(e.target.value);
+                        setRegCommunityId(null);
+                      }}
+                      required={!regCommunityId}
+                    />
+                  )}
 
                   {/* AI Semantic Suggestion - clean & fades when blurring field */}
                   {isCommunityFocused && aiSuggestion && (

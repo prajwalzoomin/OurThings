@@ -27,10 +27,109 @@ const PRESET_PRODUCT_PHOTOS = [
   { name: 'Mechanic Toolkit', icon: '🔧', url: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80' },
 ];
 
+const QUICK_TEMPLATES = [
+  {
+    label: 'Bosch Impact Drill',
+    icon: '🔌',
+    title: 'Bosch 13mm Impact Drill Kit with Masonry Bits',
+    category: 'Tools & Hardware',
+    condition: 'Good',
+    description: 'Electric 13mm hammer drill with forward/reverse, chuck key, and 6-piece masonry drill bit set. Great for home shelving and wall brackets.',
+    pricingType: 'RENTAL',
+    dailyRate: '150',
+    deposit: '500',
+    repValue: '3500',
+    imageUrl: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Adult Crutches',
+    icon: '🩼',
+    title: 'Adjustable Aluminum Underarm Crutches (Adult Pair)',
+    category: 'Healthcare & Mobility',
+    condition: 'Like New',
+    description: 'Lightweight push-button adjustable crutches suited for heights 5ft 2in to 6ft 0in. Padded arm rests and non-skid rubber feet. Thoroughly sanitized.',
+    pricingType: 'FREE',
+    dailyRate: '',
+    deposit: '',
+    repValue: '1400',
+    imageUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Full HD Projector',
+    icon: '📽️',
+    title: 'Epson Portable Full HD Projector with HDMI Cable',
+    category: 'Electronics',
+    condition: 'Good',
+    description: '3300 lumens brightness, HDMI and USB inputs, built-in speaker. Includes 5-meter HDMI cord and carrying case. Ideal for project presentations and club seminars.',
+    pricingType: 'RENTAL',
+    dailyRate: '350',
+    deposit: '1500',
+    repValue: '28000',
+    imageUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Camping Tent',
+    icon: '⛺',
+    title: 'Quechua 3-Person Waterproof Camping Tent with Carry Bag',
+    category: 'Travel Gear',
+    condition: 'Like New',
+    description: 'Fresh & Black patented fabric for heat insulation and blackout sleep. Wind resistant up to 50 km/h, waterproof PU coating. Includes ground pegs and poles.',
+    pricingType: 'RENTAL',
+    dailyRate: '200',
+    deposit: '1000',
+    repValue: '4999',
+    imageUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Folding Ladder',
+    icon: '🪜',
+    title: '6-Step Heavy-Duty Aluminium Folding Ladder',
+    category: 'Tools & Hardware',
+    condition: 'Good',
+    description: 'Anti-skid ribbed steps with safety top platform. Max load 150 kg. Lightweight and easy to carry for ceiling repairs and painting.',
+    pricingType: 'FREE',
+    dailyRate: '',
+    deposit: '',
+    repValue: '4200',
+    imageUrl: 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Digital BP Monitor',
+    icon: '🩺',
+    title: 'Omron Digital Blood Pressure Monitor with Medium Cuff',
+    category: 'Healthcare & Mobility',
+    condition: 'Like New',
+    description: 'Accurate upper arm blood pressure measurement device. Battery operated, easy one-touch start. Sanitized after every use.',
+    pricingType: 'FREE',
+    dailyRate: '',
+    deposit: '',
+    repValue: '2200',
+    imageUrl: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'PS5 Console',
+    icon: '🎮',
+    title: 'Sony PlayStation 5 Console with 2 Controllers & Games',
+    category: 'Electronics',
+    condition: 'Like New',
+    description: 'PS5 Disc Edition console with 2 wireless DualSense haptic controllers, HDMI 2.1 cable, and multiplayer games. Great for weekend tournaments.',
+    pricingType: 'RENTAL',
+    dailyRate: '450',
+    deposit: '2000',
+    repValue: '54990',
+    imageUrl: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80',
+  },
+];
+
 export default function CreateEditItem() {
-  const { currentCommunity, currentUser, prefillItem, navigateTo, notify } = useApp();
+  const { currentCommunity, currentUser, prefillItem, navigateTo, notify, communities } = useApp();
 
   const isEditMode = Boolean(prefillItem && prefillItem.id);
+
+  // Automatically default to the registered community of the logged-in user
+  const userRegisteredCommunityId = currentUser?.activeCommunityId || currentCommunity?.id || (communities?.[0]?.id || 1);
+  const selectedCommunityId = prefillItem?.communityId || userRegisteredCommunityId;
+  const userCommunityObj = communities?.find((c) => c.id === selectedCommunityId) || currentCommunity;
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -149,11 +248,34 @@ export default function CreateEditItem() {
     } else {
       const todayStr = new Date().toISOString().slice(0, 10);
       setAvailableFrom(todayStr);
+      const oneYearLater = new Date();
+      oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+      setAvailableTo(oneYearLater.toISOString().slice(0, 10));
       if (currentUser && currentUser.roomOrFlat) {
         setPickupLocation(currentUser.roomOrFlat);
       }
     }
   }, [prefillItem, currentUser]);
+
+  const addMonthsToAvailableTo = (months) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + months);
+    setAvailableTo(d.toISOString().slice(0, 10));
+    notify('info', `Availability set to +${months} month${months > 1 ? 's' : ''}`);
+  };
+
+  const applyQuickTemplate = (tpl) => {
+    setTitle(tpl.title);
+    setCategory(tpl.category);
+    setItemCondition(tpl.condition);
+    setDescription(tpl.description);
+    setPricingType(tpl.pricingType);
+    setDailyRateInr(tpl.dailyRate);
+    setSecurityDepositInr(tpl.deposit);
+    setEstimatedReplacementValueInr(tpl.repValue);
+    setImageUrl(tpl.imageUrl);
+    notify('success', `⚡ Applied template: ${tpl.label}`);
+  };
 
   const handleLocationConfirm = (locData) => {
     setLatitude(locData.latitude);
@@ -252,6 +374,7 @@ export default function CreateEditItem() {
       dailyRateInr: pricingType === 'RENTAL' && dailyRateInr ? Number(dailyRateInr) : 0,
       securityDepositInr: pricingType === 'RENTAL' && securityDepositInr ? Number(securityDepositInr) : 0,
       imageUrl: imageUrl.trim() || null,
+      communityId: selectedCommunityId ? Number(selectedCommunityId) : (currentCommunity?.id || 1),
     };
 
     try {
@@ -303,6 +426,64 @@ export default function CreateEditItem() {
         {error && <div className="alert alert-danger">{error}</div>}
 
         <form onSubmit={handleSubmit}>
+          {/* Registered Community Badge (Auto-assigned from user registration) */}
+          <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1rem', backgroundColor: 'var(--color-surface-hover)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div>
+                <label style={{ fontSize: '0.82rem', fontWeight: 700, display: 'block', marginBottom: '0.2rem', color: 'var(--color-text-primary)' }}>
+                  🏢 Your Community Circle
+                </label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                  Automatically assigned from your registered account profile. Item is discoverable across Bengaluru.
+                </span>
+              </div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '0.4rem 0.85rem',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                color: 'var(--color-text-primary)'
+              }}>
+                <span style={{ color: 'var(--color-brand)' }}>📍</span>
+                <span>{userCommunityObj?.name || 'Your Registered Community'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Demo Templates */}
+          {!isEditMode && (
+            <div style={{ marginBottom: '1.25rem', padding: '0.75rem 1rem', backgroundColor: 'rgba(31, 78, 59, 0.08)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--color-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.25rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-brand)' }}>
+                  ⚡ Quick Demo Templates (Click to fill all fields instantly):
+                </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                  Includes photo, category, description & price
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {QUICK_TEMPLATES.map((tpl) => (
+                  <button
+                    key={tpl.label}
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--color-surface)' }}
+                    onClick={() => applyQuickTemplate(tpl)}
+                    title={`Fill details for ${tpl.title}`}
+                  >
+                    <span>{tpl.icon}</span>
+                    <span>{tpl.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="item-title" className="form-label">Resource Title *</label>
             <input
@@ -668,7 +849,15 @@ export default function CreateEditItem() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="item-avail-to" className="form-label">Available Until *</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <label htmlFor="item-avail-to" className="form-label" style={{ margin: 0 }}>Available Until *</label>
+                <div style={{ display: 'flex', gap: '0.25rem' }}>
+                  <button type="button" className="btn btn-secondary btn-sm" style={{ padding: '0.1rem 0.4rem', fontSize: '0.68rem', height: 'auto', lineHeight: 1.2 }} onClick={() => addMonthsToAvailableTo(1)}>+1 Mo</button>
+                  <button type="button" className="btn btn-secondary btn-sm" style={{ padding: '0.1rem 0.4rem', fontSize: '0.68rem', height: 'auto', lineHeight: 1.2 }} onClick={() => addMonthsToAvailableTo(3)}>+3 Mo</button>
+                  <button type="button" className="btn btn-secondary btn-sm" style={{ padding: '0.1rem 0.4rem', fontSize: '0.68rem', height: 'auto', lineHeight: 1.2 }} onClick={() => addMonthsToAvailableTo(6)}>+6 Mo</button>
+                  <button type="button" className="btn btn-secondary btn-sm" style={{ padding: '0.1rem 0.4rem', fontSize: '0.68rem', height: 'auto', lineHeight: 1.2 }} onClick={() => addMonthsToAvailableTo(12)}>+1 Yr</button>
+                </div>
+              </div>
               <input
                 id="item-avail-to"
                 type="date"

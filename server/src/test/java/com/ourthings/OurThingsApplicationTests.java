@@ -32,7 +32,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@TestPropertySource(properties = "spring.datasource.url=jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1")
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1",
+    "spring.datasource.driverClassName=org.h2.Driver",
+    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
+})
 public class OurThingsApplicationTests {
 
     @Autowired

@@ -56,9 +56,9 @@ public class DataInitializer implements CommandLineRunner {
         boolean hasCauvery = communityRepository.findAll().stream()
                 .anyMatch(c -> c.getName() != null && c.getName().toLowerCase().contains("cauvery"));
 
-        // Reseed if database is empty, contains outdated "Cauvery" records, or has fewer than 5 communities
-        if (communityRepository.count() == 0 || hasCauvery || communityRepository.count() < 5) {
-            System.out.println(">>> Initializing complete real-world demo dataset for OurThings (7 Communities, 79 Users, 50+ Items)...");
+        // Reseed if database is empty, contains outdated "Cauvery" records, or has fewer than 5 communities or fewer than 75 items
+        if (communityRepository.count() == 0 || hasCauvery || communityRepository.count() < 5 || itemListingRepository.count() < 75) {
+            System.out.println(">>> Initializing complete real-world demo dataset for OurThings (7 Communities, 79 Users, 85+ Items)...");
             reseedFullDemoData();
             System.out.println(">>> Real-world demo dataset seeded successfully!");
         } else {
@@ -316,6 +316,46 @@ public class DataInitializer implements CommandLineRunner {
                 "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itGuitar);
 
+        ItemListing itDrone = seedItem(cNhce.getId(), uTanvi.getId(),
+                "DJI Mini 3 Lightweight 4K HDR Camera Drone with Remote",
+                "Under 249g ultralight drone with 4K HDR video, True Vertical Shooting for social feeds, 38-minute flight time, and spare intelligent battery. For campus events and video projects.",
+                "Electronics", "Like New", "Room 220, Campus Girls Hostel", "Campus Girls Hostel", "Near Admission Office", "Marathahalli", "Bengaluru", "560103",
+                12.9332, 77.6926, "RENTAL", 450.0, 2000.0, 48000.0,
+                "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itDrone);
+
+        ItemListing itMonitor = seedItem(cNhce.getId(), uSneha.getId(),
+                "Dell 27-inch 4K UHD IPS Designer Monitor with USB-C Hub",
+                "Color-accurate IPS panel with 99% sRGB, 65W USB-C power delivery, HDMI and DisplayPort inputs, and height-adjustable stand. Great for code reviews, editing, and dual-display setups.",
+                "Electronics", "Like New", "Faculty Flat F-3", "Staff Quarters", "Outer Ring Road", "Marathahalli", "Bengaluru", "560103",
+                12.9344, 77.6916, "RENTAL", 250.0, 1000.0, 29990.0,
+                "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itMonitor);
+
+        ItemListing itSoldering = seedItem(cNhce.getId(), uArvind.getId(),
+                "60W Digital Soldering Station & SMD Hot Air Rework Kit",
+                "Precision temperature control (200°C-480°C) with hot air rework gun, ESD-safe tweezers, desoldering pump, lead-free solder wire, and 5 interchangeable iron tips.",
+                "Tools & Hardware", "Like New", "Staff Residence Q-12", "Campus Research Block", "Central Lab Wing", "Marathahalli", "Bengaluru", "560103",
+                12.9338, 77.6920, "FREE", 0.0, 300.0, 5600.0,
+                "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itSoldering);
+
+        ItemListing itScanner = seedItem(cNhce.getId(), uDeepa.getId(),
+                "BenQ Professional 16MP Book & Document Overhead Scanner",
+                "Fast overhead book scanner with flattening curve technology, auto-page turn detection, OCR text extraction, and foot pedal trigger. Scans bound textbooks in seconds.",
+                "Electronics", "Like New", "Room 310, Campus Girls Hostel", "Campus Girls Hostel", "Near Central Library", "Marathahalli", "Bengaluru", "560103",
+                12.9330, 77.6924, "RENTAL", 150.0, 600.0, 18500.0,
+                "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itScanner);
+
+        ItemListing itBicycle = seedItem(cNhce.getId(), uKarthik.getId(),
+                "Decathlon Riverside 21-Speed Hybrid Commuter Bicycle",
+                "Lightweight aluminum frame with Shimano 21-speed gears, front suspension fork, double-wall rims, LED safety lights, helmet, and heavy-duty U-lock.",
+                "Travel Gear", "Good", "Room 402, Campus Hostel A", "Campus Hostel A", "Near Parking Stand", "Marathahalli", "Bengaluru", "560103",
+                12.9342, 77.6911, "RENTAL", 100.0, 500.0, 14999.0,
+                "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBicycle);
+
         // === Community 2: Green Glen Layout & Heights Items (8 items) ===
         ItemListing itWheelchair = seedItem(cGreenGlen.getId(), uAnanyaRao.getId(),
                 "Foldable Adult Wheelchair with Removable Footrests",
@@ -381,6 +421,46 @@ public class DataInitializer implements CommandLineRunner {
                 "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itAirFryer);
 
+        ItemListing itStroller = seedItem(cGreenGlen.getId(), uPooja.getId(),
+                "Chicco Lightweight Foldable Baby Stroller & Buggy",
+                "One-hand umbrella fold stroller with multi-position reclining seat, 5-point safety harness, expandable sun canopy, and bottom shopping basket. For visiting families and toddlers.",
+                "Healthcare & Mobility", "Like New", "Flat 702, Block C", "Green Glen Heights (Block C)", "Clubhouse Wing", "Bellandur", "Bengaluru", "560103",
+                12.9272, 77.6772, "RENTAL", 120.0, 500.0, 6990.0,
+                "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itStroller);
+
+        ItemListing itPS5 = seedItem(cGreenGlen.getId(), uVivek.getId(),
+                "Sony PlayStation 5 Console with 2 DualSense Controllers & Games",
+                "PS5 Disc Edition console with 2 wireless haptic controllers, HDMI 2.1 cable, and 4 top multiplayer games (FIFA 24, Spider-Man 2, Gran Turismo 7, Overcooked).",
+                "Electronics", "Like New", "Flat 108, Block B", "Green Glen Heights (Block B)", "Near Green Glen Park", "Bellandur", "Bengaluru", "560103",
+                12.9261, 77.6763, "RENTAL", 450.0, 2000.0, 54990.0,
+                "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itPS5);
+
+        ItemListing itSewing = seedItem(cGreenGlen.getId(), uRitu.getId(),
+                "Usha Janome Wonder Stitch Automatic Zig-Zag Sewing Machine",
+                "Compact free-arm sewing machine with 13 built-in stitch patterns, automatic needle threader, triple strength stitch, and accessories kit. For altering dresses and home fabrics.",
+                "Tools & Hardware", "Good", "Flat 405, Block D", "Green Glen Heights (Block D)", "Near Swimming Pool", "Bellandur", "Bengaluru", "560103",
+                12.9274, 77.6774, "RENTAL", 120.0, 500.0, 11500.0,
+                "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itSewing);
+
+        ItemListing itDyson = seedItem(cGreenGlen.getId(), uDeepak.getId(),
+                "Dyson V12 Detect Slim Cordless Stick Vacuum Cleaner",
+                "Laser Slim Fluffy cleaner head reveals invisible dust. Hyperdymium motor, HEPA filtration, click-in battery, hair screw tool, and wall dock. Deep cleans floors and sofas.",
+                "Tools & Hardware", "Like New", "Flat 303, Block A", "Green Glen Heights (Block A)", "Near Main Security Gate", "Bellandur", "Bengaluru", "560103",
+                12.9264, 77.6765, "RENTAL", 280.0, 1200.0, 47900.0,
+                "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itDyson);
+
+        ItemListing itGuestBed = seedItem(cGreenGlen.getId(), uHarish.getId(),
+                "Foldable Steel Rollaway Guest Bed with 4-inch Mattress",
+                "Heavy-duty tubular steel frame with smooth caster wheels and high-resilience foam mattress. Easily unfolds for overnight guests and folds flat into wardrobes.",
+                "Event Equipment", "Good", "Flat 204, Block B", "Green Glen Heights (Block B)", "Near Green Glen Park", "Bellandur", "Bengaluru", "560103",
+                12.9262, 77.6761, "RENTAL", 150.0, 600.0, 6800.0,
+                "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itGuestBed);
+
         // === Community 3: Prestige Tech Enclave Items (7 items) ===
         ItemListing itDewaltDrill = seedItem(cPrestige.getId(), uNikhil.getId(),
                 "DeWalt 20V Max Cordless Hammer Drill & Driver Set",
@@ -437,6 +517,46 @@ public class DataInitializer implements CommandLineRunner {
                 12.9210, 77.6975, "RENTAL", 200.0, 800.0, 10500.0,
                 "https://images.unsplash.com/photo-1520523839898-507127054976?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itKeyboard);
+
+        ItemListing itNebulizer = seedItem(cPrestige.getId(), uPradeep.getId(),
+                "Philips Respironics Compressor Nebulizer with Dual Masks",
+                "Fast, efficient aerosol medication delivery with SideStream technology. Includes both child and adult soft silicone masks, tubing, and carry case. Sanitized medical grade.",
+                "Healthcare & Mobility", "Like New", "Tower 2, Flat 204", "Prestige Tech Enclave (Tower 2)", "Near Central Park", "Doddakannelli", "Bengaluru", "560035",
+                12.9207, 77.6981, "FREE", 0.0, 0.0, 2400.0,
+                "https://images.unsplash.com/photo-1628771065518-0d82f1938462?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itNebulizer);
+
+        ItemListing itGoPro = seedItem(cPrestige.getId(), uArchana.getId(),
+                "GoPro HERO12 Black Action Camera with Chest Strap & Mounts",
+                "5.3K60 Ultra HD video, HyperSmooth 6.0 stabilization, HDR photo/video, 10m waterproof without housing, dual LCD screens, and Enduro battery with 128GB extreme SD card.",
+                "Electronics", "Like New", "Tower 4, Flat 602", "Prestige Tech Enclave (Tower 4)", "Clubhouse Gate", "Doddakannelli", "Bengaluru", "560035",
+                12.9203, 77.6984, "RENTAL", 320.0, 1500.0, 39990.0,
+                "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itGoPro);
+
+        ItemListing itGimbal = seedItem(cPrestige.getId(), uNeha.getId(),
+                "DJI Ronin-SC 3-Axis Camera Gimbal Stabilizer",
+                "Lightweight stabilizer designed for mirrorless cameras. ActiveTrack 3.0, 360-degree roll, automated panorama/timelapse, and quick-release plate. Perfect for smooth event video.",
+                "Electronics", "Like New", "Tower 3, Flat 703", "Prestige Tech Enclave (Tower 3)", "Near Badminton Courts", "Doddakannelli", "Bengaluru", "560035",
+                12.9206, 77.6979, "RENTAL", 300.0, 1200.0, 26900.0,
+                "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itGimbal);
+
+        ItemListing itLevels = seedItem(cPrestige.getId(), uTarun.getId(),
+                "Stanley FatMax 3-Piece Magnetic Spirit Level & Stud Finder Set",
+                "Includes 24-inch and 48-inch heavy-duty box beam levels with amplified rare earth magnets, 9-inch torpedo level, and digital multi-surface stud finder for drywall.",
+                "Tools & Hardware", "Good", "Tower 2, Flat 401", "Prestige Tech Enclave (Tower 2)", "Near Central Park", "Doddakannelli", "Bengaluru", "560035",
+                12.9209, 77.6983, "FREE", 0.0, 200.0, 4200.0,
+                "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itLevels);
+
+        ItemListing itIceCooler = seedItem(cPrestige.getId(), uSandeep.getId(),
+                "Coleman 50L Heavy-Duty Wheeled Camping Ice Cooler Box",
+                "Keeps ice frozen up to 5 days at 32°C. Heavy-duty all-terrain wheels, telescoping locking handle, leak-resistant drain channel, and molded cup holders on lid.",
+                "Travel Gear", "Like New", "Tower 2, Flat 1102", "Prestige Tech Enclave (Tower 2)", "Near Central Park", "Doddakannelli", "Bengaluru", "560035",
+                12.9208, 77.6982, "RENTAL", 120.0, 600.0, 6500.0,
+                "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itIceCooler);
 
         // === Community 4: Adarsh Palm Retreat Items (7 items) ===
         ItemListing itProjectorScreen = seedItem(cAdarsh.getId(), uSiddharth.getId(),
@@ -495,6 +615,46 @@ public class DataInitializer implements CommandLineRunner {
                 "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itYogaKit);
 
+        ItemListing itPowerStation = seedItem(cAdarsh.getId(), uJayant.getId(),
+                "EcoFlow River 2 Pro 768Wh Portable Power Station (800W AC)",
+                "Fast 70-minute AC recharge, long-lasting LiFePO4 battery, 3x pure sine wave AC outlets, 100W USB-C, and solar charging input. Powers laptops, mini fridges, and CPAP machines.",
+                "Electronics", "Like New", "Tower Orchid, Flat 502", "Adarsh Palm Retreat (Tower Orchid)", "Central Boulevard", "Devarabisanahalli", "Bengaluru", "560103",
+                12.9247, 77.6894, "RENTAL", 500.0, 2500.0, 59999.0,
+                "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itPowerStation);
+
+        ItemListing itBoat = seedItem(cAdarsh.getId(), uKunal.getId(),
+                "Intex Excursion 4-Person Heavy-Duty Inflatable Raft Boat",
+                "Rugged vinyl construction with 3 air chambers, inflatable I-beam floor, 2 deluxe inflatable seats with backrests, 54-inch aluminum oars, and high-output manual pump.",
+                "Travel Gear", "Good", "Tower Lotus, Flat 804", "Adarsh Palm Retreat (Tower Lotus)", "Near Tennis Courts", "Devarabisanahalli", "Bengaluru", "560103",
+                12.9243, 77.6891, "RENTAL", 250.0, 1000.0, 12500.0,
+                "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBoat);
+
+        ItemListing itPartyLights = seedItem(cAdarsh.getId(), uGayatri.getId(),
+                "Chauvet DJ GigBAR Party Stage Lighting System with Tripod",
+                "4-in-1 portable lighting bar with 2 LED RGB derbies, 2 RGB PAR cans, 4 strobe lights, and laser. Includes wireless wireless foot switch, tripod stand, and carry bags.",
+                "Event Equipment", "Like New", "Villa 63, Palm Grove", "Adarsh Palm Retreat (Villa 63)", "Palm Grove Lane", "Devarabisanahalli", "Bengaluru", "560103",
+                12.9244, 77.6893, "RENTAL", 400.0, 1500.0, 34000.0,
+                "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itPartyLights);
+
+        ItemListing itCpap = seedItem(cAdarsh.getId(), uSameer.getId(),
+                "ResMed AirSense 10 AutoSet CPAP Machine with Humidifier",
+                "Whisper-quiet motor with integrated HumidAir heated humidifier, ClimateLineAir heated tube, and sanitized medium mask. Medical-grade sanitized after every borrow.",
+                "Healthcare & Mobility", "Like New", "Tower Jasmine, Flat 303", "Adarsh Palm Retreat (Tower Jasmine)", "High Rise Cluster", "Devarabisanahalli", "Bengaluru", "560103",
+                12.9246, 77.6897, "FREE", 0.0, 0.0, 48000.0,
+                "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itCpap);
+
+        ItemListing itHedgeTrimmer = seedItem(cAdarsh.getId(), uRashmi.getId(),
+                "Black+Decker 20V Cordless Dual-Action Electric Hedge Trimmer",
+                "22-inch laser cut dual-action steel blades cut branches with 40% less vibration. Wrap-around front handle with battery and fast charger included.",
+                "Tools & Hardware", "Good", "Tower Orchid, Flat 901", "Adarsh Palm Retreat (Tower Orchid)", "Central Boulevard", "Devarabisanahalli", "Bengaluru", "560103",
+                12.9248, 77.6896, "RENTAL", 140.0, 600.0, 6200.0,
+                "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itHedgeTrimmer);
+
         // === Community 5: Marathahalli Silver Springs Items (7 items) ===
         ItemListing itRingLight = seedItem(cMarathahalli.getId(), uNidhi.getId(),
                 "Neewer 18-inch Bi-Color LED Ring Light Kit with 2m Stand",
@@ -552,6 +712,46 @@ public class DataInitializer implements CommandLineRunner {
                 "https://images.unsplash.com/photo-1534158914592-062992fbe900?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itTableTennis);
 
+        ItemListing itCommode = seedItem(cMarathahalli.getId(), uPallavi.getId(),
+                "Foldable Commode Toilet Chair with Padded Cushion & Bucket",
+                "Corrosion-resistant steel frame with removable bucket, splash shield, and padded comfort seat. Folds completely flat for storage or travel. Sanitized medical aid.",
+                "Healthcare & Mobility", "Like New", "Flat 101, Raghavendra Nilaya", "Raghavendra Nilaya", "Spice Garden", "Marathahalli", "Bengaluru", "560037",
+                12.9521, 77.7014, "FREE", 0.0, 0.0, 2800.0,
+                "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itCommode);
+
+        ItemListing itMarshall = seedItem(cMarathahalli.getId(), uVignesh.getId(),
+                "Marshall Kilburn II Portable Bluetooth Speaker with Strap",
+                "Multi-directional 36W stereo sound with 20+ hours portable playtime. IPX2 water-resistant design, custom bass and treble analog knobs, and guitar-inspired carry strap.",
+                "Event Equipment", "Like New", "#19, Anand Nagar", "Anand Nagar Main Road", "Near Marathahalli Market", "Marathahalli", "Bengaluru", "560037",
+                12.9518, 77.7022, "RENTAL", 220.0, 800.0, 19999.0,
+                "https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itMarshall);
+
+        ItemListing itTileCutter = seedItem(cMarathahalli.getId(), uHemanth.getId(),
+                "Bosch GDC 120 Professional Marble, Tile & Granite Cutter",
+                "Powerful 1200W motor with 110mm diamond blade, ergonomic grip, and adjustable base plate for angle cuts. For bathroom tiling and balcony renovations.",
+                "Tools & Hardware", "Good", "#56, 4th Cross", "Spice Garden Layout", "Near Spice Garden Bus Stop", "Marathahalli", "Bengaluru", "560037",
+                12.9523, 77.7016, "RENTAL", 160.0, 600.0, 4800.0,
+                "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itTileCutter);
+
+        ItemListing itGazebo = seedItem(cMarathahalli.getId(), uRakesh.getId(),
+                "Cosco 10x10ft Waterproof Pop-Up Canopy Gazebo Tent",
+                "Heavy-duty rust resistant powder-coated steel frame with 100% waterproof UV50+ canopy top, 4 sand weight bags, guy ropes, and wheeled roller bag.",
+                "Event Equipment", "Like New", "#73, Ring Road Lane", "Spice Garden Layout", "Ring Road Lane", "Marathahalli", "Bengaluru", "560037",
+                12.9512, 77.7028, "RENTAL", 300.0, 1200.0, 11800.0,
+                "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itGazebo);
+
+        ItemListing itOsprey = seedItem(cMarathahalli.getId(), uChetan.getId(),
+                "Osprey Farpoint 40 Travel Backpack (Cabin Luggage Approved)",
+                "LightWire frame suspension with breathable mesh backpanel, stowable harness, lockable main compartment, padded laptop/tablet sleeve, and external compression straps.",
+                "Travel Gear", "Like New", "#88, Near Multiplex", "Marathahalli Ring Road", "Near Marathahalli Bridge", "Marathahalli", "Bengaluru", "560037",
+                12.9510, 77.7030, "RENTAL", 120.0, 500.0, 11500.0,
+                "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itOsprey);
+
         // === Community 6: Kaikondrahalli Lake View Items (6 items) ===
         ItemListing itLawnMower = seedItem(cKaikondrahalli.getId(), uSuresh.getId(),
                 "Bosch ARM 32 Electric Lawn Mower & Grass Trimmer",
@@ -601,6 +801,46 @@ public class DataInitializer implements CommandLineRunner {
                 "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itGardeningSet);
 
+        ItemListing itWalker = seedItem(cKaikondrahalli.getId(), uAnupama.getId(),
+                "Senior Folding Mobility Rollator Walker with Seat & Hand Brakes",
+                "Lightweight aluminum walker with 8-inch smooth wheels, ergonomic hand loop-lock brakes, padded seat and backrest, and under-seat storage basket. Folds with one hand.",
+                "Healthcare & Mobility", "Like New", "#18, 1st Cross", "Lake Road Residential Sector", "Near Kaikondrahalli Lake", "Kaikondrahalli", "Bengaluru", "560035",
+                12.9141, 77.6784, "FREE", 0.0, 0.0, 5800.0,
+                "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itWalker);
+
+        ItemListing itBinoculars = seedItem(cKaikondrahalli.getId(), uUsha.getId(),
+                "Nikon Monarch M5 8x42 Waterproof Bird Watching Binoculars",
+                "Extra-low dispersion (ED) glass corrects chromatic aberrations, multilayer dielectric prism coatings, waterproof and fogproof O-ring sealed with turn-and-slide eyecups.",
+                "Travel Gear", "Like New", "#41, Lake Mist Lane", "Lake Mist Lane", "Near Lake Promenade", "Kaikondrahalli", "Bengaluru", "560035",
+                12.9139, 77.6781, "RENTAL", 180.0, 800.0, 24500.0,
+                "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBinoculars);
+
+        ItemListing itBBQ = seedItem(cKaikondrahalli.getId(), uBalaji.getId(),
+                "Weber Go-Anywhere Portable Charcoal Barbecue Grill",
+                "Porcelain-enameled bowl and lid retain heat, plated steel cooking grate, rust-resistant aluminum dampers, and pivoting plated steel legs that lock the lid for carrying.",
+                "Event Equipment", "Good", "#67, Green Field Cross", "Green Field Cross", "Sarjapur Road Junction", "Kaikondrahalli", "Bengaluru", "560035",
+                12.9146, 77.6789, "RENTAL", 180.0, 600.0, 8990.0,
+                "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBBQ);
+
+        ItemListing itFloodlights = seedItem(cKaikondrahalli.getId(), uNalini.getId(),
+                "Havells 200W High-Lumen Outdoor Floodlight Twin Kit with Stands",
+                "Two 100W waterproof IP65 LED floodlights mounted on heavy-duty telescoping steel tripod with 10m heavy gauge power cable. Bright illumination for night events.",
+                "Event Equipment", "Like New", "#11, 3rd Main", "Kaikondrahalli 3rd Main", "Near Kaikondrahalli Lake", "Kaikondrahalli", "Bengaluru", "560035",
+                12.9144, 77.6786, "RENTAL", 150.0, 600.0, 6800.0,
+                "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itFloodlights);
+
+        ItemListing itBrushcutter = seedItem(cKaikondrahalli.getId(), uArvindKR.getId(),
+                "Stihl 2-Stroke Gas-Powered Garden Grass Trimmer & Brushcutter",
+                "Lightweight grass trimmer with Easy2Start technology, TapAction bump feed dual line head, steel brushcutter blade, and padded shoulder harness. Cleans overgrown yards.",
+                "Tools & Hardware", "Good", "#22, Lakeview Crescent", "Lakeview Crescent", "Near Lake Road", "Kaikondrahalli", "Bengaluru", "560035",
+                12.9137, 77.6779, "RENTAL", 200.0, 1000.0, 16900.0,
+                "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBrushcutter);
+
         // === Community 7: Panathur Balagere Green Meadows Items (6 items) ===
         ItemListing itGarmin = seedItem(cPanathur.getId(), uManoj.getId(),
                 "Garmin Forerunner 55 GPS Sports & Running Smartwatch",
@@ -649,6 +889,46 @@ public class DataInitializer implements CommandLineRunner {
                 12.9414, 77.7122, "FREE", 0.0, 0.0, 1800.0,
                 "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
         items.add(itFoamRoller);
+
+        ItemListing itBabyScale = seedItem(cPanathur.getId(), uMeenakshi.getId(),
+                "Equinox Digital Weighing Scale with Infant Baby Curved Tray",
+                "High precision load sensors with tare function, hold function, and detachable ergonomic curved infant tray. Measures infants up to 20kg and adults up to 150kg.",
+                "Healthcare & Mobility", "Like New", "Flat B-505, Green Meadows", "Green Meadows (Tower B)", "Near Gym Complex", "Panathur", "Bengaluru", "560087",
+                12.9413, 77.7124, "FREE", 0.0, 0.0, 2600.0,
+                "https://images.unsplash.com/photo-1628771065518-0d82f1938462?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBabyScale);
+
+        ItemListing itCompressor = seedItem(cPanathur.getId(), uSanjay.getId(),
+                "Xiaomi Mi Portable Electric Air Compressor 2 (150 PSI)",
+                "Digital tire pressure detection with auto shut-off, high-precision cylinder block inflates car and bicycle tires in minutes. Built-in LED light and 6 preset inflation modes.",
+                "Tools & Hardware", "Like New", "Flat C-802, Green Meadows", "Green Meadows (Tower C)", "Near Balagere Circle", "Panathur", "Bengaluru", "560087",
+                12.9416, 77.7129, "RENTAL", 90.0, 400.0, 3999.0,
+                "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itCompressor);
+
+        ItemListing itPackingCubes = seedItem(cPanathur.getId(), uNandini.getId(),
+                "Samsonite 4-Piece Compression Packing Cubes & Luggage Scale",
+                "Ultralight water-resistant ripstop nylon with dual zipper compression system and backlit digital electronic luggage hanging scale (up to 50kg) to avoid airport excess baggage fees.",
+                "Travel Gear", "Like New", "Flat A-303, Green Meadows", "Green Meadows (Tower A)", "Near Embassy TechVillage", "Panathur", "Bengaluru", "560087",
+                12.9411, 77.7123, "FREE", 0.0, 100.0, 3200.0,
+                "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itPackingCubes);
+
+        ItemListing itStudioLight = seedItem(cPanathur.getId(), uMadhavi.getId(),
+                "Godox SL60W 5600K Continuous Studio LED Light with Softbox",
+                "High CRI 95+ 60W LED video light with Bowens mount, 60cm octabox softbox with diffuser, 2m light stand, and wireless remote control. For crisp product video and live streaming.",
+                "Electronics", "Like New", "Flat B-1101, Green Meadows", "Green Meadows (Tower B)", "Near Gym Complex", "Panathur", "Bengaluru", "560087",
+                12.9415, 77.7126, "RENTAL", 250.0, 1000.0, 13900.0,
+                "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itStudioLight);
+
+        ItemListing itBench = seedItem(cPanathur.getId(), uSriram.getId(),
+                "Domyos Foldable Multi-Position Incline / Decline Weight Bench",
+                "Supports up to 220kg with 4 backrest incline angles and 2 seat positions. High density foam padding with sweat-resistant vinyl upholstery. Folds compact in 30 seconds.",
+                "Event Equipment", "Good", "Flat C-404, Green Meadows", "Green Meadows (Tower C)", "Near Balagere Circle", "Panathur", "Bengaluru", "560087",
+                12.9413, 77.7121, "RENTAL", 120.0, 500.0, 6999.0,
+                "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80", "AVAILABLE");
+        items.add(itBench);
 
         // 5. Seed Realistic Borrow Requests, Handover Records, and Verified Reviews
         // Scenario A: Active Loan in NHCE Campus (Projector lent from Kasim to Prajwal)

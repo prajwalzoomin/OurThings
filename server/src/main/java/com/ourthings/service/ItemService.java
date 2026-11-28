@@ -107,8 +107,21 @@ public class ItemService {
     public ItemResponseDto createItem(Long communityId, Long ownerId, CreateUpdateItemRequest req) {
         validateItemDates(req.getAvailableFrom(), req.getAvailableTo());
 
+        Long targetCommunityId = communityId;
+        if (targetCommunityId == null && req.getCommunityId() != null) {
+            targetCommunityId = req.getCommunityId();
+        }
+        if (targetCommunityId == null) {
+            targetCommunityId = userRepository.findById(ownerId)
+                    .map(User::getActiveCommunityId)
+                    .orElse(null);
+        }
+        if (targetCommunityId == null) {
+            targetCommunityId = communityRepository.findAll().stream().findFirst().map(com.ourthings.model.Community::getId).orElse(1L);
+        }
+
         ItemListing item = new ItemListing(
-                communityId,
+                targetCommunityId,
                 ownerId,
                 req.getTitle().trim(),
                 req.getDescription() != null ? req.getDescription().trim() : "",
@@ -142,7 +155,7 @@ public class ItemService {
         item = itemListingRepository.save(item);
 
         activityLogRepository.save(new ActivityLog(
-                communityId,
+                targetCommunityId,
                 ownerId,
                 "ITEM_LISTED",
                 "Listed new item: " + item.getTitle() + " (" + item.getCategory() + ")"
@@ -159,7 +172,7 @@ public class ItemService {
         if (!item.getOwnerId().equals(ownerId)) {
             throw new SecurityException("Only the owner can edit this listing.");
         }
-        if (!item.getCommunityId().equals(communityId)) {
+        if (communityId != null && !item.getCommunityId().equals(communityId)) {
             throw new SecurityException("Item does not belong to active community.");
         }
 
@@ -231,7 +244,7 @@ public class ItemService {
         item = itemListingRepository.save(item);
 
         activityLogRepository.save(new ActivityLog(
-                communityId,
+                communityId != null ? communityId : item.getCommunityId(),
                 ownerId,
                 "ITEM_STATUS_CHANGED",
                 "Listing '" + item.getTitle() + "' status changed to " + item.getStatus()
@@ -260,7 +273,7 @@ public class ItemService {
         itemListingRepository.save(item);
 
         activityLogRepository.save(new ActivityLog(
-                communityId,
+                communityId != null ? communityId : item.getCommunityId(),
                 ownerId,
                 "ITEM_REMOVED",
                 "Listing removed: " + item.getTitle()

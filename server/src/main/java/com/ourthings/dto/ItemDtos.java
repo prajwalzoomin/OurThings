@@ -30,6 +30,7 @@ public class ItemDtos {
         private String city;
         private String pincode;
         private String state;
+        private Long communityId;
 
         public String getTitle() { return title; }
         public void setTitle(String title) { this.title = title; }
@@ -96,6 +97,9 @@ public class ItemDtos {
 
         public String getState() { return state; }
         public void setState(String state) { this.state = state; }
+
+        public Long getCommunityId() { return communityId; }
+        public void setCommunityId(Long communityId) { this.communityId = communityId; }
     }
 
     public static class ReservedPeriodDto {

@@ -68,6 +68,9 @@ export default function BrowseItems() {
       setLoading(true);
       setError(null);
       const params = {};
+      if (communityOnly && currentCommunity) {
+        params.communityId = currentCommunity.id;
+      }
       if (category && category !== 'All Categories') params.category = category;
       if (keyword.trim()) params.keyword = keyword.trim();
       if (condition && condition !== 'All Conditions') params.condition = condition;
@@ -533,11 +536,21 @@ export default function BrowseItems() {
 
           {/* Result Count and Active Filters Bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)' }}>
-              Showing <strong>{items.length}</strong> resources in Bengaluru
-              {keyword ? ` for "${keyword}"` : ''}
-              {category !== 'All Categories' ? ` in ${category}` : ''}
-              {priceFilter !== 'ALL' ? ` (${PRICE_FILTERS.find((p) => p.value === priceFilter)?.label})` : ''}
+            <div style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <span>
+                Showing <strong>{items.length}</strong> resources {communityOnly ? <span>strictly in <strong>{currentCommunity?.name?.split('(')[0].trim() || 'My Community'}</strong></span> : <span>across <strong>Bengaluru</strong></span>}
+                {keyword ? ` for "${keyword}"` : ''}
+                {category !== 'All Categories' ? ` in ${category}` : ''}
+                {priceFilter !== 'ALL' ? ` (${PRICE_FILTERS.find((p) => p.value === priceFilter)?.label})` : ''}
+              </span>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                style={{ padding: '0.15rem 0.5rem', fontSize: '0.72rem', height: 'auto', lineHeight: 1.2 }}
+                onClick={toggleCommunityOnly}
+              >
+                {communityOnly ? '🌐 View Whole City (85+ Items)' : `🟢 Filter to ${currentCommunity?.name?.split('(')[0].trim() || 'My Community'}`}
+              </button>
             </div>
 
             {/* Active Pill Tags */}

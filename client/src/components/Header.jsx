@@ -8,6 +8,8 @@ export default function Header() {
   const {
     currentUser,
     currentCommunity,
+    communities,
+    switchCommunity,
     currentTab,
     theme,
     toggleTheme,
@@ -133,6 +135,43 @@ export default function Header() {
                 )}
               </span>
             </button>
+
+            {/* Community Switcher Dropdown */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+                🏢 Circle:
+              </span>
+              <select
+                className="form-select"
+                style={{
+                  fontSize: '0.74rem',
+                  padding: '0.15rem 0.5rem',
+                  height: 'auto',
+                  lineHeight: 1.3,
+                  width: 'auto',
+                  maxWidth: '210px',
+                  backgroundColor: 'var(--color-surface)',
+                  borderColor: communityOnly ? 'var(--color-brand)' : 'var(--color-border)',
+                  color: 'var(--color-text-primary)',
+                  fontWeight: communityOnly ? 700 : 500,
+                  cursor: 'pointer',
+                  borderRadius: 'var(--radius-sm)',
+                }}
+                value={currentCommunity?.id || ''}
+                onChange={(e) => {
+                  const id = Number(e.target.value);
+                  switchCommunity(id);
+                }}
+                title="Select active community circle to view or list items"
+                aria-label="Active Community Circle"
+              >
+                {(communities || []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name.split('(')[0].trim()}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Right Status Note */}
@@ -167,8 +206,8 @@ export default function Header() {
 
           {/* Flipkart / Zepto Style Global Omnibar Search */}
           <form className="header-search-form" onSubmit={handleSearchSubmit}>
-            <div className="header-search-input-wrap">
-              <svg className="header-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <div className="header-search-wrapper">
+              <svg className="header-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
@@ -192,10 +231,10 @@ export default function Header() {
                   &times;
                 </button>
               )}
+              <button type="submit" className="header-search-btn">
+                Search
+              </button>
             </div>
-            <button type="submit" className="header-search-btn">
-              Search
-            </button>
           </form>
 
           {/* Navigation Items */}
