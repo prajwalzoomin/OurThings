@@ -68,8 +68,8 @@ function AppContent() {
         {currentTab === 'browse' && <BrowseItems />}
         {currentTab === 'detail' && <ItemDetail />}
         {currentTab === 'create' && <CreateEditItem />}
-        {currentTab === 'requests' && <RequestsManagement />}
-        {currentTab === 'demands' && <UnmetDemandPage />}
+        {(currentTab === 'requests' || currentTab === 'loans') && <RequestsManagement />}
+        {(currentTab === 'demands' || currentTab === 'unmet') && <UnmetDemandPage />}
         {currentTab === 'history' && <BorrowingHistory />}
         {currentTab === 'dashboard' && <DashboardPage />}
         {currentTab === 'terms' && <TermsPage />}

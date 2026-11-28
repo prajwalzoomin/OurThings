@@ -255,15 +255,15 @@ export default function Header() {
             </button>
             <button
               type="button"
-              className={`nav-pill ${currentTab === 'loans' ? 'active' : ''}`}
-              onClick={() => navigateTo('loans')}
+              className={`nav-pill ${currentTab === 'requests' || currentTab === 'loans' ? 'active' : ''}`}
+              onClick={() => navigateTo('requests')}
             >
               Requests & Loans
             </button>
             <button
               type="button"
-              className={`nav-pill ${currentTab === 'unmet' ? 'active' : ''}`}
-              onClick={() => navigateTo('unmet')}
+              className={`nav-pill ${currentTab === 'demands' || currentTab === 'unmet' ? 'active' : ''}`}
+              onClick={() => navigateTo('demands')}
             >
               Unmet Needs
             </button>

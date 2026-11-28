@@ -56,8 +56,8 @@ public class DataInitializer implements CommandLineRunner {
         boolean hasCauvery = communityRepository.findAll().stream()
                 .anyMatch(c -> c.getName() != null && c.getName().toLowerCase().contains("cauvery"));
 
-        // Reseed if database is empty, contains outdated "Cauvery" records, or has fewer than 5 communities or fewer than 75 items
-        if (communityRepository.count() == 0 || hasCauvery || communityRepository.count() < 5 || itemListingRepository.count() < 75) {
+        // Reseed if database is empty, contains outdated "Cauvery" records, or has fewer than 10 unmet demands
+        if (communityRepository.count() == 0 || hasCauvery || communityRepository.count() < 5 || itemListingRepository.count() < 75 || unmetDemandRepository.count() < 10) {
             System.out.println(">>> Initializing complete real-world demo dataset for OurThings (7 Communities, 79 Users, 85+ Items)...");
             reseedFullDemoData();
             System.out.println(">>> Real-world demo dataset seeded successfully!");
@@ -1023,7 +1023,8 @@ public class DataInitializer implements CommandLineRunner {
                 "BORROWER_TO_OWNER"
         ));
 
-        // 6. Seed Realistic Unmet Demand Requests (Neighbour requests waiting to be fulfilled)
+        // 6. Seed Realistic Unmet Demand Requests across demo communities and accounts
+        // Community 1: NHCE Campus
         seedDemand(cNhce.getId(), uSneha.getId(), "Healthcare & Mobility",
                 "Foldable Lightweight Wheelchair", "Foldable Wheelchair",
                 today.plusDays(2), today.plusDays(10), "Needed for visiting grandparents during engineering convocation ceremony.");
@@ -1032,17 +1033,63 @@ public class DataInitializer implements CommandLineRunner {
                 "Soldering Iron Station with Desoldering Pump", "Soldering Iron Kit",
                 today.plusDays(1), today.plusDays(4), "Urgent for mini-project hardware circuit prototyping.");
 
+        seedDemand(cNhce.getId(), uPrajwal.getId(), "Electronics",
+                "High-Speed USB-C Gigabit Ethernet Hub & Multiport Adapter", "USB-C Multiport Hub",
+                today.plusDays(1), today.plusDays(5), "Needed for lab evaluation and local network debugging.");
+
+        seedDemand(cNhce.getId(), uKasim.getId(), "Event Equipment",
+                "Wireless Dual Handheld Microphone Set with Receiver", "Wireless Microphones",
+                today.plusDays(3), today.plusDays(5), "Needed for department student club orientation ceremony.");
+
+        seedDemand(cNhce.getId(), uPriya.getId(), "Travel Gear",
+                "Waterproof 2-Person Trekking Tent & Sleeping Bag", "Camping Tent",
+                today.plusDays(6), today.plusDays(8), "Weekend hiking trip to Savandurga.");
+
+        // Community 2: Green Glen Layout & Heights
         seedDemand(cGreenGlen.getId(), uRajesh.getId(), "Tools & Hardware",
                 "High-Pressure Drain Snake / Pipe Unblocker", "Drain Pipe Cleaner",
                 today.plusDays(1), today.plusDays(3), "For balcony rainwater drain clearing before heavy rains.");
 
+        seedDemand(cGreenGlen.getId(), uAnanyaRao.getId(), "Healthcare & Mobility",
+                "Blood Glucose Monitor Kit with Fresh Lancets", "Glucometer",
+                today.plusDays(1), today.plusDays(7), "Temporary health check for elderly parents visiting for 1 week.");
+
+        seedDemand(cGreenGlen.getId(), uRamesh.getId(), "Tools & Hardware",
+                "Heavy-Duty Cordless Rotary Hammer Drill (SDS Plus)", "Hammer Drill",
+                today.plusDays(2), today.plusDays(4), "Installing heavy balcony safety mesh and planter wall brackets.");
+
+        // Community 3: Prestige Tech Enclave
         seedDemand(cPrestige.getId(), uKavita.getId(), "Travel Gear",
                 "Dual-Suspension 26-inch Mountain Bike for Weekend Trail", "Mountain Bicycle",
                 today.plusDays(4), today.plusDays(6), "For Saturday Sarjapur cycle track ride.");
 
+        seedDemand(cPrestige.getId(), uNikhil.getId(), "Electronics",
+                "4K HDMI Capture Card for Live Streaming", "HDMI Video Capture Card",
+                today.plusDays(1), today.plusDays(3), "Community tech talk presentation recording.");
+
+        // Community 4: Adarsh Palm Retreat
         seedDemand(cAdarsh.getId(), uMalini.getId(), "Event Equipment",
                 "Outdoor Lawn Gazebo / Canopy Tent (10x10ft)", "Pop-up Canopy Tent",
                 today.plusDays(5), today.plusDays(7), "Children's birthday garden tea party.");
+
+        seedDemand(cAdarsh.getId(), uSiddharth.getId(), "Tools & Hardware",
+                "Electric Lawn Grass Trimmer & Edge Cutter", "Lawn Trimmer",
+                today.plusDays(1), today.plusDays(2), "Weekend garden trimming and maintenance.");
+
+        // Community 5: Marathahalli Silver Springs
+        seedDemand(cMarathahalli.getId(), uAbhinav.getId(), "Electronics",
+                "Portable Document & Book Scanner (A4 Overhead)", "Document Scanner",
+                today.plusDays(2), today.plusDays(5), "Digitizing college lecture notes and semester reference books.");
+
+        // Community 6: Kaikondrahalli Lake View
+        seedDemand(cKaikondrahalli.getId(), uSuresh.getId(), "Healthcare & Mobility",
+                "Lightweight Aluminum Rollator Walker with Seat and Hand Brakes", "Rollator Walker",
+                today.plusDays(2), today.plusDays(14), "Post-knee surgery rehab walking assistance.");
+
+        // Community 7: Panathur Balagere Green Meadows
+        seedDemand(cPanathur.getId(), uManoj.getId(), "Tools & Hardware",
+                "Automotive 12V Digital Car Tyre Inflator & Jump Starter", "Car Tyre Inflator",
+                today.plusDays(1), today.plusDays(3), "Preparing for family long-distance road trip.");
     }
 
     private User seedUser(String name, String email, String phone, String roomOrFlat, Long communityId, String fullAddress, String passwordHash, int trustScore) {

@@ -54,8 +54,15 @@ export default function RequestsManagement() {
         api.getOwnerRequests(),
         api.getMyRequests(),
       ]);
-      setIncomingRequests(inData || []);
-      setOutgoingRequests(outData || []);
+      const incoming = inData || [];
+      const outgoing = outData || [];
+      setIncomingRequests(incoming);
+      setOutgoingRequests(outgoing);
+
+      // Auto-switch to outgoing if user has no incoming requests but has outgoing requests
+      if (incoming.length === 0 && outgoing.length > 0) {
+        setActiveSubTab('outgoing');
+      }
     } catch (err) {
       setError(err.message || 'Unable to load borrowing requests.');
     } finally {
