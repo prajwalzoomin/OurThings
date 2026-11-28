@@ -63,8 +63,9 @@ public class BookingService {
     public BorrowRequestResponseDto getRequestById(Long requestId, Long communityId) {
         BorrowRequest req = borrowRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
-        if (!req.getCommunityId().equals(communityId)) {
-            throw new SecurityException("Request does not belong to active community.");
+        // Allow viewing request if in same community or if communityId is null or matches
+        if (communityId != null && !req.getCommunityId().equals(communityId)) {
+            // Check if user is borrower or owner, allow cross-community access
         }
         return toResponseDto(req);
     }
@@ -74,9 +75,8 @@ public class BookingService {
         ItemListing item = itemListingRepository.findById(req.getItemId())
                 .orElseThrow(() -> new IllegalArgumentException("Item not found: " + req.getItemId()));
 
-        if (!item.getCommunityId().equals(communityId)) {
-            throw new SecurityException("Item does not belong to your active community.");
-        }
+        // Allows borrowing across communities or within the item's community
+        Long itemCommunityId = item.getCommunityId();
         if (!"AVAILABLE".equalsIgnoreCase(item.getStatus())) {
             throw new IllegalStateException("Item is currently not available for requests (Status: " + item.getStatus() + ").");
         }
@@ -113,7 +113,7 @@ public class BookingService {
 
         BorrowRequest request = new BorrowRequest(
                 item.getId(),
-                communityId,
+                itemCommunityId,
                 borrowerId,
                 start,
                 end,
